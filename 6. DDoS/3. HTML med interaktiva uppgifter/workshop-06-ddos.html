@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:,">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lektion 6 · DDoS – individuellt, grupp och facit</title>
+<style>
+:root{--acc:#8a3b2e;--acc2:#f7e9e5;--ink:#241a17;--mut:#6d5a54;--line:#e6d6d1;--ok:#1f6b3a;--bad:#a3221a;--warn:#8a5a00;--bg:#faf5f3}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.55 system-ui,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:#fff;border-bottom:3px solid var(--acc);padding:14px 0}
+.wrap{max-width:1120px;margin:0 auto;padding:0 18px}
+h1{margin:0 0 4px;font-size:21px;color:var(--acc)}
+.sub{margin:0 0 10px;color:var(--mut);font-size:13.5px}
+nav button{border:1px solid var(--line);background:#fff;padding:7px 14px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer;margin-right:6px}
+nav button.on{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+main{padding:16px 0 70px}
+h2{font-size:17px;margin:14px 0 8px;color:var(--acc)}h3{font-size:14.5px;margin:0 0 6px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.step{background:#fff;border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.step h3{color:var(--acc)}.step p{margin:5px 0;font-size:13.8px}
+.expect{background:var(--acc2);border-radius:8px;padding:7px 10px}
+.grid2{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+label{display:block;font-size:13px;font-weight:600;margin:8px 0 2px}
+textarea,input,select{width:100%;font:13px/1.5 ui-monospace,Consolas,monospace;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:#fffdfc}
+button.p{background:var(--acc);color:#fff;border:0;padding:8px 15px;border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
+button.g{background:#fff;border:1px solid var(--line);padding:7px 12px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+pre{background:#f8f1ef;border:1px solid var(--line);border-radius:8px;padding:10px;font:12.5px/1.5 ui-monospace,Consolas,monospace;white-space:pre-wrap;margin:0}
+.res{display:flex;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.ok{color:var(--ok)}.bad{color:var(--bad)}
+.tag{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:700;background:var(--acc2);color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+th{background:var(--acc2);color:var(--acc)}
+tr.n504 td{background:#fdf0ee}
+.bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.bar button{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit;font-size:12.5px;cursor:pointer}
+.bar button.on{background:var(--acc2);border-color:var(--acc);font-weight:600}
+#clock{font:700 15px ui-monospace,Consolas,monospace;color:var(--acc)}
+.gt button{border:1px solid var(--line);background:#fff;padding:5px 12px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer;margin-right:6px}
+.gt button.on{background:var(--acc2);border-color:var(--acc);font-weight:700}
+.finding{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin:8px 0;background:#fffcfb;font-size:13px}
+.sev{font-weight:700;padding:1px 6px;border-radius:5px;font-size:11px}
+.s1{background:#e6f3ea;color:var(--ok)}.s2{background:#fdf2d8;color:var(--warn)}.s3{background:#fbe4e2;color:var(--bad)}
+.opts button{display:block;width:100%;text-align:left;border:1px solid var(--line);background:#fff;padding:7px 10px;border-radius:8px;margin:4px 0;font:inherit;font-size:13.5px;cursor:pointer}
+.opts button:hover{border-color:var(--acc)}
+.fb{font-size:13px;margin-top:5px}
+details.facit{border:1px solid var(--acc);border-radius:10px;padding:10px 12px;margin:10px 0;background:#fffcfb}
+details.facit summary{cursor:pointer;font-weight:700;color:var(--acc)}
+.muted{color:var(--mut);font-size:12.5px}
+.nums{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+.term{border-bottom:1px dotted #7c8b99;cursor:help;font-weight:600}
+.term:hover{color:var(--acc);border-bottom-color:var(--acc)}
+#pop{position:fixed;z-index:9999;max-width:330px;background:#fff;border:1px solid var(--acc);border-radius:10px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:13px;line-height:1.45;display:none}
+#pop b{color:var(--acc)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 12px}
+.chips .term{background:#fff;border:1px solid var(--line);border-radius:20px;padding:3px 10px;font-size:12px}
+.rl{border-top:1px dashed var(--line);padding:9px 0;font-size:13px}
+.rl:first-of-type{border-top:0}
+.lvl{font-size:11px;font-weight:700;background:var(--acc2);color:var(--acc);padding:1px 7px;border-radius:20px;margin-left:6px}
+.note{font-size:12px;color:var(--mut)}
+.resbox a{color:var(--acc);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--acc);padding:0}
+.simbar{height:10px;background:var(--acc2);border-radius:6px;overflow:hidden;margin:4px 0 10px}
+.simbar span{display:block;height:100%;background:var(--acc)}
+.simbar.bad span{background:var(--bad)}
+.simstat{font:700 15px ui-monospace,Consolas,monospace;color:var(--acc)}
+
+.tabhead{background:#fff;border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:10px;padding:8px 12px;margin:0 0 12px;font-size:13px;color:var(--mut)}
+.tabhead b{color:var(--acc)}
+.labblock{margin-top:16px;padding-top:6px;border-top:2px dashed var(--line)}
+
+/* interaktiv stegvisare */
+.stp{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 14px}
+.stp-dots{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.stp-dot{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--mut);font:700 13px system-ui;cursor:pointer;transition:.15s}
+.stp-dot:hover{border-color:var(--acc);color:var(--acc)}
+.stp-dot.on{background:var(--acc);border-color:var(--acc);color:#fff;transform:scale(1.08)}
+.stp-dot.done{border-color:var(--ok);color:var(--ok)}
+.stp-dot.done.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.stp-card h3{margin:0 0 6px;color:var(--acc)}
+.stp-card p{margin:5px 0;font-size:13.8px}
+.stp-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;border-top:1px dashed var(--line);padding-top:9px}
+.stp-chk{display:flex;gap:7px;align-items:center;font-size:13px;font-weight:600;color:var(--mut);cursor:pointer;margin:0}
+.stp-chk input{width:auto;margin:0}
+.stp-prog{font-size:12px;color:var(--mut);margin-left:auto}
+.stp-prog b{color:var(--acc)}
+/* dra och släpp */
+.ds{position:relative;background:linear-gradient(135deg,#ffffff 0%,#eef5fb 100%);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;margin:0 0 16px;overflow:hidden}
+.ds-head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:4px}
+.ds-head b{color:var(--acc);font-size:14.5px}
+.ds-status{font-size:12.5px;color:var(--mut)}
+.ds-status b{color:var(--ok)}
+.ds-pool{min-height:52px;padding:6px 0 2px;border-bottom:1px dashed var(--line);margin-bottom:10px}
+.ds-chip{display:inline-block;padding:8px 12px;margin:4px 6px 2px 0;border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 1px 2px rgba(16,32,48,.07);font-size:13px;line-height:1.3;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;transition:box-shadow .15s,border-color .15s,transform .15s}
+.ds-chip:hover{border-color:var(--acc);box-shadow:0 4px 12px rgba(27,79,122,.18);transform:translateY(-1px)}
+.ds-chip.ds-sel{border-color:var(--acc);background:var(--acc2);box-shadow:0 0 0 2px rgba(27,79,122,.25)}
+.ds-chip.ds-dragging{opacity:.35}
+.ds-chip.ok{background:#e8f7ef;border-color:var(--ok);color:#0d5734;cursor:default;box-shadow:none}
+.ds-chip.ok::after{content:" ✓";font-weight:700}
+.ds-chip.bad{border-color:var(--bad);animation:ds-shake .4s}
+@keyframes ds-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.ds-ghost{position:fixed;z-index:9999;pointer-events:none;border-color:var(--acc);box-shadow:0 12px 26px rgba(16,32,48,.3);transform:rotate(-2deg);opacity:.95}
+.ds-bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.ds-bin{border:2px dashed var(--line);border-radius:12px;padding:8px 10px;min-height:96px;transition:.15s;background:rgba(255,255,255,.55)}
+.ds-bin.hot{border-color:var(--acc);background:var(--acc2);transform:translateY(-2px)}
+.ds-bin>b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--mut);margin-bottom:4px}
+.ds-drop{min-height:56px}
+.ds-foot{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.ds-facit{border:1px solid var(--line);border-radius:5px;background:#fff;padding:4px 8px;font-size:12px;cursor:pointer;list-style:none}
+summary.ds-facit{list-style:none}
+.ds-facit summary{cursor:pointer;font-weight:600;color:var(--acc);font-size:12.5px}
+.ds-facit ul{margin:6px 0 2px;padding-left:16px;font-size:12.5px;color:var(--mut)}
+.ds.win{border-color:var(--ok);box-shadow:0 0 0 3px rgba(61,220,132,.22),0 14px 32px rgba(18,104,63,.18);animation:ds-pop .45s ease-out}
+@keyframes ds-pop{0%{transform:scale(1)}45%{transform:scale(1.012)}100%{transform:scale(1)}}
+.ds-badge{position:absolute;right:12px;top:10px;width:38px;height:38px;border-radius:50%;background:var(--ok);color:#fff;font:700 20px system-ui;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(18,104,63,.35);animation:ds-badge .5s ease-out}
+@keyframes ds-badge{0%{transform:scale(0) rotate(-40deg);opacity:0}70%{transform:scale(1.15) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Lektion 6 · DDoS – överbelastningsattacker</h1>
+  <p class="sub">Individuellt: diagnostisera en attack i en åtkomstlogg (8 min) · Grupparbete: mäta, attackera i labb, skydda, retesta (30 min) · Facit: rapport och facit</p>
+  <nav id="tabs"><button data-t="a" class="on">1 · Individuellt arbete</button><button data-t="b">2 · Grupparbete</button><button data-t="c">3 · Facit</button></nav>
+</div></header>
+<main class="wrap">
+<section id="a">
+<div class="tabhead"><b>Individuellt arbete</b> – gör uppgifterna själv. Allt du skriver sparas i webbläsaren och kan kopieras till rapporten i fliken Facit.</div>
+<div class="ds" id="ds6">
+  <div class="ds-head"><b>Dra och släpp · Attack eller skydd?</b><span class="ds-status">Dra varje kort till rätt låda.</span></div>
+  <div class="ds-pool"></div>
+  <div class="ds-bins"></div>
+  <div class="ds-foot"><button class="g ds-reset" type="button">Börja om</button>
+    <details class="ds-facit"><summary>Visa facit</summary><ul><li>Tusen botar skickar samtidigt → <b>Attack</b></li><li>SYN-flood mot servern → <b>Attack</b></li><li>HTTP-flood mot /search → <b>Attack</b></li><li>Rate limit per IP-adress → <b>Skydd</b></li><li>CDN som sprider ut trafiken → <b>Skydd</b></li><li>WAF som blockerar mönster → <b>Skydd</b></li></ul></details></div>
+</div>
+<script>
+(function(){
+  var root=document.getElementById('ds6'); if(!root) return;
+  var DATA={"bins": [{"k": "atk", "t": "Attack"}, {"k": "def", "t": "Skydd"}], "chips": [{"t": "Tusen botar skickar samtidigt", "b": "atk"}, {"t": "SYN-flood mot servern", "b": "atk"}, {"t": "HTTP-flood mot /search", "b": "atk"}, {"t": "Rate limit per IP-adress", "b": "def"}, {"t": "CDN som sprider ut trafiken", "b": "def"}, {"t": "WAF som blockerar mönster", "b": "def"}], "win": "Volym, protokoll och applikation – skyddet måste sitta på rätt lager."};
+  var pool=root.querySelector('.ds-pool'), binsBox=root.querySelector('.ds-bins'),
+      status=root.querySelector('.ds-status');
+  var placed=0, drag=null, ghost=null, sel=null, justDragged=0;
+
+  DATA.bins.forEach(function(b){
+    var d=document.createElement('div'); d.className='ds-bin'; d.setAttribute('data-k',b.k);
+    d.innerHTML='<b>'+b.t+'</b><div class="ds-drop"></div>';
+    d.addEventListener('click',function(){
+      if(!sel) return;
+      var s=sel; sel=null; s.classList.remove('ds-sel'); drop(s,d);
+    });
+    binsBox.appendChild(d);
+  });
+  DATA.chips.forEach(function(c){
+    var el=document.createElement('div');
+    el.className='ds-chip'; el.setAttribute('data-b',c.b); el.textContent=c.t; el.tabIndex=0;
+    el.addEventListener('pointerdown',down);
+    el.addEventListener('click',function(){ if(drag||Date.now()-justDragged<250) return; pick(el); });
+    el.addEventListener('keydown',function(e){
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); pick(el); }
+    });
+    pool.appendChild(el);
+  });
+
+  function pick(el){
+    if(el.classList.contains('ok')) return;
+    if(sel===el){ el.classList.remove('ds-sel'); sel=null; say('Klicka på ett kort och sedan på en låda.'); return; }
+    if(sel) sel.classList.remove('ds-sel');
+    sel=el; el.classList.add('ds-sel');
+    say('Välj rätt låda för "'+el.textContent+'".');
+  }
+  function down(e){
+    var el=e.currentTarget;
+    if(el.classList.contains('ok')) return;
+    e.preventDefault();
+    var r=el.getBoundingClientRect();
+    ghost=el.cloneNode(true);
+    ghost.className='ds-chip ds-ghost';
+    ghost.style.width=r.width+'px';
+    ghost.style.left=r.left+'px'; ghost.style.top=r.top+'px';
+    document.body.appendChild(ghost);
+    el.classList.add('ds-dragging');
+    drag={el:el,ox:e.clientX-r.left,oy:e.clientY-r.top};
+    document.addEventListener('pointermove',move);
+    document.addEventListener('pointerup',up);
+    document.addEventListener('pointercancel',up);
+  }
+  function move(e){
+    if(!drag) return;
+    ghost.style.left=(e.clientX-drag.ox)+'px';
+    ghost.style.top=(e.clientY-drag.oy)+'px';
+    var b=binAt(e.clientX,e.clientY);
+    [].slice.call(binsBox.children).forEach(function(x){ x.classList.toggle('hot',x===b); });
+  }
+  function up(e){
+    if(!drag) return;
+    var el=drag.el, b=binAt(e.clientX,e.clientY);
+    document.removeEventListener('pointermove',move);
+    document.removeEventListener('pointerup',up);
+    document.removeEventListener('pointercancel',up);
+    if(ghost){ ghost.parentNode.removeChild(ghost); ghost=null; }
+    el.classList.remove('ds-dragging');
+    [].slice.call(binsBox.children).forEach(function(x){ x.classList.remove('hot'); });
+    drag=null; justDragged=Date.now();
+    if(b) drop(el,b);
+  }
+  function binAt(x,y){
+    if(ghost) ghost.style.display='none';
+    var t=document.elementFromPoint(x,y);
+    if(ghost) ghost.style.display='';
+    while(t && t!==root && !t.classList.contains('ds-bin')) t=t.parentNode;
+    return (t&&t.classList&&t.classList.contains('ds-bin'))?t:null;
+  }
+  function drop(el,bin){
+    var k=bin.getAttribute('data-k');
+    if(el.getAttribute('data-b')===k){
+      el.classList.remove('ds-sel');
+      if(sel===el) sel=null;
+      el.classList.add('ok');
+      bin.querySelector('.ds-drop').appendChild(el);
+      placed++;
+      if(placed===DATA.chips.length){ win(); }
+      else say('<b>'+placed+' av '+DATA.chips.length+' rätt.</b> Fortsätt – du är på rätt spår.');
+    } else {
+      el.classList.add('bad');
+      setTimeout(function(){ el.classList.remove('bad'); },700);
+      say('Nästan! Det kortet hör inte hemma där. Läs ledtråden i lådans rubrik och prova igen.');
+    }
+  }
+  function say(t){ status.innerHTML=t; }
+  function win(){
+    say('<b>Allt rätt!</b> '+DATA.win);
+    root.classList.add('win');
+    if(!root.querySelector('.ds-badge')){
+      var b=document.createElement('div'); b.className='ds-badge'; b.textContent='✓';
+      root.appendChild(b);
+    }
+  }
+  root.querySelector('.ds-reset').onclick=function(){
+    [].slice.call(root.querySelectorAll('.ds-chip')).forEach(function(el){
+      el.classList.remove('ok','bad','ds-sel'); pool.appendChild(el);
+    });
+    placed=0; sel=null;
+    root.classList.remove('win');
+    var bd=root.querySelector('.ds-badge'); if(bd) bd.parentNode.removeChild(bd);
+    say('Dra korten till rätt låda – eller klicka på ett kort och sedan på en låda.');
+  };
+})();
+
+</script>
+<h2>Individuellt · Vad slår egentligen mot tjänsten?</h2>
+  <div id="stepsA"></div>
+  <div class="chips" id="chipsA"></div>
+  <div class="card"><h3>Simulera belastning och skydd</h3>
+    <p class="muted">Dra i reglagen. Modellen är förenklad men visar sambandet mellan trafik, cache, rate limiting och svarstid.</p>
+    <label for="r1">Anrop per sekund: <span id="v1" class="simstat">80</span></label>
+    <input id="r1" type="range" min="10" max="600" step="10" value="80">
+    <label for="r2">Cache-träffar: <span id="v2" class="simstat">0</span> %</label>
+    <input id="r2" type="range" min="0" max="90" step="5" value="0">
+    <label for="r3">Rate limit: <span id="v3" class="simstat">0</span> anrop/s (0 = avstängt)</label>
+    <input id="r3" type="range" min="0" max="300" step="10" value="0">
+    <div id="sim6" style="margin-top:10px"></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h3>Tjänstelogg <span class="tag">12 anrop · 5 sekunder</span></h3>
+      <table><thead><tr><th>#</th><th>Tid</th><th>Klient-IP</th><th>Sökväg</th><th>Status</th><th>Svarstid</th></tr></thead><tbody id="log"></tbody></table>
+    </div>
+    <div class="card">
+      <h3>Din diagnos</h3>
+      <div class="nums">
+        <div><label for="n1">Antal anrop totalt</label><input id="n1" inputmode="numeric" placeholder="t.ex. 12"></div>
+        <div><label for="n2">Unika klient-IP</label><input id="n2" inputmode="numeric" placeholder="t.ex. 3"></div>
+      </div>
+      <label for="n3">Flest anrop under en och samma sekund</label>
+      <input id="n3" inputmode="numeric" placeholder="t.ex. 4">
+      <label for="diag">Vilken typ av attack ligger närmast?</label>
+      <select id="diag"><option value="">– välj –</option>
+        <option value="vol">Volymetrisk attack (mycket trafik)</option>
+        <option value="app">Applikationsattack mot en tung endpoint</option>
+        <option value="slow">Långsam anslutning (Slowloris)</option>
+        <option value="conf">Felkonfigurerad lastbalanserare</option></select>
+      <label for="mot">Motivera med tre observationer ur loggen</label>
+      <textarea id="mot" rows="3" placeholder="En IP står för ... sökvägen ... svarstiderna ..."></textarea>
+      <div class="row" style="margin-top:10px"><button class="p" id="chkA">Kontrollera diagnosen</button><button class="g" id="cpA">Kopiera</button><button class="g" id="resetA">Rensa</button></div><p class="note">Knappen jämför dina tre tal med loggen och bedömer attacktyp och motivering var för sig.</p>
+      <div id="fb" style="margin-top:10px"></div>
+    </div>
+  </div>
+<div id="checkA"></div>
+
+<div class="labblock">
+<h3 style="margin-top:22px">Labb A (individuellt) · Tröskelräknaren – hur många botar krävs innan servern ger upp?</h3>
+<div class="labd">
+  <div class="panel">
+    <p style="margin:0 0 8px"><b>Så gör du:</b> ställ in antal botar, anrop per bot, serverns kapacitet och en rate limit. Tryck <b>Starta attack</b> och följ kurvan. Röda fält betyder att efterfrågan är högre än kapaciteten – då köar svaren och sidan blir otillgänglig.</p>
+    <p class="note" style="margin:0">Testa samma attack med rate limit av respektive på. Gruppfråga: varför räcker inte rate limit mot ett riktigt botnät?</p>
+  </div>
+  <div class="cols">
+    <div class="panel">
+      <label style="display:block;font-size:13px;font-weight:600;margin:6px 0 2px">Botar: <b id="x6-bv">80</b></label>
+      <input id="x6-b" type="range" min="5" max="500" step="5" value="80" style="width:100%">
+      <label style="display:block;font-size:13px;font-weight:600;margin:10px 0 2px">Anrop/s per bot: <b id="x6-rv">8</b></label>
+      <input id="x6-r" type="range" min="1" max="40" step="1" value="8" style="width:100%">
+      <label style="display:block;font-size:13px;font-weight:600;margin:10px 0 2px">Serverkapacitet: <b id="x6-cv2">600</b> anrop/s</label>
+      <input id="x6-c" type="range" min="100" max="3000" step="50" value="600" style="width:100%">
+      <label style="display:block;font-size:13px;font-weight:600;margin:10px 0 2px">Rate limit per IP: <b id="x6-lv">0</b> anrop/s (0 = av)</label>
+      <input id="x6-l" type="range" min="0" max="200" step="5" value="0" style="width:100%">
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="p" id="x6-run">Starta attack</button>
+        <button class="g" id="x6-reset">Nollställ</button>
+      </div>
+      <div style="margin-top:12px">
+        <div class="kv"><span>Efterfrågan</span><b id="x6-demand">–</b></div>
+        <div class="kv"><span>Släpps igenom</span><b id="x6-pass">–</b></div>
+        <div class="kv" style="border:0"><span>Överbelastning</span><b id="x6-time">–</b></div>
+      </div>
+    </div>
+    <div class="panel" style="padding:10px">
+      <canvas id="x6-cv" width="900" height="420"></canvas>
+      <div class="note" id="x6-log" style="margin-top:8px;min-height:36px">Ställ in parametrarna och starta attacken.</div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById("x6-cv"); if(!cv) return;
+  var ctx=cv.getContext("2d");
+  var bots=80, rps=8, cap=600, limit=0, t=0, running=false, hist=[], ret=[];
+  var last=0;
+
+  function params(){
+    bots=+document.getElementById("x6-b").value;
+    rps=+document.getElementById("x6-r").value;
+    cap=+document.getElementById("x6-c").value;
+    limit=+document.getElementById("x6-l").value;
+    document.getElementById("x6-bv").textContent=bots;
+    document.getElementById("x6-rv").textContent=rps;
+    document.getElementById("x6-cv2").textContent=cap;
+    document.getElementById("x6-lv").textContent=limit;
+    var demand=bots*rps, passed=limit>0?Math.min(demand,limit):demand;
+    document.getElementById("x6-demand").textContent=demand+" anrop/s";
+    document.getElementById("x6-pass").textContent=passed+" anrop/s";
+    var over=Math.max(0,passed-cap);
+    document.getElementById("x6-time").textContent=over>0?("JA – "+over+" anrop/s över kapacitet"):"nej";
+    document.getElementById("x6-time").style.color=over>0?"var(--lb-bad)":"var(--lb-ok)";
+    return {demand:demand,passed:passed,over:over};
+  }
+
+  function reset(){
+    t=0; running=false; hist=[]; ret=[];
+    document.getElementById("x6-log").textContent="Ställ in parametrarna och starta attacken.";
+    params();
+  }
+  function start(){
+    hist=[]; ret=[]; t=0; running=true; last=performance.now();
+    document.getElementById("x6-log").innerHTML='<b>Attack pågår …</b> kurvan visar hur många anrop som når servern per sekund.';
+  }
+
+  function step(){
+    var p=params();
+    if(running){
+      var now=performance.now();
+      if(now-last>90){
+        last=now; t+=0.9;
+        hist.push(p.passed);
+        // svarstid: kö växer när efterfrågan > kapacitet
+        var q=Math.max(0,p.passed-cap);
+        ret.push(q>0 ? 100+q*2 : 40);
+        if(t>59){ running=false; summary(); }
+      }
+    }
+    draw(); requestAnimationFrame(step);
+  }
+  function summary(){
+    var over=hist.filter(function(v){ return v>cap; }).length;
+    document.getElementById("x6-log").innerHTML = over>0
+      ? '<b style="color:#ff8f85">Utslagen:</b> servern var överbelastad '+over+' av 60 sekunder. Svarstiden gick från 40 ms till över '+(Math.max.apply(null,ret)||0)+' ms.'
+      : '<b style="color:#7ee2a8">Höll emot:</b> trafiken låg under kapaciteten hela minuten. Höj antalet botar för att se gränsen.';
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,900,420);
+    var g=ctx.createLinearGradient(0,0,0,420);
+    g.addColorStop(0,"#101f30"); g.addColorStop(1,"#07111c");
+    ctx.fillStyle=g; ctx.fillRect(0,0,900,420);
+    var x0=70,y0=60,W=740,H=260, maxY=Math.max(cap*1.4, bots*rps*1.1, 200);
+
+    ctx.strokeStyle="rgba(120,200,255,.12)";
+    for(var i=0;i<=4;i++){
+      var y=y0+H-H*i/4;
+      ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x0+W,y); ctx.stroke();
+      ctx.fillStyle="rgba(219,231,243,.35)"; ctx.font="10px system-ui"; ctx.textAlign="right";
+      ctx.fillText(Math.round(maxY*i/4),x0-8,y+4);
+    }
+    ctx.textAlign="center"; ctx.fillStyle="rgba(219,231,243,.35)";
+    for(var s=0;s<=60;s+=10){ ctx.fillText(s+" s",x0+W*s/60,y0+H+18); }
+
+    var cy=y0+H-H*(cap/maxY);
+    ctx.strokeStyle="#3ddc84"; ctx.setLineDash([6,5]); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(x0,cy); ctx.lineTo(x0+W,cy); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle="#3ddc84"; ctx.font="11px system-ui"; ctx.textAlign="left";
+    ctx.fillText("kapacitet "+cap+"/s",x0+8,cy-8);
+
+    if(hist.length){
+      ctx.beginPath(); ctx.moveTo(x0, y0+H);
+      hist.forEach(function(v,i){ ctx.lineTo(x0+W*(i/60), y0+H-H*(v/maxY)); });
+      ctx.lineTo(x0+W*(hist.length/60), y0+H); ctx.closePath();
+      var fg=ctx.createLinearGradient(0,y0,0,y0+H);
+      fg.addColorStop(0,"rgba(255,90,77,.45)"); fg.addColorStop(1,"rgba(90,200,255,.05)");
+      ctx.fillStyle=fg; ctx.fill();
+      ctx.strokeStyle="#ff8f85"; ctx.lineWidth=2; ctx.stroke();
+      var lx=x0+W*(hist.length/60);
+      ctx.beginPath(); ctx.arc(lx,y0+H-H*(hist[hist.length-1]/maxY),5,0,Math.PI*2);
+      ctx.fillStyle="#fff"; ctx.fill();
+      // markera överbelastning
+      ctx.fillStyle="rgba(255,90,77,.08)";
+      hist.forEach(function(v,i){ if(v>cap) ctx.fillRect(x0+W*(i/60),y0,Math.max(2,W/60),H); });
+    }
+
+    ctx.textAlign="left"; ctx.fillStyle="rgba(219,231,243,.85)"; ctx.font="13px system-ui";
+    ctx.fillText("Anrop per sekund mot servern",x0,34);
+    ctx.fillStyle="rgba(219,231,243,.45)"; ctx.font="11px system-ui";
+    ctx.fillText("Rate limit "+(limit>0?limit+"/s per IP – men botarna är många":"av")+" · "+bots+" botar × "+rps+" anrop/s",x0,52);
+    ctx.fillStyle="rgba(219,231,243,.4)";
+    ctx.fillText("Röda fält = efterfrågan över kapacitet. Servern svarar långsammare och till slut inte alls.",x0,y0+H+48);
+  }
+
+  ["x6-b","x6-r","x6-c","x6-l"].forEach(function(id){
+    document.getElementById(id).addEventListener("input",function(){ if(!running) params(); else params(); });
+  });
+  document.getElementById("x6-run").onclick=start;
+  document.getElementById("x6-reset").onclick=reset;
+  reset(); step();
+})();
+</script>
+</div>
+</section>
+
+<section id="b" hidden>
+<div class="tabhead"><b>Grupparbete</b> – arbeta två till fyra personer. Dokumentera gruppens val och jämför med facit när ni är klara.</div>
+  <h2>Grupparbete · Mät, belasta och skydda en tjänst i labb</h2>
+  <p class="muted">Grupp A mäter normalbelastning och genomför en kontrollerad belastning mot tjänsten i labben. Grupp B äger skyddet: rate limiting, cache och WAF. Därefter retestar A.</p>
+  <div class="bar" id="phases"></div>
+  <div class="bar"><span class="muted">Tid kvar i vald fas:</span><span id="clock">00:00</span><button id="skip">Hoppa över återkoppling</button></div>
+  <div id="phaseInfo"></div>
+  <div class="gt" id="gt"><button data-g="A" class="on">Grupp A · belastning</button><button data-g="B">Grupp B · skydd</button></div>
+  <div id="paneA"></div>
+  <div id="paneB" hidden></div>
+  <div id="findings"></div>
+
+<div class="labblock">
+<style>
+.labd6{--line:#d7dfe8;--mut:#5b6b7c;--acc:var(--acc,#1b4f7a);--acc2:var(--acc2,#e8f0f7);--ok:var(--ok,#12683f);--bad:var(--bad,#a3221a);--warn:var(--warn,#8a5a00)}
+.labd6 .panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.labd6 canvas{width:100%;height:auto;display:block;border-radius:10px;background:#0b1622}
+.labd6 .ctrl{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:820px){.labd6 .ctrl{grid-template-columns:1fr}}
+.labd6 label{display:block;font-size:12px;font-weight:700;margin:8px 0 2px;color:#33475b}
+.labd6 input[type=range]{width:100%}
+.labd6 .val{font-family:ui-monospace,Consolas,monospace;font-weight:700;color:var(--acc)}
+.labd6 button.p{background:var(--acc);color:#fff;border:0;padding:8px 15px;border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
+.labd6 button.g{background:#fff;border:1px solid var(--line);padding:7px 12px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer}
+.labd6 .note{font-size:12.5px;color:var(--mut)}
+.labd6 .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.labd6 .k{border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.labd6 .k span{display:block;font-size:11px;color:var(--mut)}
+.labd6 .k b{font-size:15px}
+</style>
+<h2>Labb B (grupp) · belastningslabbet – när blir en server utslagen?</h2>
+<div class="labd6">
+  <div class="panel">
+    <p style="margin:0 0 6px"><b>Så gör du:</b> starta attacken och öka trafiken tills svarstiden skenar. Slå sedan på <b>rate limiting</b> och <b>cache</b> och se hur servern klarar samma last. Allt sker i webbläsaren – ingen trafik lämnar datorn.</p>
+    <div class="ctrl">
+      <div>
+        <label>Anfallande trafik: <span class="val" id="labd6-rpsv">400</span> req/s</label>
+        <input type="range" id="labd6-rps" min="20" max="4000" step="20" value="400">
+        <label>Antal attackerande IP: <span class="val" id="labd6-ipsv">50</span></label>
+        <input type="range" id="labd6-ips" min="1" max="500" step="1" value="50">
+        <label>Rate limit per IP: <span class="val" id="labd6-limv">20</span> req/s</label>
+        <input type="range" id="labd6-lim" min="5" max="200" step="5" value="20">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+          <button class="p" id="labd6-run">Starta attack</button>
+          <button class="g" id="labd6-rl">Rate limiting: av</button>
+          <button class="g" id="labd6-cache">Cache: av</button>
+          <button class="g" id="labd6-reset">Nollställ</button>
+        </div>
+      </div>
+      <div>
+        <div class="kpi">
+          <div class="k"><span>Svarstid</span><b id="labd6-k1">–</b></div>
+          <div class="k"><span>Kö</span><b id="labd6-k2">0</b></div>
+          <div class="k"><span>Serverhälsa</span><b id="labd6-k3">100 %</b></div>
+          <div class="k"><span>Blockerade</span><b id="labd6-k4">0 %</b></div>
+        </div>
+        <p class="note" id="labd6-msg" style="margin:10px 0 0">Servern tar 400 req/s. Starta attacken och jämför.</p>
+      </div>
+    </div>
+  </div>
+  <div class="panel" style="padding:10px">
+    <canvas id="labd6-cv" width="900" height="400"></canvas>
+  </div>
+</div>
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById("labd6-cv"); if(!cv) return;
+  var ctx=cv.getContext("2d");
+  var W=900,H=400;
+  var S=function(id){return document.getElementById(id);};
+  var CAP=400;      // serverkapacitet req/s
+  var hist=[]; var queue=0; var health=100; var running=false; var rl=false; var cache=false; var t=0;
+  var bots=[]; var last=0;
+
+  function n(id){return parseFloat(S(id).value);}
+
+  function tick(dt){
+    var rps=n("labd6-rps"), ips=n("labd6-ips"), lim=n("labd6-lim");
+    var perIP=rps/Math.max(1,ips);
+    var accepted=rps;
+    if(rl && perIP>lim){ accepted=ips*lim; }
+    if(cache){ accepted=accepted*0.55; }          // cache tar bort en stor del
+    var excess=Math.max(0,accepted-CAP);
+    queue+=excess*dt;
+    if(queue>0 && accepted<CAP) queue=Math.max(0,queue-(CAP-accepted)*dt*1.2);
+    if(queue>600) queue=600;
+    var resp=queue>0 ? 40+queue*2.2 : Math.max(18, 4000/Math.max(1,accepted));
+    if(accepted>CAP) resp+=120;
+    health=Math.max(0,100-queue*0.22);
+    if(queue>520) health=0;
+    hist.push({r:Math.min(1400,resp), h:health});
+    if(hist.length>240) hist.shift();
+    S("labd6-k1").textContent=Math.round(resp)+" ms";
+    S("labd6-k1").style.color = resp>600?"var(--bad)":(resp>250?"var(--warn)":"var(--ok)");
+    S("labd6-k2").textContent=Math.round(queue)+" st";
+    S("labd6-k3").textContent=Math.round(health)+" %";
+    S("labd6-k3").style.color = health<40?"var(--bad)":(health<80?"var(--warn)":"var(--ok)");
+    S("labd6-k4").textContent=Math.round(100*Math.max(0,rps-accepted)/Math.max(1,rps))+" %";
+    S("labd6-msg").innerHTML = queue>500 ? '<b style="color:var(--bad)">Servern svarar inte längre – kön är full.</b> Slå på rate limiting och cache för att återhämta.' :
+      (rl||cache ? 'Skydden är på: jämför svarstiden med läget utan skydd.' : 'Servern tar 400 req/s. Starta attacken och jämför.');
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    var g=ctx.createLinearGradient(0,0,W,H); g.addColorStop(0,"#0d1c2a"); g.addColorStop(1,"#0a1420");
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+    // server
+    var sx=760, sy=150;
+    ctx.beginPath(); ctx.arc(sx,sy,34,0,Math.PI*2);
+    ctx.fillStyle=health<40?"rgba(255,90,77,.25)":"rgba(90,200,250,.18)"; ctx.fill();
+    ctx.lineWidth=3; ctx.strokeStyle=health<40?"#ff5a4d":(health<80?"#ffcf70":"#3ddc84"); ctx.stroke();
+    ctx.fillStyle="#dbe7f3"; ctx.font="bold 12px system-ui"; ctx.textAlign="center";
+    ctx.fillText("server", sx, sy+4);
+    ctx.font="11px system-ui"; ctx.fillStyle="rgba(219,231,243,.6)";
+    ctx.fillText("400 req/s", sx, sy+52);
+
+    // botar + partiklar
+    var rps=n("labd6-rps"), ips=n("labd6-ips");
+    var rate=running?Math.min(1, rps/1500):0;
+    if(running && Math.random()<rate){
+      bots.push({x:40+Math.random()*120, y:60+Math.random()*220, p:0, speed:0.02+Math.random()*0.02, block:(rl && (rps/Math.max(1,ips))>n("labd6-lim"))||false});
+    }
+    bots.forEach(function(b){ b.p+=b.speed; });
+    bots=bots.filter(function(b){return b.p<1;});
+    bots.forEach(function(b){
+      var x=b.x+(sx-b.x)*(b.block? b.p*0.55 : b.p), y=b.y+(sy-b.y)*b.p;
+      ctx.beginPath(); ctx.arc(x,y,3.2,0,Math.PI*2);
+      ctx.fillStyle=b.block?"#ff8f85":(b.p>0.8?"#ffcf70":"#5ac8fa"); ctx.fill();
+    });
+
+    // graf
+    var gx=60, gy=250, gw=760, gh=110;
+    ctx.strokeStyle="rgba(120,200,255,.25)"; ctx.lineWidth=1;
+    ctx.strokeRect(gx,gy,gw,gh);
+    ctx.fillStyle="rgba(219,231,243,.55)"; ctx.font="11px system-ui"; ctx.textAlign="left";
+    ctx.fillText("Svarstid (0–1400 ms) och serverhälsa över tid", gx, gy-8);
+    if(hist.length>1){
+      ctx.beginPath();
+      hist.forEach(function(p,i){
+        var x=gx+gw*(i/(hist.length-1)), y=gy+gh-(p.r/1400)*gh;
+        i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+      });
+      ctx.strokeStyle="#5ac8fa"; ctx.lineWidth=2; ctx.stroke();
+      ctx.beginPath();
+      hist.forEach(function(p,i){
+        var x=gx+gw*(i/(hist.length-1)), y=gy+gh-(p.h/100)*gh;
+        i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+      });
+      ctx.strokeStyle="rgba(126,226,168,.8)"; ctx.lineWidth=1.6; ctx.stroke();
+    }
+    ctx.fillStyle="rgba(180,140,255,.9)"; ctx.beginPath(); ctx.moveTo(gx,gw); // legend
+    ctx.fillStyle="#5ac8fa"; ctx.fillRect(gx+gw-120, gy-22, 10, 3);
+    ctx.fillStyle="rgba(219,231,243,.7)"; ctx.font="11px system-ui"; ctx.fillText("svarstid", gx+gw-104, gy-16);
+    ctx.fillStyle="rgba(126,226,168,.9)"; ctx.fillRect(gx+gw-46, gy-22, 10, 3);
+    ctx.fillStyle="rgba(219,231,243,.7)"; ctx.fillText("hälsa", gx+gw-30, gy-16);
+
+    ctx.textAlign="left"; ctx.fillStyle="rgba(219,231,243,.6)"; ctx.font="12px system-ui";
+    ctx.fillText((rl?"rate limiting PÅ":"rate limiting AV")+"  ·  "+(cache?"cache PÅ":"cache AV")+"  ·  "+Math.round(rps)+" req/s från "+Math.round(ips)+" IP", 24, 22);
+  }
+
+  function loop(ts){
+    if(!last) last=ts;
+    var dt=Math.min(0.05,(ts-last)/1000); last=ts;
+    t+=dt;
+    if(running) tick(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  S("labd6-rps").oninput=function(){ S("labd6-rpsv").textContent=this.value; };
+  S("labd6-ips").oninput=function(){ S("labd6-ipsv").textContent=this.value; };
+  S("labd6-lim").oninput=function(){ S("labd6-limv").textContent=this.value; };
+  S("labd6-run").onclick=function(){
+    running=!running; S("labd6-run").textContent=running?"Stoppa attack":"Starta attack";
+  };
+  S("labd6-rl").onclick=function(){ rl=!rl; S("labd6-rl").textContent="Rate limiting: "+(rl?"på":"av"); };
+  S("labd6-cache").onclick=function(){ cache=!cache; S("labd6-cache").textContent="Cache: "+(cache?"på":"av"); };
+  S("labd6-reset").onclick=function(){
+    running=false; queue=0; health=100; hist=[]; bots=[]; rl=false; cache=false;
+    S("labd6-run").textContent="Starta attack";
+    S("labd6-rl").textContent="Rate limiting: av"; S("labd6-cache").textContent="Cache: av";
+    tick(0.016);
+  };
+  tick(0.016); requestAnimationFrame(loop);
+})();
+</script>
+</div>
+</section>
+
+<section id="c" hidden>
+<div class="tabhead"><b>Facit</b> – här ligger rapporten, de fullständiga svaren och begreppen. Fyll i rapporten efter att ni gjort båda arbetsflikarna.</div>
+  <h2>Facit · Rapport och referensfacit</h2>
+  <div id="facitA"></div>
+  <div id="facitB"></div>
+  <div class="card"><div class="row"><button class="p" id="mk">Uppdatera rapport</button><button class="g" id="cp">Kopiera</button><button class="g" id="dl">Spara som fil</button><button class="g" id="rst">Nollställ allt</button></div>
+    <p class="muted" style="margin-top:8px"><b>Så fyller du i rapporten:</b> 1) sammanfatta Del A med dina mätvärden, 2) klistra in gruppernas fält, 3) lägg till varje fynd i fyndregistret med bevis, 4) skriv jämförelsen mot referensfacit – vad ni hittade, vad ni missade och varför. Klicka sedan på <b>Uppdatera rapport</b>.</p></div>
+  <pre id="report">Klicka på "Uppdatera rapport".</pre>
+  <div id="faq"></div>
+  <div id="res"></div>
+</section>
+</main>
+<script>
+"use strict";
+var $=function(s){return document.querySelector(s);}, $$=function(s){return [].slice.call(document.querySelectorAll(s));};
+var K='sa_w6', S={};
+try{S=JSON.parse(localStorage.getItem(K)||'{}')||{};}catch(e){S={};}
+S.findings=S.findings||[];
+function save(){try{localStorage.setItem(K,JSON.stringify(S));}catch(e){}}
+function esc(t){return String(t==null?'':t).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+function copy(t,b){var done=function(){var o=b.textContent;b.textContent='Kopierat ✓';setTimeout(function(){b.textContent=o;},1200);};
+  var fb=function(){var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){alert('Kopiera manuellt:\n\n'+t);}document.body.removeChild(ta);};
+  if(navigator.clipboard&&window.isSecureContext&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,fb);}else{fb();}}
+function download(name,text){try{var b=new Blob([text],{type:'text/markdown;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);document.body.removeChild(a);},500);}catch(e){alert('Kunde inte spara – kopiera texten i stället.');}}
+$$('#tabs button').forEach(function(b){b.onclick=function(){$$('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});['a','b','c'].forEach(function(k){$('#'+k).hidden=(k!==b.dataset.t);});};});
+function steps(list,host){
+  var cur=0, done={};
+  function paint(){
+    var n=0; for(var k in done){ if(done[k]) n++; }
+    var s=list[cur], last=(cur===list.length-1);
+    host.innerHTML='<div class="stp"><div class="stp-dots">'+
+      list.map(function(x,j){ return '<button class="stp-dot'+(j===cur?' on':'')+(done[j]?' done':'')+'" data-goto="'+j+'">'+(j+1)+'</button>'; }).join('')+
+      '</div><div class="stp-card"><h3>Steg '+(cur+1)+' av '+list.length+' – '+s.t+'</h3>'+
+      '<p><b>Vad?</b> '+s.d+'</p><p><b>Varför?</b> '+s.w+'</p><p><b>Hur?</b> '+s.h+'</p>'+
+      (s.r?'<p class="expect"><b>Förväntat resultat:</b> '+s.r+'</p>':'')+
+      '<div class="stp-bar"><button class="g" data-prev'+(cur===0?' disabled':'')+'>← Tillbaka</button>'+
+      '<label class="stp-chk"><input type="checkbox" data-done'+(done[cur]?' checked':'')+'> Klar med steget</label>'+
+      '<button class="p" data-next>'+(last?'Börja öva ↓':'Nästa →')+'</button>'+
+      '<span class="stp-prog"><b>'+n+'</b> av '+list.length+' steg klara</span></div></div></div>';
+    host.querySelector('[data-prev]').onclick=function(){ if(cur>0){cur--; paint();} };
+    host.querySelector('[data-next]').onclick=function(){
+      done[cur]=true;
+      if(cur<list.length-1){ cur++; } else { scrollToLab(); }
+      paint();
+    };
+    host.querySelector('[data-done]').onchange=function(){ done[cur]=this.checked; paint(); };
+    [].slice.call(host.querySelectorAll('[data-goto]')).forEach(function(b){
+      b.onclick=function(){ cur=+b.getAttribute('data-goto'); paint(); };
+    });
+  }
+  paint();
+}
+function scrollToLab(){
+  var l=document.querySelector('#'+ (document.querySelector('#a .labblock') ? 'a' : 'b') +' .labblock') ||
+        document.querySelector('.labblock');
+  if(l) l.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function quiz(qs,host,title){host.innerHTML='<h2>'+title+'</h2>'+qs.map(function(q,i){return '<div class="q card"><p style="margin:0 0 4px"><b>'+(i+1)+'. '+q.q+'</b></p><div class="opts">'+q.o.map(function(o,j){return '<button data-q="'+i+'" data-o="'+j+'">'+o+'</button>';}).join('')+'</div><div class="fb" id="qf'+i+'"></div></div>';}).join('');
+  $$('[data-q]').forEach(function(b){b.onclick=function(){var i=+b.dataset.q,q=qs[i],ok=(+b.dataset.o===q.a);host.querySelector('#qf'+i).innerHTML='<b class="'+(ok?'ok':'bad')+'">'+(ok?'✓ Rätt':'✗ Inte rätt')+'</b> '+q.x;};});}
+var sevTxt={1:'Låg',2:'Medel',3:'Hög'};
+function renderF(){var box=$('#flist');if(!box)return;box.innerHTML=S.findings.length?'':'<p class="muted">Inga fynd registrerade ännu.</p>';
+  S.findings.forEach(function(f,i){box.insertAdjacentHTML('beforeend','<div class="finding"><div class="row" style="justify-content:space-between"><b>'+f.g+' · '+esc(f.target)+'</b><span class="sev s'+f.sev+'">'+sevTxt[f.sev]+'</span></div><div><b>Fynd:</b> '+esc(f.what)+'</div><div><b>Bevis:</b> <code>'+esc(f.found)+'</code></div><div><b>Risk/åtgärd:</b> '+esc(f.risk)+'</div><div class="row" style="margin-top:6px"><select data-st="'+i+'">'+['Öppen','Delvis åtgärdad','Åtgärdad','Kvarstår efter retest'].map(function(s){return '<option'+(s===f.status?' selected':'')+'>'+s+'</option>';}).join('')+'</select><button class="g" data-del="'+i+'">Ta bort</button></div></div>');});
+  $$('[data-st]').forEach(function(s){s.onchange=function(){S.findings[+s.dataset.st].status=s.value;save();};});
+  $$('[data-del]').forEach(function(b){b.onclick=function(){S.findings.splice(+b.dataset.del,1);save();renderF();};});}
+
+/* Del A */
+steps([
+ {t:'Räkna grundtalen',d:'Räkna antal anrop, unika klient-IP och flest anrop inom en och samma sekund i tjänsteloggen.',
+  w:'En DDoS-diagnos bygger på mätvärden, inte på känsla. Volym, källor och koncentration avgör vilket skydd som hjälper.',
+  h:'Läs loggen rad för rad. Notera varje unik IP. Gruppera raderna per sekund i kolumnen Tid och räkna den största gruppen.',
+  r:'Tre tal ifyllda som du kan försvara med rader ur loggen.'},
+ {t:'Leta efter mönstret',d:'Jämför sökväg, statuskod och svarstid mellan raderna.',
+  w:'Volymattacker ger många anslutningar men snabba svar. Applikationsattacker ger få anrop mot en dyr operation och långa svarstider.',
+  h:'Titta på vilken sökväg som dominerar, vilka statuskoder som dyker upp (t.ex. 504) och hur svarstiderna förändras.',
+  r:'Du kan peka på minst en rad som visar överbelastning.'},
+ {t:'Välj attacktyp, motivera och testa reglagen',d:'Välj typ i listan, skriv tre observationer och prova sedan belastningssimuleringen.',
+  w:'Motiveringen skiljer en analys från en gissning – och den styr vilken åtgärd som är rimlig.',
+  h:'Välj typ och skriv observationerna. Dra sedan i reglagen för anrop/s, cache och rate limit och se hur p95 och felandelen ändras. Klicka på "Kontrollera diagnosen".',
+  r:'Rätt attacktyp, tre observationer och du kan förklara varför cache och rate limit sänker svarstiden.'}],$('#stepsA'));
+
+var LOG=[
+ {n:1,t:'10:00:01',ip:'45.12.33.9',p:'/',s:200,ms:120},
+ {n:2,t:'10:00:01',ip:'45.12.33.9',p:'/produkt/12',s:200,ms:130},
+ {n:3,t:'10:00:01',ip:'88.7.1.4',p:'/',s:200,ms:110},
+ {n:4,t:'10:00:02',ip:'45.12.33.9',p:'/search?q=test',s:200,ms:980},
+ {n:5,t:'10:00:02',ip:'45.12.33.9',p:'/search?q=test',s:200,ms:1020},
+ {n:6,t:'10:00:02',ip:'45.12.33.9',p:'/search?q=test',s:200,ms:1100},
+ {n:7,t:'10:00:03',ip:'45.12.33.9',p:'/search?q=test',s:200,ms:2400},
+ {n:8,t:'10:00:03',ip:'45.12.33.9',p:'/search?q=test',s:504,ms:29000},
+ {n:9,t:'10:00:03',ip:'45.12.33.9',p:'/search?q=test',s:504,ms:29000},
+ {n:10,t:'10:00:04',ip:'88.7.1.4',p:'/',s:200,ms:150},
+ {n:11,t:'10:00:04',ip:'45.12.33.9',p:'/search?q=test',s:504,ms:30000},
+ {n:12,t:'10:00:05',ip:'45.12.33.9',p:'/search?q=test',s:504,ms:29500}];
+$('#log').innerHTML=LOG.map(function(r){return '<tr'+(r.s===504?' class="n504"':'')+'><td>'+r.n+'</td><td>'+r.t+'</td><td>'+r.ip+'</td><td>'+r.p+'</td><td>'+r.s+'</td><td>'+r.ms+' ms</td></tr>';}).join('');
+var uniq={},perSec={};
+LOG.forEach(function(r){uniq[r.ip]=1;perSec[r.t]=(perSec[r.t]||0)+1;});
+var TOT=LOG.length,UNIQ=Object.keys(uniq).length,PEAK=Math.max.apply(null,Object.keys(perSec).map(function(k){return perSec[k];}));
+var COR={vol:0,app:1,slow:2,conf:3};
+if(S.n1)$('#n1').value=S.n1; if(S.n2)$('#n2').value=S.n2; if(S.n3)$('#n3').value=S.n3; if(S.diag)$('#diag').value=S.diag; if(S.mot)$('#mot').value=S.mot;
+['n1','n2','n3'].forEach(function(id){$('#'+id).addEventListener('input',function(){S[id]=$('#'+id).value;save();});});
+['diag','mot'].forEach(function(id){$('#'+id).addEventListener('input',function(){S[id]=$('#'+id).value;save();});});
+function num(v){return parseInt(String(v||'').replace(/[^0-9]/g,''),10);}
+$('#chkA').onclick=function(){var a=num($('#n1').value),b=num($('#n2').value),c=num($('#n3').value),d=$('#diag').value;
+  var sc=(a===TOT?1:0)+(b===UNIQ?1:0)+(c===PEAK?1:0)+(d==='app'?1:0);
+  var h='<h3>'+sc+' av 4 rätt</h3>';
+  h+='<div class="res"><b class="'+(a===TOT?'ok':'bad')+'">'+(a===TOT?'✓':'✗')+'</b><div><b>Antal anrop:</b> '+TOT+'</div></div>';
+  h+='<div class="res"><b class="'+(b===UNIQ?'ok':'bad')+'">'+(b===UNIQ?'✓':'✗')+'</b><div><b>Unika IP:</b> '+UNIQ+' (45.12.33.9 och 88.7.1.4)</div></div>';
+  h+='<div class="res"><b class="'+(c===PEAK?'ok':'bad')+'">'+(c===PEAK?'✓':'✗')+'</b><div><b>Flest per sekund:</b> '+PEAK+' (kl. 10:00:03)</div></div>';
+  h+='<div class="res"><b class="'+(d==='app'?'ok':'bad')+'">'+(d==='app'?'✓':'✗')+'</b><div><b>Attacktyp:</b> '+(d==='app'?'applikationsattack mot /search.':'Rätt är applikationsattack: få anrop, en dyr endpoint, svarstider upp till 30 s.')+'</div></div>';
+  var m=($('#mot').value||'').toLowerCase(),mok=m.length>30&&/(search|sök|504|29|30|ip|svarstid)/.test(m);
+  h+='<div class="res"><b class="'+(mok?'ok':'bad')+'">'+(mok?'✓':'✗')+'</b><div><b>Motivering:</b> '+(mok?'du hänvisar till loggens mönster.':'Hänvisa till sökvägen /search, status 504 och svarstider på 24–30 sekunder.')+'</div></div>';
+  $('#fb').innerHTML=h;};
+$('#cpA').onclick=function(){copy('LOGGANALYS\nAnrop: '+$('#n1').value+'\nUnika IP: '+$('#n2').value+'\nFlest per sekund: '+$('#n3').value+'\nDiagnos: '+$('#diag').value+'\nMotivering: '+$('#mot').value,$('#cpA'));};
+$('#resetA').onclick=function(){['n1','n2','n3','diag','mot'].forEach(function(id){$('#'+id).value='';S[id]='';});save();$('#fb').innerHTML='';};
+
+$('#facitA').innerHTML='<details class="facit"><summary>Visa facit – Del A</summary>'+
+ '<p><b>Svar:</b> 12 anrop, 2 unika IP-adresser, flest 3 anrop under samma sekund (10:00:03).</p>'+
+ '<p><b>Attacktyp: applikationsattack</b> mot sökfunktionen – inte en volymattack. Bevis: bara 12 anrop, nästan alla mot <code>/search?q=test</code>, svarstider som stiger från 980 ms till 30 000 ms och status <code>504 Gateway Timeout</code>.</p>'+
+ '<p><b>Varför inte volym?</b> En volymattack syns som tusentals anrop per sekund från många IP-adresser. Här är trafiken liten men varje anrop kostar mycket – en "dyr" sökfråga är nog för att slå ut tjänsten.</p>'+
+ '<p><b>Därför fungerar inte alltid ett volymskydd:</b> rate limiting per IP hjälper inte när en enda IP håller sig under gränsen men varje anrop tar 30 sekunder. Cache och tidsgränser i applikationen är minst lika viktiga.</p>'+
+ '<p><b>Viktigaste begrepp:</b> <i>DDoS</i> = överbelastning från många källor; <i>rate limiting</i> = begränsning av antal förfrågningar per klient och tidsenhet; <i>p95</i> = 95:e percentilen, den svarstid som 95 % av anropen klarar sig under.</p></details>';
+
+quiz([{q:'Varför räcker inte alltid rate limiting per IP?',o:['Det saktar ner servern','Angriparen kan sprida anrop över många IP eller hålla sig under gränsen','Det fungerar bara på port 443'],a:1,
+ x:'Rätt: både distribuerade källor och långsamma anrop kringgår en enkel gräns per IP.'},
+ {q:'Vad betyder statuskoden 504 i loggen?',o:['Klienten skickade fel data','En server som väntade på svar från en annan server gav upp','Sidan finns inte'],a:1,
+ x:'Rätt: 504 Gateway Timeout – backend svarade inte i tid, vilket stämmer med svarstider på 24–30 sekunder.'},
+ {q:'Vilket skydd hjälper bäst mot en attack mot en tung sökfråga?',o:['Större internetanslutning','Cache för vanliga frågor, tidsgräns i databasen och rate limiting','Fler IP-adresser'],a:1,
+ x:'Rätt: åtgärden ska minska kostnaden per anrop, inte bara öka bandbredden.'}],$('#checkA'),'Kunskapskontroll – Del A');
+
+/* Del B */
+var PH=[['1 Mät baseline',6],['2 Belasta kontrollerat',9],['3 Skydda',9],['4 Retest',4],['5 Återkoppling',2]];
+var PHINFO=[
+ {d:'Mät hur tjänsten beter sig utan belastning.',w:'Utan baseline går det inte att avgöra om en förändring beror på attacken eller på något annat.',h:'Kör 20 vanliga anrop mot tjänsten (<code>for i in $(seq 20); do curl -s -o /dev/null -w "%{time_total}\\n" http://localhost:5000/; done</code>) och notera median och max.',e:'Median och max svarstid ifyllda i "Fas 1 – baseline".'},
+ {d:'Genomför en kontrollerad belastning mot tjänsten i labben.',w:'Du ska se hur mätvärdena rör sig – inte slå ut något som andra använder.',h:'Använd <code>ab -n 200 -c 20 http://localhost:5000/search?q=test</code> eller <code>hey</code>. Kör endast mot localhost i er egen VM. Spara utdata.',e:'Utdata från ab eller hey sparat i "Fas 2 – belastning" med felkvot och p95.'},
+ {d:'Sätt skydd som motsvarar attacken ni såg.',w:'Åtgärden ska träffa flaskhalsen: dyra anrop, bristande cache eller avsaknad av gräns.',h:'Lägg till rate limiting per IP, cache för upprepade sökningar, tidsgräns i databasanropet och vid behov WAF-regel. Dokumentera tröskelvärden.',e:'Minst tre skydd med tröskelvärden i "Fas 3 – skydd och tröskelvärden".'},
+ {d:'Upprepa exakt samma belastning.',w:'Ett skydd är oprövat tills samma belastning inte längre slår ut tjänsten.',h:'Kör samma <code>ab</code>-kommando igen. Jämför felkvot och svarstid med fas 1 och 2.',e:'429 i stället för 504, p95 under er tröskel och 200 för vanlig trafik.'},
+ {d:'Redovisa på 90 sekunder per grupp.',w:'Muntlig redovisning är en del av examinationen.',h:'Visa baseline, belastning, åtgärd och siffrorna före/efter.',e:'90 sekunder: baseline, belastning, åtgärd och siffror före/efter.'}];
+var cur=0,t=null,left=0,skipped=false;
+function drawPhases(){$('#phases').innerHTML=PH.filter(function(p,i){return !(i===4&&skipped);}).map(function(p,i){return '<button data-p="'+i+'" class="'+(i===cur?'on':'')+'">'+p[0]+' · '+p[1]+' min</button>';}).join('');
+  $$('#phases button').forEach(function(b){b.onclick=function(){setPhase(+b.dataset.p);};});}
+function tick(){$('#clock').textContent=('0'+Math.floor(Math.max(0,left)/60)).slice(-2)+':'+('0'+(Math.max(0,left)%60)).slice(-2);}
+function setPhase(i){cur=i;clearInterval(t);left=PH[i][1]*60;tick();t=setInterval(function(){left--;tick();if(left<=0)clearInterval(t);},1000);drawPhases();
+  var p=PHINFO[i];$('#phaseInfo').innerHTML='<div class="step"><h3>Fas '+(i+1)+' · '+PH[i][0]+' ('+PH[i][1]+' min)</h3><p><b>Vad?</b> '+p.d+'</p><p><b>Varför?</b> '+p.w+'</p><p><b>Hur?</b> '+p.h+'</p>'+(p.e?'<p class="expect"><b>Förväntat resultat:</b> '+p.e+'</p>':'')+'</div>';}
+$('#skip').onclick=function(){skipped=!skipped;if(skipped&&cur===4)setPhase(3);drawPhases();};
+
+function pane(id,title,env,fields){return '<div class="card"><h3>'+title+' <span class="tag">Verkligt labbmoment</span></h3><p class="muted">'+env+'</p>'+
+ fields.map(function(f){return '<label for="'+id+'_'+f.k+'">'+f.t+'</label><textarea id="'+id+'_'+f.k+'" rows="'+(f.r||3)+'" placeholder="'+esc(f.ph||'')+'">'+esc(S[id+'_'+f.k]||'')+'</textarea>';}).join('')+'</div>';}
+$('#paneA').innerHTML=pane('A','Grupp A · mät och belasta','Endast mot localhost i er egen labb-VM.',[
+ {k:'base',t:'Fas 1 – baseline (median / max svarstid)',r:2,ph:'Median 0,12 s, max 0,31 s, 0 fel'},
+ {k:'load',t:'Fas 2 – belastning (kommando + utdata)',r:5,ph:'ab -n 200 -c 20 ...\nRequests per second: ..., Failed requests: ..., p95: ...'},
+ {k:'obs',t:'Observation: vad blev flaskhalsen?',r:2,ph:'Databasfrågan tog 28 s, worker-poolen tog slut'},
+ {k:'retest',t:'Fas 4 – retest efter B:s skydd',r:2,ph:'p95 0,4 s, 0 failed requests'}]);
+$('#paneB').innerHTML=pane('B','Grupp B · skydda','Bygg skyddet i er egen kopia av tjänsten.',[
+ {k:'base',t:'Fas 1 – baseline ni mätte',r:2,ph:'p95 0,15 s'},
+ {k:'fix',t:'Fas 3 – skydd och tröskelvärden',r:5,ph:'rate limit 20 req/10 s per IP, cache 60 s, DB-timeout 2 s'},
+ {k:'evid',t:'Bevis på att vanlig trafik fungerar',r:2,ph:'20 curl-anrop gav 200 och p95 0,2 s'},
+ {k:'retest',t:'Fas 4 – A:s retestresultat',r:2,ph:'Belastning gav 429 i stället för 504; p95 0,4 s'}]);
+$$('#paneA textarea, #paneB textarea').forEach(function(ta){ta.addEventListener('input',function(){S[ta.id]=ta.value;save();});});
+$$('#gt button').forEach(function(b){b.onclick=function(){$$('#gt button').forEach(function(x){x.classList.toggle('on',x===b);});
+  $('#paneA').hidden=b.dataset.g!=='A';$('#paneB').hidden=b.dataset.g!=='B';S.group=b.dataset.g;save();};});
+
+$('#findings').innerHTML='<div class="card"><h3>Fyndregister</h3><p class="note">Ett fynd = ett test ni kan visa bevis för. Fyll i alla fält – de hamnar i rapporten.</p><div class="grid2" style="gap:10px">'+
+ '<div><label>Grupp</label><select id="fg"><option>A</option><option>B</option></select></div>'+
+ '<div><label>Granskat objekt</label><select id="ft"><option>Sökendpoint</option><option>Rate limiting</option><option>Cache</option><option>Databasanrop</option></select></div></div>'+
+ '<label>Fynd</label><input id="fw" placeholder="Ingen gräns per IP mot /search">'+
+ '<label>Bevis</label><input id="fd" placeholder="200 anrop med -c 20 gav 504 och p95 29 s">'+
+ '<label>Risk och åtgärd</label><input id="fx" placeholder="Otillgänglighet → rate limit + cache + timeout">'+
+ '<div class="grid2" style="gap:10px"><div><label>Allvarlighet</label><select id="fs"><option value="1">Låg</option><option value="2">Medel</option><option value="3" selected>Hög</option></select></div>'+
+ '<div><label>Status</label><select id="fst"><option>Öppen</option><option>Delvis åtgärdad</option><option>Åtgärdad</option><option>Kvarstår efter retest</option></select></div></div>'+
+ '<div class="row" style="margin-top:8px"><button class="p" id="addf">Lägg till fynd</button><button class="g" id="clearf">Rensa fynd</button></div><div id="flist"></div></div>';
+$('#addf').onclick=function(){S.findings.push({g:$('#fg').value,target:$('#ft').value,what:$('#fw').value,found:$('#fd').value,risk:$('#fx').value,sev:+$('#fs').value,status:$('#fst').value});
+  ['#fw','#fd','#fx'].forEach(function(s){$(s).value='';});save();renderF();};
+$('#clearf').onclick=function(){if(confirm('Rensa alla fynd?')){S.findings=[];save();renderF();}};
+
+$('#facitB').innerHTML='<details class="facit"><summary>Visa referensfacit – Del B (belastning och skydd)</summary>'+
+ '<div class="step"><h3>Förväntade brister</h3><ul style="font-size:13.5px;margin:6px 0">'+
+ '<li>Sökfrågan saknar tidsgräns och körs om för varje anrop – en dyr operation.</li>'+
+ '<li>Ingen rate limiting per IP eller session.</li>'+
+ '<li>Ingen cache för upprepade identiska sökningar.</li>'+
+ '<li>Worker-poolen är för liten för normal toppbelastning.</li>'+
+ '<li>Ingen övervakning som larmar på stigande p95 och 5xx.</li></ul></div>'+
+ '<div class="step"><h3>Bevis, grundorsak, åtgärd, retest</h3>'+
+ '<p><b>Bevis:</b> mätvärden före/efter, t.ex. p95 29 s och 0,4 s, eller felkvot 38 % → 0 %.</p>'+
+ '<p><b>Grundorsak:</b> kostnaden per anrop är hög och det finns ingen gräns för hur många anrop en klient får göra.</p>'+
+ '<p><b>Åtgärd (godtagbara alternativ):</b> rate limiting (20 anrop/10 s per IP), cache med TTL, tidsgräns i databasanropet, kö/backpressure, WAF. Alla är godtagbara; minst två rekommenderas.</p>'+
+ '<p><b>Godkänt retest:</b> samma belastning ger <code>429</code> i stället för <code>504</code>, p95 under er tröskel, och vanlig trafik får fortfarande <code>200</code>.</p></div>'+
+ '<p class="muted">Jämför i Del C: vilka mätvärden förändrades, vilket skydd gav störst effekt och vad kostade det i användbarhet?</p></details>';
+
+/* Del C */
+$('#mk').onclick=function(){
+  var r='# Lektion 6 – DDoS\n\n**Del A – logganalys**\n- Anrop: '+$('#n1').value+' · unika IP: '+$('#n2').value+' · flest/sek: '+$('#n3').value+
+   '\n- Diagnos: '+$('#diag').value+'\n- Motivering: '+($('#mot').value||'(ej ifyllt)')+'\n';
+  r+='\n**Grupp A – baseline**\n\n'+($('#A_base').value||'(ej ifyllt)')+'\n\n**Grupp A – belastning**\n\n```\n'+($('#A_load').value||'(ej ifyllt)')+'\n```\n';
+  r+='\n**Grupp A – observation**\n\n'+($('#A_obs').value||'(ej ifyllt)')+'\n\n**Grupp A – retest**\n\n'+($('#A_retest').value||'(ej ifyllt)')+'\n';
+  r+='\n**Grupp B – skydd**\n\n```\n'+($('#B_fix').value||'(ej ifyllt)')+'\n```\n\n**Grupp B – funktionskontroll**\n\n'+($('#B_evid').value||'(ej ifyllt)')+
+   '\n\n**Grupp B – retest**\n\n'+($('#B_retest').value||'(ej ifyllt)')+'\n\n**Fynd**\n';
+  if(!S.findings.length)r+='\nInga fynd registrerade.\n';
+  S.findings.forEach(function(f){r+='\n### '+f.g+' · '+f.target+' ('+sevTxt[f.sev]+') – '+f.status+'\n- Fynd: '+f.what+'\n- Bevis: `'+f.found+'`\n- Risk/åtgärd: '+f.risk+'\n';});
+  r+='\n**Jämförelse mot referensfacit**\n- Fynd som facit förutspår: \n- Egna fynd utöver facit: \n- Skydd som gav störst effekt: \n- Påverkan på vanliga användare: \n';
+  $('#report').textContent=r;};
+$('#cp').onclick=function(){copy($('#report').textContent,$('#cp'));};
+$('#dl').onclick=function(){download('lektion-6-ddos.md',$('#report').textContent);};
+$('#rst').onclick=function(){if(confirm('Nollställ allt i den här workshopen?')){try{localStorage.removeItem(K);}catch(e){}location.reload();}};
+
+$('#faq').innerHTML='<div class="card"><h3>Vanliga frågor</h3>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Får vi attackera skolans server?</summary><p>Nej. Belastningen sker endast mot en tjänst i er egen labb-VM, på localhost, och efter lärarens instruktion. Att överbelasta system du inte äger är brottsligt.</p></details>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Mitt <code>ab</code>-kommando hittas inte – vad gör jag?</summary><p>Verktyget finns i paketet <code>apache2-utils</code>. Saknas det kan du använda <code>hey</code>, <code>wrk</code> eller en enkel loop med <code>curl</code> – dokumentera vad du använde.</p></details>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Varför ger rate limiting 429 i stället för att bara sakta ner?</summary><p>429 Too Many Requests talar om för klienten att den ska backa. Det skyddar tjänsten utan att skapa långa köer som ändå leder till timeout.</p></details>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Hur vet jag att skyddet räcker?</summary><p>När samma belastning ger 429 i stället för 504, p95 håller sig under er tröskel och vanliga användare fortfarande får 200.</p></details>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Min p95 skiljer sig från exemplet – är det fel?</summary><p>Nej. Mätvärden beror på hårdvara och inställningar. Det viktiga är riktningen: sjunker felkvoten och svarstiden när skyddet är på?</p></details></div>';
+
+drawPhases();setPhase(0);renderF();
+if(S.group){$$('#gt button').forEach(function(b){if(b.dataset.g===S.group)b.click();});}
+
+/* ---------- begrepp och fördjupning ---------- */
+var TERMS = [["DDoS", "En överbelastningsattack där många enheter skickar trafik mot samma tjänst."], ["Rate limiting", "En begränsning av hur många förfrågningar en klient får göra under en viss tid."], ["504 Gateway Timeout", "Statuskod: en server väntade för länge på svar från en annan server."], ["p95", "Den svarstid som 95 procent av anropen klarar sig under."], ["Cache", "Ett sparat svar som kan återanvändas utan att frågan körs igen."], ["WAF", "En brandvägg framför webbtjänsten som filtrerar misstänkta förfrågningar."], ["Baseline", "Mätvärden för normal drift, att jämföra med när något är fel."], ["ab", "ApacheBench – kommandoradsverktyg som skickar många förfrågningar för att mäta belastning."]];
+function T(k){for(var i=0;i<TERMS.length;i++){if(TERMS[i][0]===k)return TERMS[i][1];}return '';}
+(function(){
+  var chips=document.getElementById('chipsA');
+  if(chips)chips.innerHTML='<span class="note">Begrepp i den här workshopen – klicka för en kort förklaring:</span> '+
+    TERMS.map(function(t){return '<span class="term" data-k="'+t[0]+'">'+t[0]+'</span>';}).join('');
+  document.body.insertAdjacentHTML('beforeend','<div id="pop"></div>');
+  document.addEventListener('click',function(e){
+    var el=e.target.closest?e.target.closest('.term'):null,p=document.getElementById('pop');
+    if(!p)return;
+    if(!el){p.style.display='none';return;}
+    var d=T(el.getAttribute('data-k'));
+    if(!d){p.style.display='none';return;}
+    p.innerHTML='<b>'+el.textContent+'</b><br>'+d;p.style.display='block';
+    var r=el.getBoundingClientRect();
+    p.style.left=Math.max(8,Math.min(window.innerWidth-350,r.left))+'px';
+    p.style.top=Math.min(window.innerHeight-140,r.bottom+8)+'px';
+  });
+  var RES=[["Cloudflare – What is a DDoS attack?", "https://www.cloudflare.com/learning/ddos/what-is-a-ddos-attack/", "Förklarar volymattacker kontra applikationsattacker och vanliga skydd.", "Nybörjare", "Gratis, ingen registrering"]],box=document.getElementById('res');
+  if(box)box.innerHTML='<div class="card resbox"><h3>Fördjupa dig och testa själv</h3>'+
+    '<p class="note">Frivilligt komplement som kräver internet. Övningarna i workshopen fungerar utan.</p>'+
+    RES.map(function(r){return '<div class="rl"><a href="'+r[1]+'" target="_blank" rel="noopener noreferrer">'+r[0]+'</a>'+
+      '<span class="lvl">'+r[3]+'</span><br>'+r[2]+'<br><span class="note">'+r[4]+'</span></div>';}).join('')+'</div>';
+})();
+
+/* ---------- belastningssimulering ---------- */
+(function(){
+  var r1=document.getElementById('r1'),r2=document.getElementById('r2'),r3=document.getElementById('r3'),out=document.getElementById('sim6');
+  if(!r1||!out)return;
+  function upd(){
+    var rps=+r1.value,cache=+r2.value,lim=+r3.value;
+    document.getElementById('v1').textContent=rps;
+    document.getElementById('v2').textContent=cache;
+    document.getElementById('v3').textContent=lim;
+    var backend=rps*(1-cache/100);
+    var throttled=(lim>0&&rps>lim)?(rps-lim)/rps:0;
+    var cap=50,p95,err;
+    if(backend<=cap){p95=0.2+backend/cap*0.8;err=throttled*100;}
+    else{p95=Math.min(30,1+(backend-cap)*0.6);err=Math.min(95,(backend-cap)*1.5+throttled*100);}
+    var ok=p95<2&&err<2;
+    out.innerHTML='<div><b>Svarstid p95:</b> '+p95.toFixed(1).replace('.',',')+' s</div>'+
+      '<div class="simbar'+(p95>2?' bad':'')+'"><span style="width:'+Math.min(100,p95/30*100)+'%"></span></div>'+
+      '<div><b>Fel och avvisade:</b> '+err.toFixed(0)+' %</div>'+
+      '<div class="simbar'+(err>2?' bad':'')+'"><span style="width:'+Math.min(100,err)+'%"></span></div>'+
+      '<p style="font-size:13.5px;margin:8px 0 0">'+(ok?'<b class="ok">Tjänsten klarar lasten.</b> Vanliga användare får svar inom rimlig tid.':'<b class="bad">Överbelastning.</b> '+(throttled>0?'Rate limit avvisar '+(throttled*100).toFixed(0)+' % av anropen (429). ':'')+(backend>cap?'Backend hinner inte med – risk för 504 och långa köer.':''))+'</p>'+
+      '<p class="note">Backend får '+backend.toFixed(0)+' anrop/s efter cache. Kapaciteten i exemplet är 50 anrop/s.</p>';
+  }
+  [r1,r2,r3].forEach(function(r){r.addEventListener('input',upd);});
+  upd();
+})();
+</script>
+</body>
+</html>

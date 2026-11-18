@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<!-- DEMO för säkerhetsundervisning - Ej för riktigt bruk -->
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logga in - Säkerhetsdemo</title>
+    <style>
+        /* Enklare version av ICA Bankens stil */
+        body {
+            font-family: sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            max-width: 500px;
+            margin: auto;
+        }
+        .login-container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .logo {
+            text-align: center;
+            color: #e13205;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        .tab.active {
+            border-bottom-color: #e13205;
+            font-weight: bold;
+        }
+        .form-section {
+            display: none;
+        }
+        .form-section.active {
+            display: block;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #e13205;
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .demo-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .info-box {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">ICA Banken</div>
+        
+        <h2>🔐 Logga in - Phishing demonstration</h2>
+        <p><strong>Pedagogisk demo:</strong> Så här ser en phishing-sida ut</p>
+        
+        <!-- Flikar för olika inloggningssätt -->
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('bankid')">Mobilt BankID</div>
+            <div class="tab" onclick="showTab('personal')">Personlig dosa</div>
+            <div class="tab" onclick="showTab('card')">Kortdosa</div>
+        </div>
+        
+        <!-- Mobilt BankID formulär -->
+        <div id="bankid-form" class="form-section active">
+            <p>Starta BankID-appen på din mobil eller surfplatta</p>
+            <p><small>En riktig phishing-sida skulle visa en falsk QR-kod här</small></p>
+            <button onclick="simulateBankID()">Starta Mobilt BankID</button>
+        </div>
+        
+        <!-- Personlig dosa formulär -->
+        <div id="personal-form" class="form-section">
+            <label>Personnummer (ÅÅÅÅMMDDXXXX)</label>
+            <input type="text" id="personnummer" placeholder="198501231234">
+            
+            <label>Lösenord (4 siffror)</label>
+            <input type="password" id="pinkod" maxlength="4" placeholder="1234">
+            
+            <button onclick="stealPersonalData()">Få kontrollkod</button>
+            
+            <div class="info-box">
+                <strong>Vad händer här?</strong>
+                <p>I en riktig phishing skulle dina uppgifter skickas direkt till bedragaren.</p>
+            </div>
+        </div>
+        
+        <!-- Kortdosa formulär -->
+        <div id="card-form" class="form-section">
+            <p style="color: #856404;">⚠️ Viktig info: Kortdosa upphör att fungera som sätt att logga in på banken.</p>
+            <p><small>Bedragare använder ofta sådan aktuell info för ökad trovärdighet</small></p>
+        </div>
+        
+        <!-- Demo varningssektion -->
+        <div class="demo-warning" id="demo-result">
+            <h3>📊 Demo-resultat</h3>
+            <p>Inga uppgifter har matats in än. Denna sektion visar vad som skulle läcka vid riktig phishing.</p>
+        </div>
+    </div>
+
+    <script>
+        // Visa rätt flik
+        function showTab(tabName) {
+            // Uppdatera flikar
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Visa rätt formulär
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(tabName + '-form').classList.add('active');
+            
+            // Rensa tidigare resultat
+            document.getElementById('demo-result').innerHTML = `
+                <h3>📊 Demo-resultat</h3>
+                <p>Valt inloggningssätt: <strong>${tabName}</strong></p>
+                <p>Inga uppgifter har matats in än.</p>
+            `;
+        }
+
+        // Simulera BankID-försök
+        function simulateBankID() {
+            document.getElementById('demo-result').innerHTML = `
+                <h3>🚨 Phishing-varning!</h3>
+                <p>En riktig phishing-sida skulle nu:</p>
+                <ol>
+                    <li>Visa en falsk QR-kod</li>
+                    <li>Försöka öppna BankID-appen med felaktig information</li>
+                    <li>Be om godkännande för en falsk transaktion</li>
+                </ol>
+                <p><strong>BankID öppnas alltid av bankens riktiga sida - aldrig via länkar i e-post!</strong></p>
+            `;
+            alert('[DEMO] En phishing-sida skulle försöka lura dig att godkänna en falsk BankID-begäran');
+        }
+
+        // Simulera stöld av personuppgifter
+        function stealPersonalData() {
+            const pnr = document.getElementById('personnummer').value;
+            const pin = document.getElementById('pinkod').value;
+            
+            if (!pnr || !pin) {
+                alert('Fyll i båda fälten för demonstration');
+                return;
+            }
+            
+            document.getElementById('demo-result').innerHTML = `
+                <h3>🚨 DATA LÄCKT - Phishing lyckad!</h3>
+                <p>I en riktig attack hade bedragaren nu fått:</p>
+                <ul>
+                    <li><strong>Personnummer:</strong> ${pnr}</li>
+                    <li><strong>Pinkod:</strong> ${pin}</li>
+                </ul>
+                <p>Med dessa uppgifter kunde bedragaren:</p>
+                <ol>
+                    <li>Försöka logga in på din bank</li>
+                    <li>Beställa nya kort</li>
+                    <li>Initiera banköverföringar</li>
+                    <li>Ändra dina kontaktuppgifter</li>
+                </ol>
+                <p style="color: #dc3545;"><strong>VARNING: Banker ber ALDRIG om pinkoder via formulär på webben!</strong></p>
+            `;
+            
+            alert('[DEMO] I verkligheten skulle dessa uppgifter nu skickats till en bedragare');
+        }
+
+        // Visa hur enkelt man kan ändra en riktig sida
+        function showManipulation() {
+            alert('Med inspekteringsverktyget kan en bedragare enkelt:\n1. Ändra formulärets mål-URL\n2. Dölja varningsmeddelanden\n3. Lägga till falska säkerhetsgarantier\n4. Kopiera hela sidans design');
+        }
+
+        // Initiera demo
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Pedagogisk phishing-demo - Endast för utbildning');
+            console.log('Riktiga phishing-sidor skulle:\n1. Ha liknande URL (ic4-banken.se)\n2. Använda HTTPS (lås-ikon)\n3. Kopiera all CSS/styling\n4. Skicka data till egen server');
+        });
+    </script>
+</body>
+</html>

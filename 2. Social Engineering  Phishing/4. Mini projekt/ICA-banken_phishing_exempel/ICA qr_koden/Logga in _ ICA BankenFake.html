@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<!-- DEMO för säkerhetsundervisning - Kombinerar lokal QR-kod med phishing-demo -->
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logga in - Säkerhetsdemo med QR-kod</title>
+    <style>
+        /* Enklare version av ICA Bankens stil */
+        body {
+            font-family: sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            max-width: 500px;
+            margin: auto;
+        }
+        .login-container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .logo {
+            text-align: center;
+            color: #e13205;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        .tab.active {
+            border-bottom-color: #e13205;
+            font-weight: bold;
+        }
+        .form-section {
+            display: none;
+        }
+        .form-section.active {
+            display: block;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #e13205;
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .demo-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .info-box {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+        .qr-container {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .qr-code {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            border: 2px dashed #e0e0e0;
+        }
+        .qr-code img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .countdown {
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .help-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .help-links a {
+            color: #e13205;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .warning-box {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            color: #721c24;
+        }
+        .qr-source-info {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .controls button {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            margin-top: 0;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .path-info {
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin: 5px 0;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-online {
+            background: #28a745;
+        }
+        .status-offline {
+            background: #dc3545;
+        }
+        .status-loading {
+            background: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">ICA Banken</div>
+        
+        <h2>🔐 Logga in - Phishing demonstration</h2>
+        <p><strong>Pedagogisk demo:</strong> Visar hur phishing fungerar med riktig QR-kod</p>
+        
+        <!-- Flikar för olika inloggningssätt -->
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('bankid')">Mobilt BankID</div>
+            <div class="tab" onclick="showTab('personal')">Personlig dosa</div>
+            <div class="tab" onclick="showTab('card')">Kortdosa</div>
+        </div>
+        
+        <!-- Mobilt BankID formulär med QR-kod -->
+        <div id="bankid-form" class="form-section active">
+            <div class="qr-source-info">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="status-indicator status-loading" id="statusIndicator"></span>
+                    <strong>💻 Teknisk demo: QR-kod från ny sökväg</strong>
+                </div>
+                <div class="path-info">
+                    <strong>Ny sökväg:</strong> ICA%20qr_koden/Logga%20in%20_%20ICA%20Banken.html
+                </div>
+                <div style="font-size: 11px; margin-top: 5px;">
+                    Full URL: <code id="sourceUrlDisplay">Laddar...</code>
+                </div>
+            </div>
+            
+            <div class="qr-container">
+                <p>Starta BankID-appen på din mobil eller surfplatta</p>
+                
+                <div class="qr-code" id="qrCodeContainer">
+                    <!-- QR-kod kommer att laddas här -->
+                    <div id="loadingSpinner" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 180px;">
+                        <div style="width: 40px; height: 40px; border: 3px solid #f3f3f3; border-top: 3px solid #e13205; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <p style="margin-top: 10px; color: #666;">Hämtar QR-kod från ny mapp...</p>
+                    </div>
+                </div>
+                
+                <p class="countdown" id="countdownText">5 minuter</p>
+                
+                <div class="controls">
+                    <button onclick="refreshQRCode()" class="btn-secondary">🔄 Ladda om QR-kod</button>
+                    <button onclick="showQRInfo()">ℹ️ Visa QR-info</button>
+                    <button onclick="testConnection()" class="btn-secondary">🔗 Testa anslutning</button>
+                </div>
+            </div>
+            
+            <button onclick="simulateBankID()">Starta Mobilt BankID på denna enhet</button>
+            
+            <div class="warning-box">
+                <strong>🚨 Phishing-varning i riktig attack:</strong>
+                <p>1. QR-koden skulle peka på bedragarens server</p>
+                <p>2. BankID-godkännandet skulle signera falska transaktioner</p>
+                <p>3. Inget säkerhetsmeddelande skulle visas</p>
+            </div>
+        </div>
+        
+        <!-- Personlig dosa formulär -->
+        <div id="personal-form" class="form-section">
+            <div class="warning-box">
+                <strong>⚠️ Aktuellt phishing-trick:</strong>
+                <p>Bedragare kan behålla verklig sidas formulär men ändra vart data skickas</p>
+            </div>
+            
+            <label>Personnummer (ÅÅÅÅMMDDXXXX)</label>
+            <input type="text" id="personnummer" placeholder="198501231234">
+            
+            <label>Lösenord (4 siffror)</label>
+            <input type="password" id="pinkod" maxlength="4" placeholder="1234">
+            
+            <button onclick="stealPersonalData()">Få kontrollkod</button>
+            
+            <div class="info-box">
+                <strong>👨‍🏫 Lärdom:</strong>
+                <p>Banker ber <strong>ALDRIG</strong> om hela lösenord eller pinkoder via webbformulär!</p>
+                <p>Riktiga dosor genererar en engångskod som du matar in på webbsidan.</p>
+            </div>
+        </div>
+        
+        <!-- Kortdosa formulär -->
+        <div id="card-form" class="form-section">
+            <div class="warning-box">
+                <strong>🎯 Phishing-taktik:</strong>
+                <p>Använda aktuell information för ökad trovärdighet</p>
+            </div>
+            
+            <p style="color: #856404; background: #fff3cd; padding: 15px; border-radius: 4px;">
+                ⚠️ <strong>Viktig info:</strong> Kortdosa upphör att fungera som sätt att logga in på banken.
+            </p>
+            
+            <p><small>Bedragare använder ofta sådan information för att sidan ska verka uppdaterad och legitim</small></p>
+            
+            <div class="info-box">
+                <strong>💡 Så upptäcker du phishing:</strong>
+                <ol style="margin: 10px 0; padding-left: 20px;">
+                    <li>Kontrollera URL:en noggrant</li>
+                    <li>Leta efter grammatikfel</li>
+                    <li>Testa med fel lösenord (riktiga sidor ger specifika fel)</li>
+                    <li>Använd aldrig länkar i e-post</li>
+                </ol>
+            </div>
+        </div>
+        
+        <!-- Demo varningssektion -->
+        <div class="demo-warning" id="demo-result">
+            <h3>📊 Demo-resultat</h3>
+            <p>Inga uppgifter har matats in än. Denna sektion visar vad som skulle läcka vid riktig phishing.</p>
+            <p><small>Teknisk data: QR-kod hämtas från ny sökväg</small></p>
+            <div id="connectionDetails" class="path-info" style="margin-top: 10px;">
+                Väntar på anslutning...
+            </div>
+        </div>
+        
+        <div class="help-links">
+            <a href="#" id="openOriginalLink" onclick="openOriginalFile()">Öppna originalfil</a>
+            <a href="#" onclick="showSecurityTips()">Säkerhetstips</a>
+            <a href="#" onclick="showPathInfo()">Sökvägsinfo</a>
+        </div>
+    </div>
+
+    <script>
+        // CSS för spinner animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Uppdaterad URL för ny sökväg
+        const LOCAL_FILE_URL = 'http://127.0.0.1:5500/ICA%20qr_koden/Logga%20in%20_%20ICA%20Banken.html';
+        
+        // Variabler för timers
+        let countdownTimer;
+        let currentQRCode = null;
+        let connectionStatus = 'loading';
+
+        // Uppdatera statusindikator
+        function updateStatusIndicator(status) {
+            const indicator = document.getElementById('statusIndicator');
+            indicator.className = 'status-indicator';
+            
+            switch(status) {
+                case 'online':
+                    indicator.classList.add('status-online');
+                    connectionStatus = 'online';
+                    break;
+                case 'offline':
+                    indicator.classList.add('status-offline');
+                    connectionStatus = 'offline';
+                    break;
+                case 'loading':
+                    indicator.classList.add('status-loading');
+                    connectionStatus = 'loading';
+                    break;
+            }
+        }
+
+        // Funktion för att extrahera QR-kod från den nya sökvägen
+        async function extractQRFromLocalFile() {
+            const qrContainer = document.getElementById('qrCodeContainer');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const sourceUrlDisplay = document.getElementById('sourceUrlDisplay');
+            const connectionDetails = document.getElementById('connectionDetails');
+            
+            // Uppdatera URL-visning
+            sourceUrlDisplay.textContent = LOCAL_FILE_URL;
+            
+            // Uppdatera status till laddning
+            updateStatusIndicator('loading');
+            
+            try {
+                // Logga försöket
+                console.log(`Försöker hämta från: ${LOCAL_FILE_URL}`);
+                connectionDetails.innerHTML = `Försöker ansluta till: <code>${LOCAL_FILE_URL}</code>`;
+                
+                const response = await fetch(LOCAL_FILE_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const htmlContent = await response.text();
+                
+                // Skapa ett temporärt DOM-element för att analysera HTML:en
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+                
+                // Sök efter QR-koden
+                let qrImageSrc = null;
+                const images = doc.querySelectorAll('img');
+                
+                console.log(`Hittade ${images.length} bilder i filen`);
+                
+                for (const img of images) {
+                    // Logga varje bild för debugging
+                    console.log('Bild funnen:', {
+                        alt: img.alt,
+                        src: img.src ? img.src.substring(0, 50) + '...' : 'ingen src',
+                        className: img.className
+                    });
+                    
+                    if ((img.alt && img.alt.includes('QR')) || 
+                        (img.src && img.src.startsWith('data:image/png;base64'))) {
+                        qrImageSrc = img.src;
+                        console.log('QR-kod hittad i img-tag!');
+                        break;
+                    }
+                }
+                
+                // Om vi inte hittade via img-taggar, sök i HTML
+                if (!qrImageSrc) {
+                    console.log('Letar efter base64-kod i HTML...');
+                    const base64Match = htmlContent.match(/data:image\/png;base64,[A-Za-z0-9+/=]+/);
+                    if (base64Match) {
+                        qrImageSrc = base64Match[0];
+                        console.log('QR-kod hittad via regex!');
+                    }
+                }
+                
+                if (qrImageSrc) {
+                    qrContainer.innerHTML = '';
+                    
+                    const qrImg = document.createElement('img');
+                    qrImg.alt = "QR Kod från lokal ICA Banken-fil (DEMO)";
+                    qrImg.width = 180;
+                    qrImg.height = 180;
+                    qrImg.style.objectFit = 'contain';
+                    
+                    qrImg.src = qrImageSrc;
+                    currentQRCode = qrImageSrc;
+                    
+                    qrContainer.appendChild(qrImg);
+                    
+                    // Uppdatera status till online
+                    updateStatusIndicator('online');
+                    connectionDetails.innerHTML = `
+                        <strong>✅ Ansluten!</strong><br>
+                        Fil: <code>${LOCAL_FILE_URL}</code><br>
+                        QR-kod storlek: ${Math.round(qrImageSrc.length / 1024 * 100) / 100} KB<br>
+                        Hämtningsdatum: ${new Date().toLocaleTimeString()}
+                    `;
+                    
+                    updateDemoResult('qr-loaded', 'QR-kod laddad från ny sökväg');
+                    return true;
+                } else {
+                    throw new Error('Ingen QR-kod hittades i filen');
+                }
+                
+            } catch (error) {
+                console.error('Fel vid hämtning:', error);
+                
+                // Uppdatera status till offline
+                updateStatusIndicator('offline');
+                
+                loadingSpinner.innerHTML = `
+                    <div style="text-align: center; color: #d32f2f;">
+                        <p>❌</p>
+                        <p><strong>Fel vid hämtning från ny sökväg</strong></p>
+                        <p style="font-size: 12px;">${error.message}</p>
+                        <div style="margin-top: 10px; font-size: 11px; color: #666;">
+                            <p>Möjliga problem:</p>
+                            <ul style="text-align: left; margin: 5px 0;">
+                                <li>Felaktig sökväg</li>
+                                <li>Ingen lokal webbserver</li>
+                                <li>Fel mappstruktur</li>
+                            </ul>
+                        </div>
+                        <button onclick="refreshQRCode()" style="margin-top: 10px; padding: 8px 16px; background: #e13205; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                            Försök igen
+                        </button>
+                    </div>
+                `;
+                
+                connectionDetails.innerHTML = `
+                    <strong>❌ Anslutning misslyckades</strong><br>
+                    Fel: ${error.message}<br>
+                    URL: <code>${LOCAL_FILE_URL}</code><br>
+                    Kontrollera att filen finns och servern körs.
+                `;
+                
+                updateDemoResult('qr-error', `Fel: ${error.message}`);
+                return false;
+            }
+        }
+
+        // Funktion för att starta nedräkning
+        function startCountdown() {
+            const countdownElement = document.getElementById('countdownText');
+            clearInterval(countdownTimer);
+            
+            let minutes = 5;
+            let seconds = 0;
+            
+            countdownTimer = setInterval(() => {
+                if (seconds === 0) {
+                    if (minutes === 0) {
+                        clearInterval(countdownTimer);
+                        countdownElement.textContent = "QR-koden har löpt ut";
+                        countdownElement.style.color = "#dc3545";
+                        
+                        const qrContainer = document.getElementById('qrCodeContainer');
+                        qrContainer.innerHTML = `
+                            <div style="text-align: center; padding: 20px; color: #dc3545;">
+                                <p>⏰</p>
+                                <p>QR-koden har utgått</p>
+                                <button onclick="refreshQRCode()" style="margin-top: 10px; padding: 8px 16px; background: #e13205; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                    Generera ny
+                                </button>
+                            </div>
+                        `;
+                        return;
+                    }
+                    minutes--;
+                    seconds = 59;
+                } else {
+                    seconds--;
+                }
+                
+                countdownElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                countdownElement.style.color = minutes < 1 ? "#dc3545" : "#666";
+            }, 1000);
+        }
+
+        // Funktion för att uppdatera QR-koden
+        function refreshQRCode() {
+            const qrContainer = document.getElementById('qrCodeContainer');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            
+            qrContainer.innerHTML = '';
+            qrContainer.appendChild(loadingSpinner);
+            loadingSpinner.style.display = 'flex';
+            
+            startCountdown();
+            
+            setTimeout(() => {
+                extractQRFromLocalFile();
+            }, 500);
+        }
+
+        // Testa anslutningen
+        async function testConnection() {
+            const connectionDetails = document.getElementById('connectionDetails');
+            connectionDetails.innerHTML = 'Testar anslutning... <span class="status-indicator status-loading"></span>';
+            
+            try {
+                const startTime = Date.now();
+                const response = await fetch(LOCAL_FILE_URL);
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+                
+                if (response.ok) {
+                    connectionDetails.innerHTML = `
+                        <strong>✅ Anslutning OK!</strong><br>
+                        Svarstid: ${responseTime} ms<br>
+                        Status: ${response.status} ${response.statusText}<br>
+                        URL: <code>${LOCAL_FILE_URL}</code>
+                    `;
+                    updateStatusIndicator('online');
+                    alert(`✅ Anslutning lyckades!\nSvarstid: ${responseTime} ms\nStatus: ${response.status} ${response.statusText}`);
+                } else {
+                    throw new Error(`${response.status} ${response.statusText}`);
+                }
+            } catch (error) {
+                connectionDetails.innerHTML = `
+                    <strong>❌ Anslutning misslyckades</strong><br>
+                    Fel: ${error.message}<br>
+                    Kontrollera att:<br>
+                    1. Lokal webbserver körs<br>
+                    2. Filen finns i rätt mapp<br>
+                    3. Port 5500 är tillgänglig
+                `;
+                updateStatusIndicator('offline');
+                alert(`❌ Anslutning misslyckades: ${error.message}`);
+            }
+        }
+
+        // Visa QR-info
+        function showQRInfo() {
+            const info = `
+                <div class="info-box">
+                    <h4>🔍 QR-kod Analys - Ny sökväg</h4>
+                    <p><strong>Status:</strong> <span class="status-indicator ${connectionStatus === 'online' ? 'status-online' : connectionStatus === 'offline' ? 'status-offline' : 'status-loading'}"></span> ${connectionStatus}</p>
+                    <p><strong>Källa:</strong> <code>ICA%20qr_koden/Logga%20in%20_%20ICA%20Banken.html</code></p>
+                    <p><strong>Full URL:</strong> <code>${LOCAL_FILE_URL}</code></p>
+                    ${currentQRCode ? `
+                    <p><strong>QR-storlek:</strong> ${Math.round(currentQRCode.length / 1024 * 100) / 100} KB</p>
+                    <p><strong>Data-typ:</strong> ${currentQRCode.substring(0, 20)}...</p>
+                    ` : '<p><strong>QR-storlek:</strong> Ej laddad</p>'}
+                    <p><strong>I en riktig phishing:</strong></p>
+                    <ul>
+                        <li>QR-kod skulle genereras av bedragarens server</li>
+                        <li>Den skulle peka på deras autentiseringssystem</li>
+                        <li>Alla BankID-godkännanden skulle fångas upp</li>
+                    </ul>
+                </div>
+            `;
+            
+            const existingInfo = document.querySelector('.info-box');
+            if (existingInfo && existingInfo.parentElement.id === 'bankid-form') {
+                existingInfo.remove();
+            }
+            
+            document.getElementById('bankid-form').insertAdjacentHTML('beforeend', info);
+        }
+
+        // Uppdatera demo-resultat
+        function updateDemoResult(type, message) {
+            const resultDiv = document.getElementById('demo-result');
+            
+            switch(type) {
+                case 'qr-loaded':
+                    resultDiv.innerHTML = `
+                        <h3>✅ QR-kod laddad</h3>
+                        <p><strong>Teknisk demo fungerar med ny sökväg!</strong></p>
+                        <p>QR-koden hämtades från: <code>${LOCAL_FILE_URL}</code></p>
+                        <p>I en riktig phishing-attack:</p>
+                        <ol>
+                            <li>QR-kod genereras av bedragare</li>
+                            <li>Den länkar till falsk BankID-server</li>
+                            <li>Alla godkännanden stjäls</li>
+                        </ol>
+                        <p><small>${message}</small></p>
+                    `;
+                    break;
+                    
+                case 'qr-error':
+                    resultDiv.innerHTML = `
+                        <h3>❌ Tekniskt fel</h3>
+                        <p><strong>Demonstration av offline-phishing:</strong></p>
+                        <p>Bedragare kan inte garantera att deras phishing-sida alltid fungerar.</p>
+                        <p>Riktiga banker har redundans och felhantering.</p>
+                        <p><small>Felmeddelande: ${message}</small></p>
+                        <p><small>Försökte nå: <code>${LOCAL_FILE_URL}</code></small></p>
+                    `;
+                    break;
+                    
+                default:
+                    // Behåll nuvarande innehåll
+                    break;
+            }
+        }
+
+        // Tab-funktionalitet
+        function showTab(tabName) {
+            // Uppdatera flikar
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Visa rätt formulär
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(tabName + '-form').classList.add('active');
+            
+            // Uppdatera demo-resultat
+            const resultDiv = document.getElementById('demo-result');
+            resultDiv.innerHTML = `
+                <h3>📊 Valt inloggningssätt: ${tabName}</h3>
+                <p><strong>Phishing-risk:</strong> ${getPhishingRisk(tabName)}</p>
+                <p><strong>Vanligaste attacken:</strong> ${getCommonAttack(tabName)}</p>
+                <p><small>Denna demo kombinerar riktig teknik med pedagogisk information</small></p>
+            `;
+        }
+
+        function getPhishingRisk(tabName) {
+            switch(tabName) {
+                case 'bankid': return 'Hög - QR-koder kan manipuleras';
+                case 'personal': return 'Mycket hög - Direkt datafångst';
+                case 'card': return 'Medel - Mindre vanlig nu';
+                default: return 'Okänd';
+            }
+        }
+
+        function getCommonAttack(tabName) {
+            switch(tabName) {
+                case 'bankid': return 'Falska QR-koder som leder till bedragarens server';
+                case 'personal': return 'Formulär som skickar direkt till bedragare';
+                case 'card': return 'Förfrågan om kortuppgifter via falska uppdateringsmeddelanden';
+                default: return 'Okänd';
+            }
+        }
+
+        // Simulera BankID-försök
+        function simulateBankID() {
+            const resultDiv = document.getElementById('demo-result');
+            resultDiv.innerHTML = `
+                <h3>🚨 Phishing-simulation aktiverad!</h3>
+                <p><strong>Vad som händer i riktig attack:</strong></p>
+                <ol>
+                    <li>BankID-appen öppnas med falsk information</li>
+                    <li>Du ombeds godkänna "inloggning" som faktiskt är en transaktion</li>
+                    <li>Bedragaren får tillgång till din BankID</li>
+                    <li>Alla framtida transaktioner kan signeras</li>
+                </ol>
+                <p style="color: #dc3545;"><strong>✔️ RIKTIGT SKYDD: BankID visar alltid vem som begär godkännande och vilken transaktion det gäller!</strong></p>
+            `;
+            
+            alert('[DEMO] I verkligheten: BankID skulle visa "Begäran från: OKÄND SERVER"\nTransaktion: Överföring 10.000 kr till konto 1234');
+        }
+
+        // Simulera stöld av personuppgifter
+        function stealPersonalData() {
+            const pnr = document.getElementById('personnummer').value;
+            const pin = document.getElementById('pinkod').value;
+            
+            if (!pnr || !pin) {
+                alert('[DEMO] För demonstration, fyll i båda fälten med testdata');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('demo-result');
+            resultDiv.innerHTML = `
+                <h3>🚨 PHISHING LYCKAD - Data stulen!</h3>
+                <p><strong>Stulna uppgifter:</strong></p>
+                <ul>
+                    <li><strong>Personnummer:</strong> ${pnr}</li>
+                    <li><strong>Pinkod:</strong> ${pin}</li>
+                </ul>
+                <p><strong>Vad bedragaren kan göra:</strong></p>
+                <ol>
+                    <li>Logga in på din bank (med dosa)</li>
+                    <li>Beställa nya kort</li>
+                    <li>Ändra kontaktinformation</li>
+                    <li>Initiera överföringar</li>
+                    <li>Sälja dina uppgifter vidare</li>
+                </ol>
+                <p style="color: #dc3545;"><strong>VIKTIGT: Banker ber ALDRIG om pinkoder via webbformulär! Endast engångskoder från dosa.</strong></p>
+            `;
+            
+            alert('[DEMO] Dina testdata skulle nu skickats till bedragarens server\nIP: 185.143.233.45 (Ryssland)\nTidstämpel: ' + new Date().toISOString());
+        }
+
+        // Öppna originalfil
+        function openOriginalFile() {
+            window.open(LOCAL_FILE_URL, '_blank');
+            return false;
+        }
+
+        // Visa sökvägsinfo
+        function showPathInfo() {
+            const info = `
+                <div class="info-box">
+                    <h4>📁 Sökvägsinformation</h4>
+                    <p><strong>Gammal sökväg:</strong></p>
+                    <code style="display: block; background: #f8f9fa; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 10px;">
+                        http://127.0.0.1:5500/Logga%20in%20_%20ICA%20Banken.html
+                    </code>
+                    <p><strong>Ny sökväg (uppdaterad):</strong></p>
+                    <code style="display: block; background: #e8f5e8; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 10px;">
+                        ${LOCAL_FILE_URL}
+                    </code>
+                    <p><strong>Mappstruktur:</strong></p>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; font-size: 10px; overflow-x: auto;">
+projekt-mapp/
+├── denna-demo.html
+└── ICA qr_koden/
+    └── Logga in _ ICA Banken.html
+                    </pre>
+                    <p><small>Denna demo hämtar QR-koden från undermappen "ICA qr_koden"</small></p>
+                </div>
+            `;
+            
+            document.getElementById('demo-result').insertAdjacentHTML('beforeend', info);
+            return false;
+        }
+
+        // Hjälpfunktioner
+        function showSecurityTips() {
+            alert('💡 SÄKERHETSTIPS:\n\n1. Använd ALLTID bokmärken för banken\n2. Kontrollera URL:en noggrant\n3. Leta efter HTTPS och lås-ikonen\n4. Banker skickar aldrig länkar i e-post\n5. Vid tvivel, ring banken direkt\n6. Använd BankID-säkerhetsapp för extra skydd');
+            return false;
+        }
+
+        // Initiera sidan
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Pedagogisk phishing-demo med QR-kod från ny sökväg');
+            console.log('Källa:', LOCAL_FILE_URL);
+            
+            // Uppdatera länken för originalfil
+            document.getElementById('openOriginalLink').href = LOCAL_FILE_URL;
+            
+            // Starta med att ladda QR-kod
+            refreshQRCode();
+            
+            // Uppdatera resultat
+            updateDemoResult('init', 'Demo initierad - Hämtar från ny sökväg');
+            
+            // Auto-refresh var 4:e minut
+            setInterval(() => {
+                if (connectionStatus === 'online') {
+                    const countdownText = document.getElementById('countdownText').textContent;
+                    if (countdownText.includes(':') && !countdownText.includes('utgått')) {
+                        const time = countdownText.split(':');
+                        if (parseInt(time[0]) < 1 && parseInt(time[1]) < 30) {
+                            refreshQRCode();
+                        }
+                    }
+                }
+            }, 30000); // Var 30:e sekund
+        });
+    </script>
+</body>
+</html>

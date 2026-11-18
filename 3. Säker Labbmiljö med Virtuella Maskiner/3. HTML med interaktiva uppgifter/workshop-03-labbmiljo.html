@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:,">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lektion 3 · Säker labbmiljö med virtuella maskiner – individuellt, grupp och facit</title>
+<style>
+:root{--acc:#1f6b3a;--acc2:#e6f3ea;--ink:#15221a;--mut:#55695c;--line:#d3e3d8;--ok:#0f6b3f;--bad:#a3221a;--warn:#8a5a00;--bg:#f4f8f5}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.55 system-ui,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:#fff;border-bottom:3px solid var(--acc);padding:14px 0}
+.wrap{max-width:1100px;margin:0 auto;padding:0 18px}
+h1{margin:0 0 4px;font-size:21px;color:var(--acc)}
+.sub{margin:0 0 10px;color:var(--mut);font-size:13.5px}
+nav button{border:1px solid var(--line);background:#fff;padding:7px 14px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer;margin-right:6px}
+nav button.on{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+main{padding:16px 0 70px}
+h2{font-size:17px;margin:14px 0 8px;color:var(--acc)}h3{font-size:14.5px;margin:0 0 6px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.step{background:#fff;border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.step h3{color:var(--acc)}.step p{margin:5px 0;font-size:13.8px}
+.expect{background:var(--acc2);border-radius:8px;padding:7px 10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+label{display:block;font-size:13px;font-weight:600;margin:8px 0 2px}
+textarea,input,select{width:100%;font:13px/1.5 ui-monospace,Consolas,monospace;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:#fdfefd}
+button.p{background:var(--acc);color:#fff;border:0;padding:8px 15px;border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
+button.g{background:#fff;border:1px solid var(--line);padding:7px 12px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+pre{background:#f2f7f3;border:1px solid var(--line);border-radius:8px;padding:10px;font:12.5px/1.5 ui-monospace,Consolas,monospace;white-space:pre-wrap;margin:0}
+.res{display:flex;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.ok{color:var(--ok)}.bad{color:var(--bad)}
+.tag{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:700;background:var(--acc2);color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--acc2);color:var(--acc)}
+.bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.bar button{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit;font-size:12.5px;cursor:pointer}
+.bar button.on{background:var(--acc2);border-color:var(--acc);font-weight:600}
+#clock{font:700 15px ui-monospace,Consolas,monospace;color:var(--acc)}
+.gt button{border:1px solid var(--line);background:#fff;padding:5px 12px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer;margin-right:6px}
+.gt button.on{background:var(--acc2);border-color:var(--acc);font-weight:700}
+.finding{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin:8px 0;background:#fcfffd;font-size:13px}
+.sev{font-weight:700;padding:1px 6px;border-radius:5px;font-size:11px}
+.s1{background:#e6f3ea;color:var(--ok)}.s2{background:#fdf2d8;color:var(--warn)}.s3{background:#fbe4e2;color:var(--bad)}
+.opts button{display:block;width:100%;text-align:left;border:1px solid var(--line);background:#fff;padding:7px 10px;border-radius:8px;margin:4px 0;font:inherit;font-size:13.5px;cursor:pointer}
+.opts button:hover{border-color:var(--acc)}
+.fb{font-size:13px;margin-top:5px}
+details.facit{border:1px solid var(--acc);border-radius:10px;padding:10px 12px;margin:10px 0;background:#fcfffd}
+details.facit summary{cursor:pointer;font-weight:700;color:var(--acc)}
+.muted{color:var(--mut);font-size:12.5px}
+.scn{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px}
+.scn .q2{font-size:13.5px;margin-bottom:6px}
+.scn select{width:auto;font-family:inherit}
+
+.term{border-bottom:1px dotted #7c8b99;cursor:help;font-weight:600}
+.term:hover{color:var(--acc);border-bottom-color:var(--acc)}
+#pop{position:fixed;z-index:9999;max-width:330px;background:#fff;border:1px solid var(--acc);border-radius:10px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:13px;line-height:1.45;display:none}
+#pop b{color:var(--acc)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 12px}
+.chips .term{background:#fff;border:1px solid var(--line);border-radius:20px;padding:3px 10px;font-size:12px}
+.rl{border-top:1px dashed var(--line);padding:9px 0;font-size:13px}
+.rl:first-of-type{border-top:0}
+.lvl{font-size:11px;font-weight:700;background:var(--acc2);color:var(--acc);padding:1px 7px;border-radius:20px;margin-left:6px}
+.note{font-size:12px;color:var(--mut)}
+.resbox a{color:var(--acc);font-weight:600}
+.mrow{display:flex;justify-content:space-between;border-bottom:1px dashed var(--line);padding:6px 0;font-size:13.5px}
+.yes{color:var(--ok);font-weight:700}.no{color:var(--bad);font-weight:700}
+
+.tabhead{background:#fff;border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:10px;padding:8px 12px;margin:0 0 12px;font-size:13px;color:var(--mut)}
+.tabhead b{color:var(--acc)}
+.labblock{margin-top:16px;padding-top:6px;border-top:2px dashed var(--line)}
+
+/* interaktiv stegvisare */
+.stp{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 14px}
+.stp-dots{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.stp-dot{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--mut);font:700 13px system-ui;cursor:pointer;transition:.15s}
+.stp-dot:hover{border-color:var(--acc);color:var(--acc)}
+.stp-dot.on{background:var(--acc);border-color:var(--acc);color:#fff;transform:scale(1.08)}
+.stp-dot.done{border-color:var(--ok);color:var(--ok)}
+.stp-dot.done.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.stp-card h3{margin:0 0 6px;color:var(--acc)}
+.stp-card p{margin:5px 0;font-size:13.8px}
+.stp-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;border-top:1px dashed var(--line);padding-top:9px}
+.stp-chk{display:flex;gap:7px;align-items:center;font-size:13px;font-weight:600;color:var(--mut);cursor:pointer;margin:0}
+.stp-chk input{width:auto;margin:0}
+.stp-prog{font-size:12px;color:var(--mut);margin-left:auto}
+.stp-prog b{color:var(--acc)}
+/* dra och släpp */
+.ds{position:relative;background:linear-gradient(135deg,#ffffff 0%,#eef5fb 100%);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;margin:0 0 16px;overflow:hidden}
+.ds-head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:4px}
+.ds-head b{color:var(--acc);font-size:14.5px}
+.ds-status{font-size:12.5px;color:var(--mut)}
+.ds-status b{color:var(--ok)}
+.ds-pool{min-height:52px;padding:6px 0 2px;border-bottom:1px dashed var(--line);margin-bottom:10px}
+.ds-chip{display:inline-block;padding:8px 12px;margin:4px 6px 2px 0;border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 1px 2px rgba(16,32,48,.07);font-size:13px;line-height:1.3;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;transition:box-shadow .15s,border-color .15s,transform .15s}
+.ds-chip:hover{border-color:var(--acc);box-shadow:0 4px 12px rgba(27,79,122,.18);transform:translateY(-1px)}
+.ds-chip.ds-sel{border-color:var(--acc);background:var(--acc2);box-shadow:0 0 0 2px rgba(27,79,122,.25)}
+.ds-chip.ds-dragging{opacity:.35}
+.ds-chip.ok{background:#e8f7ef;border-color:var(--ok);color:#0d5734;cursor:default;box-shadow:none}
+.ds-chip.ok::after{content:" ✓";font-weight:700}
+.ds-chip.bad{border-color:var(--bad);animation:ds-shake .4s}
+@keyframes ds-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.ds-ghost{position:fixed;z-index:9999;pointer-events:none;border-color:var(--acc);box-shadow:0 12px 26px rgba(16,32,48,.3);transform:rotate(-2deg);opacity:.95}
+.ds-bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.ds-bin{border:2px dashed var(--line);border-radius:12px;padding:8px 10px;min-height:96px;transition:.15s;background:rgba(255,255,255,.55)}
+.ds-bin.hot{border-color:var(--acc);background:var(--acc2);transform:translateY(-2px)}
+.ds-bin>b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--mut);margin-bottom:4px}
+.ds-drop{min-height:56px}
+.ds-foot{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.ds-facit{border:1px solid var(--line);border-radius:5px;background:#fff;padding:4px 8px;font-size:12px;cursor:pointer;list-style:none}
+summary.ds-facit{list-style:none}
+.ds-facit summary{cursor:pointer;font-weight:600;color:var(--acc);font-size:12.5px}
+.ds-facit ul{margin:6px 0 2px;padding-left:16px;font-size:12.5px;color:var(--mut)}
+.ds.win{border-color:var(--ok);box-shadow:0 0 0 3px rgba(61,220,132,.22),0 14px 32px rgba(18,104,63,.18);animation:ds-pop .45s ease-out}
+@keyframes ds-pop{0%{transform:scale(1)}45%{transform:scale(1.012)}100%{transform:scale(1)}}
+.ds-badge{position:absolute;right:12px;top:10px;width:38px;height:38px;border-radius:50%;background:var(--ok);color:#fff;font:700 20px system-ui;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(18,104,63,.35);animation:ds-badge .5s ease-out}
+@keyframes ds-badge{0%{transform:scale(0) rotate(-40deg);opacity:0}70%{transform:scale(1.15) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Lektion 3 · Säker labbmiljö med virtuella maskiner</h1>
+  <p class="sub">Individuellt: välj rätt nätverksläge (8 min) · Grupparbete: isolera, testa, åtgärda, retesta (30 min) · Facit: rapport och facit</p>
+  <nav id="tabs"><button data-t="a" class="on">1 · Individuellt arbete</button><button data-t="b">2 · Grupparbete</button><button data-t="c">3 · Facit</button></nav>
+</div></header>
+<main class="wrap">
+<section id="a">
+<div class="tabhead"><b>Individuellt arbete</b> – gör uppgifterna själv. Allt du skriver sparas i webbläsaren och kan kopieras till rapporten i fliken Facit.</div>
+<div class="ds" id="ds3">
+  <div class="ds-head"><b>Dra och släpp · Vilket nätverksläge?</b><span class="ds-status">Dra varje behov till rätt nätverksläge.</span></div>
+  <div class="ds-pool"></div>
+  <div class="ds-bins"></div>
+  <div class="ds-foot"><button class="g ds-reset" type="button">Börja om</button>
+    <details class="ds-facit"><summary>Visa facit</summary><ul><li>VM:erna ska bara nå varandra → <b>Host-only</b></li><li>Angreppstest ska inte kunna nå skolnätet → <b>Host-only</b></li><li>Behöver internet för att installera paket → <b>NAT</b></li><li>Ska ladda ner verktyg men inte exponeras → <b>NAT</b></li><li>Ska synas som en egen dator på skolnätet → <b>Bryggat</b></li></ul></details></div>
+</div>
+<script>
+(function(){
+  var root=document.getElementById('ds3'); if(!root) return;
+  var DATA={"bins": [{"k": "host", "t": "Host-only"}, {"k": "nat", "t": "NAT"}, {"k": "brygga", "t": "Bryggat"}], "chips": [{"t": "VM:erna ska bara nå varandra", "b": "host"}, {"t": "Angreppstest ska inte kunna nå skolnätet", "b": "host"}, {"t": "Behöver internet för att installera paket", "b": "nat"}, {"t": "Ska ladda ner verktyg men inte exponeras", "b": "nat"}, {"t": "Ska synas som en egen dator på skolnätet", "b": "brygga"}], "win": "Host-only för attacker, NAT när du behöver internet – aldrig bryggat i labben."};
+  var pool=root.querySelector('.ds-pool'), binsBox=root.querySelector('.ds-bins'),
+      status=root.querySelector('.ds-status');
+  var placed=0, drag=null, ghost=null, sel=null, justDragged=0;
+
+  DATA.bins.forEach(function(b){
+    var d=document.createElement('div'); d.className='ds-bin'; d.setAttribute('data-k',b.k);
+    d.innerHTML='<b>'+b.t+'</b><div class="ds-drop"></div>';
+    d.addEventListener('click',function(){
+      if(!sel) return;
+      var s=sel; sel=null; s.classList.remove('ds-sel'); drop(s,d);
+    });
+    binsBox.appendChild(d);
+  });
+  DATA.chips.forEach(function(c){
+    var el=document.createElement('div');
+    el.className='ds-chip'; el.setAttribute('data-b',c.b); el.textContent=c.t; el.tabIndex=0;
+    el.addEventListener('pointerdown',down);
+    el.addEventListener('click',function(){ if(drag||Date.now()-justDragged<250) return; pick(el); });
+    el.addEventListener('keydown',function(e){
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); pick(el); }
+    });
+    pool.appendChild(el);
+  });
+
+  function pick(el){
+    if(el.classList.contains('ok')) return;
+    if(sel===el){ el.classList.remove('ds-sel'); sel=null; say('Klicka på ett kort och sedan på en låda.'); return; }
+    if(sel) sel.classList.remove('ds-sel');
+    sel=el; el.classList.add('ds-sel');
+    say('Välj rätt låda för "'+el.textContent+'".');
+  }
+  function down(e){
+    var el=e.currentTarget;
+    if(el.classList.contains('ok')) return;
+    e.preventDefault();
+    var r=el.getBoundingClientRect();
+    ghost=el.cloneNode(true);
+    ghost.className='ds-chip ds-ghost';
+    ghost.style.width=r.width+'px';
+    ghost.style.left=r.left+'px'; ghost.style.top=r.top+'px';
+    document.body.appendChild(ghost);
+    el.classList.add('ds-dragging');
+    drag={el:el,ox:e.clientX-r.left,oy:e.clientY-r.top};
+    document.addEventListener('pointermove',move);
+    document.addEventListener('pointerup',up);
+    document.addEventListener('pointercancel',up);
+  }
+  function move(e){
+    if(!drag) return;
+    ghost.style.left=(e.clientX-drag.ox)+'px';
+    ghost.style.top=(e.clientY-drag.oy)+'px';
+    var b=binAt(e.clientX,e.clientY);
+    [].slice.call(binsBox.children).forEach(function(x){ x.classList.toggle('hot',x===b); });
+  }
+  function up(e){
+    if(!drag) return;
+    var el=drag.el, b=binAt(e.clientX,e.clientY);
+    document.removeEventListener('pointermove',move);
+    document.removeEventListener('pointerup',up);
+    document.removeEventListener('pointercancel',up);
+    if(ghost){ ghost.parentNode.removeChild(ghost); ghost=null; }
+    el.classList.remove('ds-dragging');
+    [].slice.call(binsBox.children).forEach(function(x){ x.classList.remove('hot'); });
+    drag=null; justDragged=Date.now();
+    if(b) drop(el,b);
+  }
+  function binAt(x,y){
+    if(ghost) ghost.style.display='none';
+    var t=document.elementFromPoint(x,y);
+    if(ghost) ghost.style.display='';
+    while(t && t!==root && !t.classList.contains('ds-bin')) t=t.parentNode;
+    return (t&&t.classList&&t.classList.contains('ds-bin'))?t:null;
+  }
+  function drop(el,bin){
+    var k=bin.getAttribute('data-k');
+    if(el.getAttribute('data-b')===k){
+      el.classList.remove('ds-sel');
+      if(sel===el) sel=null;
+      el.classList.add('ok');
+      bin.querySelector('.ds-drop').appendChild(el);
+      placed++;
+      if(placed===DATA.chips.length){ win(); }
+      else say('<b>'+placed+' av '+DATA.chips.length+' rätt.</b> Fortsätt – du är på rätt spår.');
+    } else {
+      el.classList.add('bad');
+      setTimeout(function(){ el.classList.remove('bad'); },700);
+      say('Nästan! Det kortet hör inte hemma där. Läs ledtråden i lådans rubrik och prova igen.');
+    }
+  }
+  function say(t){ status.innerHTML=t; }
+  function win(){
+    say('<b>Allt rätt!</b> '+DATA.win);
+    root.classList.add('win');
+    if(!root.querySelector('.ds-badge')){
+      var b=document.createElement('div'); b.className='ds-badge'; b.textContent='✓';
+      root.appendChild(b);
+    }
+  }
+  root.querySelector('.ds-reset').onclick=function(){
+    [].slice.call(root.querySelectorAll('.ds-chip')).forEach(function(el){
+      el.classList.remove('ok','bad','ds-sel'); pool.appendChild(el);
+    });
+    placed=0; sel=null;
+    root.classList.remove('win');
+    var bd=root.querySelector('.ds-badge'); if(bd) bd.parentNode.removeChild(bd);
+    say('Dra korten till rätt låda – eller klicka på ett kort och sedan på en låda.');
+  };
+})();
+
+</script>
+<h2>Individuellt · Välj nätverksläge och skapa en säker startpunkt</h2>
+  <div id="stepsA"></div>
+  <div class="chips" id="chipsA"></div>
+  <div class="card"><h3>Testa nätverkslägena visuellt</h3>
+    <p class="muted">Välj ett läge och se vad som blir möjligt. Jämför med tabellen i facit.</p>
+    <div class="bar" id="mbtns"></div>
+    <div id="diagram"></div>
+  </div>
+  <div class="card">
+    <h3>Fyra scenarier – välj nätverksläge</h3>
+    <div id="scn"></div>
+    <label for="why">Motivera kort varför just dessa val skyddar labbmiljön</label>
+    <textarea id="why" rows="3" placeholder="Angriparen ska aldrig nå ..."></textarea>
+    <div class="row" style="margin-top:10px"><button class="p" id="chkA">Kontrollera mina fyra val</button><button class="g" id="cpA">Kopiera svar</button><button class="g" id="resetA">Rensa</button></div>
+    <p class="note">Knappen jämför dina fyra val med facit och bedömer motiveringen separat. 4 av 4 krävs för godkänt.</p>
+    <div id="fb" style="margin-top:10px"></div>
+  </div>
+<div id="checkA"></div>
+
+<div class="labblock">
+<style>
+.labd3{--line:#d7dfe8;--mut:#5b6b7c;--acc:var(--acc,#1b4f7a);--acc2:var(--acc2,#e8f0f7);--ok:var(--ok,#12683f);--bad:var(--bad,#a3221a);--warn:var(--warn,#8a5a00)}
+.labd3 .panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.labd3 canvas{width:100%;height:auto;display:block;border-radius:10px;background:#0b1622}
+.labd3 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.labd3 label{display:block;font-size:12px;font-weight:700;margin-bottom:3px;color:#33475b}
+.labd3 select{font:13px/1.5 system-ui;padding:6px 9px;border:1px solid var(--line);border-radius:8px;background:#fdfefe}
+.labd3 button.p{background:var(--acc);color:#fff;border:0;padding:8px 15px;border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
+.labd3 button.g{background:#fff;border:1px solid var(--line);padding:7px 12px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer}
+.labd3 .note{font-size:12.5px;color:var(--mut)}
+.labd3 .kv{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.labd3 .pill{font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;background:var(--acc2);color:var(--acc)}
+</style>
+<h2>Labb A (individuellt) · nätverksläget – vad når din VM egentligen?</h2>
+<div class="labd3">
+  <div class="panel">
+    <p style="margin:0 0 10px"><b>Så gör du:</b> byt nätverksläge i listan och skicka ett paket. Se vilka paket som passerar och vilka som studsar tillbaka. Målet är att du ska kunna välja rätt läge för en isolerad labb utan att råka släppa ut trafik på skolans nät.</p>
+    <div class="row">
+      <div><label>Nätverksläge i VirtualBox</label>
+        <select id="labd3-mode">
+          <option value="nat">NAT</option>
+          <option value="bridged">Bridged (brygga)</option>
+          <option value="hostonly">Host-only</option>
+          <option value="internal">Internt nät</option>
+        </select></div>
+      <div><label>Skicka paket till</label>
+        <select id="labd3-dst">
+          <option value="net">Internet</option>
+          <option value="vm2">Den andra VM:en</option>
+          <option value="host">Värddatorn</option>
+        </select></div>
+      <button class="p" id="labd3-send">Skicka ping</button>
+      <button class="g" id="labd3-auto">Autospela av/på</button>
+    </div>
+  </div>
+  <div class="panel" style="padding:10px">
+    <canvas id="labd3-cv" width="900" height="360"></canvas>
+  </div>
+  <div class="panel">
+    <div class="kv"><span>Svar från Internet</span><b id="labd3-r1">–</b></div>
+    <div class="kv"><span>Svar från andra VM:en</span><b id="labd3-r2">–</b></div>
+    <div class="kv"><span>Svar från värddatorn</span><b id="labd3-r3">–</b></div>
+    <div class="kv" style="border:0"><span>Lämpligt för en isolerad attack/defense-labb?</span><b id="labd3-r4">–</b></div>
+    <p class="note" id="labd3-why" style="margin:10px 0 0">Välj läge och skicka ett paket.</p>
+  </div>
+</div>
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById("labd3-cv"); if(!cv) return;
+  var ctx=cv.getContext("2d");
+  var W=900,H=360;
+  var N={
+    vm1:{x:140,y:250,label:"Din VM",sub:"Ubuntu"},
+    vm2:{x:140,y:110,label:"VM 2",sub:"målservrar"},
+    host:{x:420,y:180,label:"Värddatorn",sub:"Windows/macOS"},
+    net:{x:720,y:180,label:"Router / Internet",sub:"skolans nät"}
+  };
+  var parts=[]; var auto=false; var t0=0;
+  var S=function(id){return document.getElementById(id);};
+
+  function mode(){ return S("labd3-mode").value; }
+  function dst(){ return S("labd3-dst").value; }
+
+  // vad som passerar i varje läge
+  function allowed(m,d){
+    if(m==="nat")      return d==="net" || d==="host";
+    if(m==="bridged")  return true;
+    if(m==="hostonly") return d==="host" || d==="vm2";
+    if(m==="internal") return d==="vm2";
+    return false;
+  }
+
+  function explain(m,d,ok){
+    var txt={
+      nat:"NAT: VM:en ligger bakom värddatorn. Den når internet (ut) men syns inte utifrån, och andra maskiner i nätet kan inte nå den.",
+      bridged:"Bridged: VM:en får en egen adress på skolans nät – den syns för alla andra och är därmed inte isolerad.",
+      hostonly:"Host-only: bara värddatorn (och andra host-only-VM:ar) kan prata med VM:en. Internet finns inte.",
+      internal:"Internt nät: bara VM:ar i samma interna nät ser varandra. Värddatorn och internet är helt osynliga."
+    }[m];
+    return txt+" "+(ok?"Paketet gick fram.":"Paketet stoppades – det finns ingen väg dit i det här läget.");
+  }
+
+  function send(){
+    var m=mode(), d=dst(), ok=allowed(m,d);
+    var from=N.vm1, to = d==="net"?N.net : (d==="vm2"?N.vm2:N.host);
+    parts.push({x:from.x, y:from.y, tx:to.x, ty:to.y, p:0, ok:ok, col:ok?"#3ddc84":"#ff5a4d"});
+    // rätt svar
+    function setv(id,txt,good){ var e=S(id); e.textContent=txt; e.style.color=good?"var(--ok)":"var(--bad)"; }
+    if(d==="net") setv("labd3-r1", ok?"ja – går ut via värddatorn":"nej", ok);
+    if(d==="vm2") setv("labd3-r2", ok?"ja – når grann-VM:en":"nej", ok);
+    if(d==="host") setv("labd3-r3", ok?"ja – värddatorn når VM:en":"nej", ok);
+    var iso=(m==="hostonly"||m==="internal");
+    var e4=S("labd3-r4"); e4.textContent=iso?"ja – isolerad mot internet":"nej – trafik kan läcka ut"; e4.style.color=iso?"var(--ok)":"var(--bad)";
+    S("labd3-why").textContent=explain(m,d,ok);
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    var g=ctx.createLinearGradient(0,0,W,H); g.addColorStop(0,"#0d1c2a"); g.addColorStop(1,"#0a1420");
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+    // zoner
+    ctx.strokeStyle="rgba(120,200,255,.22)"; ctx.setLineDash([6,6]); ctx.lineWidth=1.5;
+    ctx.strokeRect(60,50,220,270); ctx.setLineDash([]);
+    ctx.fillStyle="rgba(120,200,255,.55)"; ctx.font="12px system-ui"; ctx.textAlign="left";
+    ctx.fillText("Virtuellt nät", 68, 42);
+
+    // länkar
+    var m=mode();
+    var links=[[N.vm1,N.host,true],[N.vm2,N.host,(m!=="internal")],[N.vm1,N.net,(m==="bridged")],[N.host,N.net,true]];
+    links.forEach(function(l){
+      ctx.strokeStyle=l[2]?"rgba(120,200,255,.35)":"rgba(120,200,255,.12)";
+      ctx.lineWidth=l[2]?2:1.5;
+      ctx.setLineDash(l[2]?[]:[4,6]);
+      ctx.beginPath(); ctx.moveTo(l[0].x,l[0].y); ctx.lineTo(l[1].x,l[1].y); ctx.stroke();
+    });
+    ctx.setLineDash([]);
+
+    // noder
+    Object.keys(N).forEach(function(k){
+      var n=N[k], isVM=k==="vm1";
+      ctx.beginPath(); roundRect(n.x-56,n.y-34,112,68,12);
+      ctx.fillStyle=isVM?"rgba(90,200,250,.12)":"rgba(255,255,255,.05)"; ctx.fill();
+      ctx.strokeStyle=isVM?"#5ac8fa":"rgba(190,215,240,.45)"; ctx.lineWidth=isVM?2.5:1.8; ctx.stroke();
+      ctx.fillStyle="#dbe7f3"; ctx.font="bold 13px system-ui"; ctx.textAlign="center";
+      ctx.fillText(n.label, n.x, n.y-4);
+      ctx.font="11px system-ui"; ctx.fillStyle="rgba(219,231,243,.6)";
+      ctx.fillText(n.sub, n.x, n.y+13);
+    });
+
+    // paket
+    parts.forEach(function(p){
+      var x=p.x+(p.tx-p.x)*p.p, y=p.y+(p.ty-p.y)*p.p;
+      if(!p.ok && p.p>0.45){ var k=(p.p-0.45)/0.55; x=p.x+(p.tx-p.x)*0.45*(1-k); y=p.y+(p.ty-p.y)*0.45*(1-k); }
+      ctx.beginPath(); ctx.arc(x,y,7,0,Math.PI*2);
+      ctx.fillStyle=p.col; ctx.shadowColor=p.col; ctx.shadowBlur=12; ctx.fill(); ctx.shadowBlur=0;
+    });
+
+    ctx.fillStyle="rgba(219,231,243,.6)"; ctx.font="12px system-ui"; ctx.textAlign="left";
+    ctx.fillText("Läge: "+({nat:"NAT",bridged:"Bridged",hostonly:"Host-only",internal:"Internt nät"})[m], 24, 22);
+  }
+
+  function roundRect(x,y,w,h,r){
+    ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+  }
+
+  function loop(){
+    var now=Date.now();
+    if(auto && now-t0>900){ t0=now; send(); }
+    parts.forEach(function(p){ p.p+=p.ok?0.016:0.020; });
+    parts=parts.filter(function(p){return p.p<1;});
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  S("labd3-send").onclick=send;
+  S("labd3-auto").onclick=function(){ auto=!auto; S("labd3-auto").textContent=auto?"Autospela: på":"Autospela av/på"; };
+  S("labd3-mode").onchange=function(){ send(); };
+  draw(); loop();
+})();
+</script>
+</div>
+</section>
+
+<section id="b" hidden>
+<div class="tabhead"><b>Grupparbete</b> – arbeta två till fyra personer. Dokumentera gruppens val och jämför med facit när ni är klara.</div>
+  <h2>Grupparbete · Bygg en isolerad labb och försök bryta isoleringen</h2>
+  <p class="muted">Grupp A bygger labbmiljön (Kali + målsystem) och försöker sedan nå den från värddatorn. Grupp B försöker nå den inifrån och ut. Båda dokumenterar vad som faktiskt tog sig igenom.</p>
+  <div class="bar" id="phases"></div>
+  <div class="bar"><span class="muted">Tid kvar i vald fas:</span><span id="clock">00:00</span><button id="skip">Hoppa över återkoppling</button></div>
+  <div id="phaseInfo"></div>
+  <div class="gt" id="gt"><button data-g="A" class="on">Grupp A</button><button data-g="B">Grupp B</button></div>
+  <div id="paneA"></div>
+  <div id="paneB" hidden></div>
+  <div id="findings"></div>
+
+<div class="labblock">
+<h3 style="margin-top:22px">Labb B (grupp) · Labbprofilen – hur säker är er labbmiljö?</h3>
+<div class="labd">
+  <div class="panel">
+    <p style="margin:0 0 8px"><b>Så gör du:</b> enas i gruppen om en nätverksmodell och bocka sedan i de skyddsåtgärder ni faktiskt har.Radarn ritar er profil på fem axlar och poängen räknas om direkt.</p>
+    <p class="note" style="margin:0">Gruppfråga: vilken axel är svagast hos er – och vad kostar det att laga den? Skriv svaret i rapporten.</p>
+  </div>
+  <div class="cols">
+    <div class="panel">
+      <h3 style="margin:0 0 8px">Nätverksmodell</h3>
+      <div id="x3-net">
+        <div class="asset on" data-n="host"><span class="box"></span><span><b>Host-only</b><br><span class="note">VM:erna når bara varandra och värden.</span></span></div>
+        <div class="asset" data-n="nat"><span class="box"></span><span><b>NAT</b><br><span class="note">Utgående internet via värden.</span></span></div>
+        <div class="asset" data-n="brygga"><span class="box"></span><span><b>Bryggat</b><br><span class="note">Ligger direkt på skolnätet.</span></span></div>
+      </div>
+      <h3 style="margin:14px 0 8px">Skyddsåtgärder</h3>
+      <div id="x3-ops">
+        <div class="asset" data-o="snap"><span class="box"></span><span><b>Snapshot före varje test</b><br><span class="note">Ren återställningspunkt.</span></span></div>
+        <div class="asset" data-o="user"><span class="box"></span><span><b>Separat labbkonto utan sudo</b><br><span class="note">Minsta behörighet i vardagen.</span></span></div>
+        <div class="asset" data-o="share"><span class="box"></span><span><b>Delad mapp avstängd</b><br><span class="note">Ingen väg tillbaka till värden.</span></span></div>
+        <div class="asset" data-o="log"><span class="box"></span><span><b>Loggning på</b><br><span class="note">Kommandon och inloggningar sparas.</span></span></div>
+        <div class="asset" data-o="img"><span class="box"></span><span><b>Versionerad grundimage</b><br><span class="note">Samma miljö varje gång.</span></span></div>
+      </div>
+      <div class="kv" style="margin-top:12px"><span>Total poäng</span><b id="x3-total">–</b></div>
+      <div class="verdict" id="x3-verdict">–</div>
+    </div>
+    <div class="panel" style="padding:10px">
+      <canvas id="x3-cv" width="900" height="440"></canvas>
+      <div class="note" id="x3-log" style="margin-top:8px;min-height:36px">Profilen ritas om när du ändrar inställningarna.</div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById("x3-cv"); if(!cv) return;
+  var ctx=cv.getContext("2d");
+  var AX=["Isolering","Återställning","Minsta behörighet","Spårbarhet","Reproducerbarhet"];
+  var state={net:"host",snap:false,user:false,share:false,log:false,img:false};
+  var val=[0,0,0,0,0], target=[0,0,0,0,0], total=0;
+
+  function calc(){
+    var s=state, v=[0,0,0,0,0];
+    v[0]= s.net==="host"?88:(s.net==="nat"?52:12);
+    if(s.share) v[0]=Math.max(0,v[0]-18);
+    v[1]= s.snap?78:16;
+    if(s.img) v[1]=Math.min(100,v[1]+18);
+    v[2]= s.user?58:10;
+    if(!s.share) v[2]=Math.min(100,v[2]+30);
+    v[3]= s.log?72:8;
+    if(s.net==="host") v[3]=Math.min(100,v[3]+14);
+    v[4]= s.img?72:12;
+    if(s.snap) v[4]=Math.min(100,v[4]+22);
+    target=v;
+    total=Math.round(v.reduce(function(a,b){return a+b;},0)/v.length);
+    document.getElementById("x3-total").textContent=total+" / 100";
+    var weak=0; v.forEach(function(x,i){ if(x<v[weak]) weak=i; });
+    var d=document.getElementById("x3-verdict");
+    d.textContent = total>=80?"Stark labbprofil – redo för angreppstester":
+                    total>=55?"Godkänd men ojämn – svagast: "+AX[weak]:"Svag profil – börja med "+AX[weak];
+    d.style.color = total>=80?"var(--lb-ok)":(total>=55?"var(--lb-warn)":"var(--lb-bad)");
+    document.getElementById("x3-log").innerHTML = total>=80
+      ? '<b style="color:#7ee2a8">Bra:</b> miljön tål att du kör skadlig kod – och du kan återställa den på minuter.'
+      : '<b style="color:#ffcf70">Saknas:</b> '+AX[weak].toLowerCase()+' är svagast. Fråga: vad händer om ett test slår sönder miljön i morgon?';
+  }
+  function draw(){
+    ctx.clearRect(0,0,900,440);
+    var g=ctx.createRadialGradient(430,215,20,430,215,430);
+    g.addColorStop(0,"#12263a"); g.addColorStop(1,"#07111c");
+    ctx.fillStyle=g; ctx.fillRect(0,0,900,440);
+    var cx=430, cy=218, R=145;
+    for(var ring=1;ring<=4;ring++){
+      ctx.beginPath();
+      for(var i=0;i<5;i++){
+        var a=-Math.PI/2 + i*2*Math.PI/5, r=R*ring/4;
+        var x=cx+Math.cos(a)*r, y=cy+Math.sin(a)*r;
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.closePath(); ctx.strokeStyle="rgba(120,200,255,"+(ring===4?0.28:0.13)+")"; ctx.stroke();
+    }
+    for(var j=0;j<5;j++){
+      var ang=-Math.PI/2 + j*2*Math.PI/5;
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(ang)*R,cy+Math.sin(ang)*R);
+      ctx.strokeStyle="rgba(120,200,255,.13)"; ctx.stroke();
+      var lx=cx+Math.cos(ang)*(R+30), ly=cy+Math.sin(ang)*(R+30);
+      ctx.fillStyle="rgba(219,231,243,.75)"; ctx.font="12px system-ui"; ctx.textAlign="center";
+      ctx.fillText(AX[j],lx,ly);
+    }
+    ctx.beginPath();
+    for(var k=0;k<5;k++){
+      var a2=-Math.PI/2 + k*2*Math.PI/5, rr=R*(val[k]/100);
+      var px=cx+Math.cos(a2)*rr, py=cy+Math.sin(a2)*rr;
+      if(k===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.closePath();
+    var grad=ctx.createLinearGradient(cx-R,cy-R,cx+R,cy+R);
+    grad.addColorStop(0,"rgba(90,200,255,.45)"); grad.addColorStop(1,"rgba(61,220,132,.45)");
+    ctx.fillStyle=grad; ctx.fill();
+    ctx.strokeStyle="#5ac8fa"; ctx.lineWidth=2.5; ctx.stroke();
+    for(var m=0;m<5;m++){
+      var a3=-Math.PI/2 + m*2*Math.PI/5, r3=R*(val[m]/100);
+      ctx.beginPath(); ctx.arc(cx+Math.cos(a3)*r3,cy+Math.sin(a3)*r3,5,0,Math.PI*2);
+      ctx.fillStyle="#dbe7f3"; ctx.fill();
+    }
+    ctx.textAlign="left"; ctx.fillStyle="rgba(219,231,243,.85)"; ctx.font="13px system-ui";
+    ctx.fillText("Labbprofil",24,32);
+    ctx.fillStyle="rgba(219,231,243,.5)"; ctx.font="11px system-ui";
+    ctx.fillText("Nätverk: "+(state.net==="host"?"host-only":(state.net==="nat"?"NAT":"bryggat")),24,52);
+    ctx.fillText("Poäng: "+total+" / 100",24,70);
+    ctx.fillStyle="rgba(219,231,243,.45)";
+    ctx.fillText("En bra labb ska kunna förstöras",24,392);
+    ctx.fillText("och återställas på under fem minuter.",24,408);
+  }
+  function loop(){
+    for(var i=0;i<5;i++){ val[i]+=(target[i]-val[i])*0.12; }
+    draw(); requestAnimationFrame(loop);
+  }
+  function wire(){
+    [].slice.call(document.querySelectorAll("#x3-net .asset")).forEach(function(el){
+      el.onclick=function(){
+        [].slice.call(document.querySelectorAll("#x3-net .asset")).forEach(function(x){ x.classList.toggle("on",x===el); });
+        state.net=el.getAttribute("data-n"); calc();
+      };
+    });
+    [].slice.call(document.querySelectorAll("#x3-ops .asset")).forEach(function(el){
+      el.onclick=function(){
+        var k=el.getAttribute("data-o"); state[k]=!state[k];
+        el.classList.toggle("on",state[k]); calc();
+      };
+    });
+  }
+  wire(); calc(); val=target.slice(); loop();
+})();
+</script>
+</div>
+</section>
+
+<section id="c" hidden>
+<div class="tabhead"><b>Facit</b> – här ligger rapporten, de fullständiga svaren och begreppen. Fyll i rapporten efter att ni gjort båda arbetsflikarna.</div>
+  <h2>Facit · Rapport och referensfacit</h2>
+  <div id="facitA"></div>
+  <div id="facitB"></div>
+  <div class="card"><div class="row"><button class="p" id="mk">Uppdatera rapport</button><button class="g" id="cp">Kopiera</button><button class="g" id="dl">Spara som fil</button><button class="g" id="rst">Nollställ allt</button></div>
+    <p class="muted" style="margin-top:8px"><b>Så fyller du i rapporten:</b> 1) sammanfatta Del A med dina mätvärden, 2) klistra in gruppernas fält, 3) lägg till varje fynd i fyndregistret med bevis, 4) skriv jämförelsen mot referensfacit – vad ni hittade, vad ni missade och varför. Klicka sedan på <b>Uppdatera rapport</b>.</p></div>
+  <pre id="report">Klicka på "Uppdatera rapport".</pre>
+  <div id="faq"></div>
+  <div id="res"></div>
+</section>
+</main>
+<script>
+"use strict";
+var $=function(s){return document.querySelector(s);}, $$=function(s){return [].slice.call(document.querySelectorAll(s));};
+var K='sa_w3', S={};
+try{S=JSON.parse(localStorage.getItem(K)||'{}')||{};}catch(e){S={};}
+S.findings=S.findings||[];
+function save(){try{localStorage.setItem(K,JSON.stringify(S));}catch(e){}}
+function esc(t){return String(t==null?'':t).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+function copy(t,b){var done=function(){var o=b.textContent;b.textContent='Kopierat ✓';setTimeout(function(){b.textContent=o;},1200);};
+  var fb=function(){var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){alert('Kopiera manuellt:\n\n'+t);}document.body.removeChild(ta);};
+  if(navigator.clipboard&&window.isSecureContext&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,fb);}else{fb();}}
+function download(name,text){try{var b=new Blob([text],{type:'text/markdown;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);document.body.removeChild(a);},500);}catch(e){alert('Kunde inte spara – kopiera texten i stället.');}}
+$$('#tabs button').forEach(function(b){b.onclick=function(){$$('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});['a','b','c'].forEach(function(k){$('#'+k).hidden=(k!==b.dataset.t);});};});
+function steps(list,host){
+  var cur=0, done={};
+  function paint(){
+    var n=0; for(var k in done){ if(done[k]) n++; }
+    var s=list[cur], last=(cur===list.length-1);
+    host.innerHTML='<div class="stp"><div class="stp-dots">'+
+      list.map(function(x,j){ return '<button class="stp-dot'+(j===cur?' on':'')+(done[j]?' done':'')+'" data-goto="'+j+'">'+(j+1)+'</button>'; }).join('')+
+      '</div><div class="stp-card"><h3>Steg '+(cur+1)+' av '+list.length+' – '+s.t+'</h3>'+
+      '<p><b>Vad?</b> '+s.d+'</p><p><b>Varför?</b> '+s.w+'</p><p><b>Hur?</b> '+s.h+'</p>'+
+      (s.r?'<p class="expect"><b>Förväntat resultat:</b> '+s.r+'</p>':'')+
+      '<div class="stp-bar"><button class="g" data-prev'+(cur===0?' disabled':'')+'>← Tillbaka</button>'+
+      '<label class="stp-chk"><input type="checkbox" data-done'+(done[cur]?' checked':'')+'> Klar med steget</label>'+
+      '<button class="p" data-next>'+(last?'Börja öva ↓':'Nästa →')+'</button>'+
+      '<span class="stp-prog"><b>'+n+'</b> av '+list.length+' steg klara</span></div></div></div>';
+    host.querySelector('[data-prev]').onclick=function(){ if(cur>0){cur--; paint();} };
+    host.querySelector('[data-next]').onclick=function(){
+      done[cur]=true;
+      if(cur<list.length-1){ cur++; } else { scrollToLab(); }
+      paint();
+    };
+    host.querySelector('[data-done]').onchange=function(){ done[cur]=this.checked; paint(); };
+    [].slice.call(host.querySelectorAll('[data-goto]')).forEach(function(b){
+      b.onclick=function(){ cur=+b.getAttribute('data-goto'); paint(); };
+    });
+  }
+  paint();
+}
+function scrollToLab(){
+  var l=document.querySelector('#'+ (document.querySelector('#a .labblock') ? 'a' : 'b') +' .labblock') ||
+        document.querySelector('.labblock');
+  if(l) l.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function quiz(qs,host,title){host.innerHTML='<h2>'+title+'</h2>'+qs.map(function(q,i){return '<div class="q card"><p style="margin:0 0 4px"><b>'+(i+1)+'. '+q.q+'</b></p><div class="opts">'+q.o.map(function(o,j){return '<button data-q="'+i+'" data-o="'+j+'">'+o+'</button>';}).join('')+'</div><div class="fb" id="qf'+i+'"></div></div>';}).join('');
+  $$('[data-q]').forEach(function(b){b.onclick=function(){var i=+b.dataset.q,q=qs[i],ok=(+b.dataset.o===q.a);host.querySelector('#qf'+i).innerHTML='<b class="'+(ok?'ok':'bad')+'">'+(ok?'✓ Rätt':'✗ Inte rätt')+'</b> '+q.x;};});}
+var sevTxt={1:'Låg',2:'Medel',3:'Hög'};
+function renderF(){var box=$('#flist');if(!box)return;box.innerHTML=S.findings.length?'':'<p class="muted">Inga fynd registrerade ännu.</p>';
+  S.findings.forEach(function(f,i){box.insertAdjacentHTML('beforeend','<div class="finding"><div class="row" style="justify-content:space-between"><b>'+f.g+' · '+esc(f.target)+'</b><span class="sev s'+f.sev+'">'+sevTxt[f.sev]+'</span></div><div><b>Fynd:</b> '+esc(f.what)+'</div><div><b>Bevis:</b> <code>'+esc(f.found)+'</code></div><div><b>Risk/åtgärd:</b> '+esc(f.risk)+'</div><div class="row" style="margin-top:6px"><select data-st="'+i+'">'+['Öppen','Delvis åtgärdad','Åtgärdad','Kvarstår efter retest'].map(function(s){return '<option'+(s===f.status?' selected':'')+'>'+s+'</option>';}).join('')+'</select><button class="g" data-del="'+i+'">Ta bort</button></div></div>');});
+  $$('[data-st]').forEach(function(s){s.onchange=function(){S.findings[+s.dataset.st].status=s.value;save();};});
+  $$('[data-del]').forEach(function(b){b.onclick=function(){S.findings.splice(+b.dataset.del,1);save();renderF();};});}
+
+/* Del A */
+steps([
+ {t:'Bestäm vad labben ska kunna göra',d:'Skriv ner vilka maskiner som ingår (Kali, mål, värd) och vilka förbindelser som verkligen behövs.',
+  w:'Nätverksläget ska följa av behovet. Väljer man läge först och behov sedan blir det nästan alltid för öppet.',
+  h:'Utgå från att målet bara behöver nås av angriparen och att värddatorn bara behöver nå målets webbgränssnitt.',
+  r:'Du kan peka ut vilka förbindelser som är nödvändiga och vilka som är onödiga.'},
+ {t:'Välj nätverksläge per scenario',d:'Läs de fyra scenarierna i kortet "Fyra scenarier" och välj läge i varje lista.',
+  w:'Bridged ger VM:en en egen adress på det riktiga nätet – bekvämt men riskabelt. NAT döljer dem bakom värden. Host-only och internal håller dem instängda.',
+  h:'Öppna först "Testa nätverkslägena visuellt" och jämför ja/nej-raden för varje läge. Välj sedan det mest begränsade läge som ändå klarar uppgiften.',
+  r:'Alla fyra listor ifyllda och en kort motivering skriven i textfältet.'},
+ {t:'Kontrollera och läs facit',d:'Klicka på "Kontrollera mina fyra val" och jämför med motiveringarna i facit.',
+  w:'Du behöver kunna förklara skillnaden inför det praktiska arbetet i Del B.',
+  h:'Knappen visar 4 av 4 när alla val stämmer och bedömer motiveringen separat. Rätta fel val, skriv om motiveringen och öppna "Visa facit – Del A".',
+  r:'4 av 4 rätt, en godkänd motivering och du kan förklara varför just dessa lägen skyddar labben.'}],$('#stepsA'));
+
+var SC=[
+ {q:'Du ska analysera skadlig kod som sprider sig själv. Maskinerna får inte under några omständigheter nå internet.',a:'internal'},
+ {q:'Du behöver kunna uppdatera dina verktyg i Kali, men målsystemet ska inte kunna kontaktas från det vanliga nätet.',a:'nat'},
+ {q:'Du vill att värddatorn ska kunna ansluta till målsystemets webbgränssnitt, men ingen annan dator i nätverket.',a:'hostonly'},
+ {q:'Du ska testa hur en enhet beter sig på ett fysiskt nätverk, i en isolerad testmiljö med egen router.',a:'bridged'}];
+var NAM={'internal':'Internal (internt nät)','nat':'NAT','hostonly':'Host-only','bridged':'Bridged'};
+$('#scn').innerHTML=SC.map(function(s,i){return '<div class="scn"><div class="q2"><b>'+(i+1)+'.</b> '+s.q+'</div><select id="s'+i+'"><option value="">– välj –</option>'+Object.keys(NAM).map(function(k){return '<option value="'+k+'">'+NAM[k]+'</option>';}).join('')+'</select></div>';}).join('');
+if(S.choices)S.choices.forEach(function(v,i){var e=$('#s'+i);if(e&&v)e.value=v;});
+if(S.why)$('#why').value=S.why;
+$('#resetA').onclick=function(){SC.forEach(function(_,i){$('#s'+i).value='';});$('#why').value='';$('#fb').innerHTML='';S.choices=null;S.why='';save();};
+$('#chkA').onclick=function(){var good=0,h='';SC.forEach(function(s,i){var v=$('#s'+i).value;if(v===s.a)good++;h+='<div class="res"><b class="'+(v===s.a?'ok':'bad')+'">'+(v===s.a?'✓':'✗')+'</b><div><b>Scenario '+(i+1)+'</b> – rätt: '+NAM[s.a]+(v&&v!==s.a?' (du valde '+NAM[v]+')':'')+'</div></div>';});
+  var y=($('#why').value||'').toLowerCase(),yok=/(isol|begräns|inte nå|skydda|risk)/.test(y)&&y.length>25;
+  h+='<div class="res"><b class="'+(yok?'ok':'bad')+'">'+(yok?'✓':'✗')+'</b><div><b>Motivering</b> – '+(yok?'du utgår från isolering och risk.':'Förklara att labben ska vara isolerad och att onödiga vägar ut ska stängas.')+'</div></div>';
+  h='<h3>'+good+' av 4 rätt</h3>'+h;$('#fb').innerHTML=h;S.choices=SC.map(function(_,i){return $('#s'+i).value;});S.why=$('#why').value;save();};
+$('#cpA').onclick=function(){copy('LABBMILJÖ – NÄTVERKSVAL\n'+SC.map(function(s,i){return 'Scenario '+(i+1)+': '+(NAM[$('#s'+i).value]||'-');}).join('\n')+'\nMotivering: '+$('#why').value,$('#cpA'));};
+$('#why').addEventListener('input',function(){S.why=$('#why').value;save();});
+SC.forEach(function(_,i){$('#s'+i).onchange=function(){S.choices=SC.map(function(_,j){return $('#s'+j).value;});save();};});
+
+$('#facitA').innerHTML='<details class="facit"><summary>Visa facit – Del A</summary>'+
+ '<table><tr><th>Scenario</th><th>Rätt läge</th><th>Motiv</th></tr>'+
+ '<tr><td>1 Skadlig kod</td><td><b>Internal</b></td><td>Endast VM–VM. Ingen väg till värden eller internet.</td></tr>'+
+ '<tr><td>2 Uppdatera Kali</td><td><b>NAT</b></td><td>Utgående trafik via värden, men ingen inkommande väg till labben.</td></tr>'+
+ '<tr><td>3 Värd når webbgränssnitt</td><td><b>Host-only</b></td><td>Bara värd och VM på ett eget virtuellt nät – ingen extern åtkomst.</td></tr>'+
+ '<tr><td>4 Beteende på fysiskt nät</td><td><b>Bridged</b></td><td>Kopplar VM:n direkt till det fysiska nätet. Endast i isolerad testmiljö med tillstånd.</td></tr></table>'+
+ '<p><b>Varför:</b> bridged ger målet en riktig adress i skolnätet – ett misstag där kan påverka andra. Internal och host-only är standard för attacker.</p>'+
+ '<p><b>Viktigaste begreppen:</b> <i>host-only</i> = VM och värd på eget nät utan väg ut; <i>snapshot</i> = sparad återställningspunkt; <i>isolering</i> = att labben inte kan nå eller nås av produktionssystem.</p>'+
+ '<p><b>Innan du startar attacken:</b> ta en snapshot med namn som beskriver läget (t.ex. <code>innan-attack</code>) så att du kan återställa på sekunder.</p></details>';
+
+quiz([{q:'Varför är bridged olämpligt för en attackövning i skolans nät?',o:['Det går långsammare','VM:n får en adress i det riktiga nätet och kan påverka andra system','Verktygen fungerar inte i bridged'],a:1,
+ x:'Rätt: bridged exponerar labben mot det vanliga nätet. Host-only eller internal håller attacken instängd.'},
+ {q:'Vad är syftet med en snapshot?',o:['Att spara en återställningspunkt innan ett riskfyllt moment','Att öka prestandan i VM:n','Att koppla VM:n till internet'],a:0,
+ x:'Rätt: en snapshot låter dig gå tillbaka till ett känt läge, till exempel innan du kör skadlig kod.'},
+ {q:'Du ska analysera ett misstänkt program och vill vara säker på att det inte når internet. Vad gör du?',o:['Kör det i bridged och hoppas','Kör det i en VM med internal-nät och snapshot','Kör det direkt i värddatorn'],a:1,
+ x:'Rätt: internal-nät utan väg ut plus snapshot är minimikravet. Aldrig på värddatorn.'}],$('#checkA'),'Kunskapskontroll – Del A');
+
+/* Del B */
+var PH=[['1 Bygg labben',7],['2 Testa isoleringen',8],['3 Åtgärda',7],['4 Retest',5],['5 Återkoppling',3]];
+var PHINFO=[
+ {d:'Sätt upp två VM: en angripare och ett mål, i valt nätverksläge. Ta snapshot.',w:'Utan en reproducerbar labb kan ni inte bevisa något om isoleringen.',h:'Skapa VM:erna, sätt nätverkskortet till host-only (eller internal), starta, notera IP-adresser och kör <code>ip a</code> i båda. Ta snapshot med namn.',e:'Två VM:er med IP-adresser ifyllda i "Topologi och nätverksläge" och en snapshot tagen före testet.'},
+ {d:'Försök nå labben utifrån och inifrån och dokumentera exakt vad som svarar.',w:'Isolering är ett påstående som måste prövas – inte antas.',h:'Från värden: <code>ping</code> och <code>curl</code> mot mål-IP. Från målet: <code>ping 8.8.8.8</code> och <code>curl</code> mot en extern adress. Från angriparen: nå målporten. Spara kommandon och svar.',e:'Fältet "tester och svar" visar minst tre kommandon med tillhörande svar.'},
+ {d:'Stäng det som svarade men inte behöver svara.',w:'Minsta möjliga åtkomst är grundprincipen – åtgärden ska träffa den väg som faktiskt var öppen.',h:'Exempel: byt till internal, ta bort portvidarebefordran, sätt brandväggsregel i värden, stäng av delade mappar och urklipp. Dokumentera varje ändring.',e:'Varje öppen väg har en dokumenterad åtgärd i "Fas 3 – åtgärder".'},
+ {d:'Upprepa exakt samma tester som i fas 2.',w:'Ett retest med nya tester bevisar ingenting.',h:'Kör samma kommandon igen och jämför. Svaret ska vara timeout eller "connection refused" där det tidigare svarade.',e:'Samma kommandon ger timeout eller "connection refused" där de tidigare svarade.'},
+ {d:'Redovisa på 90 sekunder per grupp.',w:'Muntlig redovisning är en del av examinationen.',h:'Säg: vad som var öppet, beviset, åtgärden, vad retestet visade och en lärdom.',e:'90 sekunder: vad som var öppet, beviset, åtgärden, retestet och en lärdom.'}];
+var cur=0,t=null,left=0,skipped=false;
+function drawPhases(){$('#phases').innerHTML=PH.filter(function(p,i){return !(i===4&&skipped);}).map(function(p,i){return '<button data-p="'+i+'" class="'+(i===cur?'on':'')+'">'+p[0]+' · '+p[1]+' min</button>';}).join('');
+  $$('#phases button').forEach(function(b){b.onclick=function(){setPhase(+b.dataset.p);};});}
+function tick(){$('#clock').textContent=('0'+Math.floor(Math.max(0,left)/60)).slice(-2)+':'+('0'+(Math.max(0,left)%60)).slice(-2);}
+function setPhase(i){cur=i;clearInterval(t);left=PH[i][1]*60;tick();t=setInterval(function(){left--;tick();if(left<=0)clearInterval(t);},1000);drawPhases();
+  var p=PHINFO[i];$('#phaseInfo').innerHTML='<div class="step"><h3>Fas '+(i+1)+' · '+PH[i][0]+' ('+PH[i][1]+' min)</h3><p><b>Vad?</b> '+p.d+'</p><p><b>Varför?</b> '+p.w+'</p><p><b>Hur?</b> '+p.h+'</p>'+(p.e?'<p class="expect"><b>Förväntat resultat:</b> '+p.e+'</p>':'')+'</div>';}
+$('#skip').onclick=function(){skipped=!skipped;if(skipped&&cur===4)setPhase(3);drawPhases();};
+
+function pane(id,title,env,fields){return '<div class="card"><h3>'+title+' <span class="tag">Verkligt labbmoment</span></h3><p class="muted">'+env+'</p>'+
+ fields.map(function(f){return '<label for="'+id+'_'+f.k+'">'+f.t+'</label><textarea id="'+id+'_'+f.k+'" rows="'+(f.r||3)+'" placeholder="'+esc(f.ph||'')+'">'+esc(S[id+'_'+f.k]||'')+'</textarea>';}).join('')+'</div>';}
+$('#paneA').innerHTML=pane('A','Grupp A · bygg och testa utifrån','Utgå från värddatorn och försök nå labben.',[
+ {k:'topo',t:'Topologi och nätverksläge',r:3,ph:'Kali 192.168.x.10 (host-only), mål 192.168.x.20 (host-only), värd 192.168.x.1'},
+ {k:'test',t:'Fas 2 – tester och svar (kommando + resultat)',r:5,ph:'ping 192.168.x.20 → svar\ncurl http://192.168.x.20 → 200 OK'},
+ {k:'fix',t:'Fas 3 – åtgärder',r:3,ph:'Bytte till internal, tog bort portvidarebefordran ...'},
+ {k:'retest',t:'Fas 4 – retest efter åtgärd',r:2,ph:'ping → timeout, curl → connection refused'}]);
+$('#paneB').innerHTML=pane('B','Grupp B · bygg och testa inifrån','Testa om labben kan nå ut och vad som i så fall exponeras.',[
+ {k:'env',t:'Miljö och IP-adresser',r:2,ph:'Mål: 192.168.x.20, gateway 192.168.x.1'},
+ {k:'test',t:'Fas 2 – tester utåt (kommando + resultat)',r:5,ph:'ping 8.8.8.8 → svar\ncurl https://example.com → 200'},
+ {k:'fix',t:'Fas 3 – åtgärder',r:3,ph:'Stängde av NAT, delade mappar och urklipp ...'},
+ {k:'retest',t:'Fas 4 – retest efter åtgärd',r:2,ph:'ping 8.8.8.8 → "Network is unreachable"'}]);
+$$('#paneA textarea, #paneB textarea').forEach(function(ta){ta.addEventListener('input',function(){S[ta.id]=ta.value;save();});});
+$$('#gt button').forEach(function(b){b.onclick=function(){$$('#gt button').forEach(function(x){x.classList.toggle('on',x===b);});
+  $('#paneA').hidden=b.dataset.g!=='A';$('#paneB').hidden=b.dataset.g!=='B';S.group=b.dataset.g;save();};});
+
+$('#findings').innerHTML='<div class="card"><h3>Fyndregister</h3><p class="note">Ett fynd = ett test ni kan visa bevis för. Fyll i alla fält – de hamnar i rapporten.</p><div class="grid2" style="gap:10px">'+
+ '<div><label>Grupp</label><select id="fg"><option>A</option><option>B</option></select></div>'+
+ '<div><label>Granskat objekt</label><select id="ft"><option>Nätverksläge</option><option>Snapshot</option><option>Delade mappar / urklipp</option><option>Portvidarebefordran</option><option>Brandvägg i värden</option></select></div></div>'+
+ '<label>Fynd</label><input id="fw" placeholder="Målet svarar från värdnätet">'+
+ '<label>Bevis</label><input id="fd" placeholder="curl http://192.168.56.20 gav 200 OK">'+
+ '<label>Risk och åtgärd</label><input id="fx" placeholder="Exponering av sårbart mål → host-only + brandvägg">'+
+ '<div class="grid2" style="gap:10px"><div><label>Allvarlighet</label><select id="fs"><option value="1">Låg</option><option value="2">Medel</option><option value="3" selected>Hög</option></select></div>'+
+ '<div><label>Status</label><select id="fst"><option>Öppen</option><option>Delvis åtgärdad</option><option>Åtgärdad</option><option>Kvarstår efter retest</option></select></div></div>'+
+ '<div class="row" style="margin-top:8px"><button class="p" id="addf">Lägg till fynd</button><button class="g" id="clearf">Rensa fynd</button></div><div id="flist"></div></div>';
+$('#addf').onclick=function(){S.findings.push({g:$('#fg').value,target:$('#ft').value,what:$('#fw').value,found:$('#fd').value,risk:$('#fx').value,sev:+$('#fs').value,status:$('#fst').value});
+  ['#fw','#fd','#fx'].forEach(function(s){$(s).value='';});save();renderF();};
+$('#clearf').onclick=function(){if(confirm('Rensa alla fynd?')){S.findings=[];save();renderF();}};
+
+$('#facitB').innerHTML='<details class="facit"><summary>Visa referensfacit – Del B (isolering)</summary>'+
+ '<div class="step"><h3>Förväntade brister</h3><ul style="font-size:13.5px;margin:6px 0">'+
+ '<li>Målet svarar på ping eller HTTP från värddatorn trots att det inte behövs.</li>'+
+ '<li>Målet når internet via NAT – skadlig kod kan ringa hem eller hämta payload.</li>'+
+ '<li>Delade mappar eller urklipp aktiverat mellan värd och VM – en väg in i värden.</li>'+
+ '<li>Ingen snapshot före attackmomentet.</li>'+
+ '<li>Portvidarebefordran kvar från tidigare laboration.</li></ul></div>'+
+ '<div class="step"><h3>Bevis, grundorsak, åtgärd, retest</h3>'+
+ '<p><b>Bevis:</b> kommando + svar, t.ex. <code>curl http://192.168.56.20</code> → <code>200 OK</code>, eller <code>ping 8.8.8.8</code> → svar.</p>'+
+ '<p><b>Grundorsak:</b> nätverksläget och de virtuella funktionerna valdes för bekvämlighet, inte efter behov.</p>'+
+ '<p><b>Åtgärd (godtagbara alternativ):</b> byt till host-only/internal, ta bort portvidarebefordran, sätt brandväggsregel i värden, stäng av delade mappar/urklipp. Alla fyra är godtagbara; minst två rekommenderas.</p>'+
+ '<p><b>Godkänt retest:</b> samma kommandon ger timeout eller "connection refused", medan den åtkomst som behövs (t.ex. värd → webbgränssnitt i host-only) fortfarande fungerar.</p></div>'+
+ '<p class="muted">Jämför i Del C: vilka vägar var öppna, vilken åtgärd stängde dem och vad retestet visade.</p></details>';
+
+/* Del C */
+$('#mk').onclick=function(){
+  var r='# Lektion 3 – Säker labbmiljö\n\n**Del A – nätverksval**\n'+SC.map(function(s,i){return '- Scenario '+(i+1)+': '+(NAM[S.choices&&S.choices[i]]||'-')+' (rätt: '+NAM[s.a]+')';}).join('\n')+
+  '\n- Motivering: '+($('#why').value||'(ej ifyllt)')+'\n\n**Grupp A – topologi**\n\n'+($('#A_topo').value||'(ej ifyllt)')+
+  '\n\n**Grupp A – tester**\n\n```\n'+($('#A_test').value||'(ej ifyllt)')+'\n```\n\n**Grupp A – åtgärder**\n\n'+($('#A_fix').value||'(ej ifyllt)')+
+  '\n\n**Grupp A – retest**\n\n'+($('#A_retest').value||'(ej ifyllt)')+'\n';
+  r+='\n**Grupp B – miljö**\n\n'+($('#B_env').value||'(ej ifyllt)')+'\n\n**Grupp B – tester utåt**\n\n```\n'+($('#B_test').value||'(ej ifyllt)')+'\n```\n\n**Grupp B – åtgärder**\n\n'+($('#B_fix').value||'(ej ifyllt)')+'\n\n**Grupp B – retest**\n\n'+($('#B_retest').value||'(ej ifyllt)')+'\n\n**Fynd**\n';
+  if(!S.findings.length)r+='\nInga fynd registrerade.\n';
+  S.findings.forEach(function(f){r+='\n### '+f.g+' · '+f.target+' ('+sevTxt[f.sev]+') – '+f.status+'\n- Fynd: '+f.what+'\n- Bevis: `'+f.found+'`\n- Risk/åtgärd: '+f.risk+'\n';});
+  r+='\n**Jämförelse mot referensfacit**\n- Öppna vägar som facit förutspår: \n- Vägar vi hittade utöver facit: \n- Åtgärd som stängde vägen: \n- Kvarstående risk: \n';
+  $('#report').textContent=r;};
+$('#cp').onclick=function(){copy($('#report').textContent,$('#cp'));};
+$('#dl').onclick=function(){download('lektion-3-labbmiljo.md',$('#report').textContent);};
+$('#rst').onclick=function(){if(confirm('Nollställ allt i den här workshopen?')){try{localStorage.removeItem(K);}catch(e){}location.reload();}};
+
+$('#faq').innerHTML='<div class="card"><h3>Vanliga frågor</h3>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Mina VM:er får ingen IP-adress – vad gör jag?</summary><p>Kontrollera att nätverkskortet är aktiverat i VM-inställningarna och att läget matchar (host-only kräver att det virtuella nätet finns). Starta om nätverket i gästen med <code>sudo dhclient</code> eller <code>nmcli</code>.</p></details>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Varför svarar målet trots host-only?</summary><p>Host-only ger just värddatorn åtkomst – det är meningen. Det som ska testas är att <i>andra</i> datorer i nätet inte når målet, och att målet inte når internet.</p></details>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Räcker det att stänga av internet i gästen?</summary><p>Nej. Det är en inställning inuti systemet som kan slås på igen. Isoleringen ska sitta i nätverksläget och i värden.</p></details>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Hur vet jag att min åtgärd räcker?</summary><p>När retestet med samma kommandon inte längre får svar, samtidigt som den åtkomst som behövs fortfarande fungerar.</p></details>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Vad gör jag om resultatet skiljer sig från exemplet?</summary><p>Dokumentera ditt resultat och jämför med facit i Del C. Olika virtualiseringsprogram har olika namn på lägena – funktionen är det som räknas.</p></details></div>';
+
+drawPhases();setPhase(0);renderF();
+if(S.group){$$('#gt button').forEach(function(b){if(b.dataset.g===S.group)b.click();});}
+if(S.choices)S.choices.forEach(function(v,i){if(v&&$('#s'+i))$('#s'+i).value=v;});
+
+/* ---------- begrepp och fördjupning ---------- */
+var TERMS = [["VM", "En virtuell dator som körs inuti din vanliga dator."], ["Hypervisor", "Programmet som kör VM:erna, t.ex. VirtualBox eller VMware."], ["Host-only", "VM:er når varandra och värddatorn, men inte det externa nätet."], ["NAT", "VM:en lånar värddatorns anslutning och kan nå internet, men nås inte utifrån."], ["Internal", "VM:er når bara varandra – inte värddatorn och inte internet."], ["Bridged", "VM:en kopplas direkt till det fysiska nätet och får en egen adress där."], ["Snapshot", "En sparad återställningspunkt för en virtuell dator."], ["DHCP", "Tjänsten som delar ut IP-adresser automatiskt i ett nät."]];
+function T(k){for(var i=0;i<TERMS.length;i++){if(TERMS[i][0]===k)return TERMS[i][1];}return '';}
+(function(){
+  var chips=document.getElementById('chipsA');
+  if(chips)chips.innerHTML='<span class="note">Begrepp i den här workshopen – klicka för en kort förklaring:</span> '+
+    TERMS.map(function(t){return '<span class="term" data-k="'+t[0]+'">'+t[0]+'</span>';}).join('');
+  document.body.insertAdjacentHTML('beforeend','<div id="pop"></div>');
+  document.addEventListener('click',function(e){
+    var el=e.target.closest?e.target.closest('.term'):null,p=document.getElementById('pop');
+    if(!p)return;
+    if(!el){p.style.display='none';return;}
+    var d=T(el.getAttribute('data-k'));
+    if(!d){p.style.display='none';return;}
+    p.innerHTML='<b>'+el.textContent+'</b><br>'+d;p.style.display='block';
+    var r=el.getBoundingClientRect();
+    p.style.left=Math.max(8,Math.min(window.innerWidth-350,r.left))+'px';
+    p.style.top=Math.min(window.innerHeight-140,r.bottom+8)+'px';
+  });
+  var RES=[["VirtualBox – Network modes", "https://www.virtualbox.org/manual/ch06.html", "Officiell tabell över host-only, internal, NAT och bridged: vem som når vem.", "Nybörjare", "Gratis, ingen registrering"]],box=document.getElementById('res');
+  if(box)box.innerHTML='<div class="card resbox"><h3>Fördjupa dig och testa själv</h3>'+
+    '<p class="note">Frivilligt komplement som kräver internet. Övningarna i workshopen fungerar utan.</p>'+
+    RES.map(function(r){return '<div class="rl"><a href="'+r[1]+'" target="_blank" rel="noopener noreferrer">'+r[0]+'</a>'+
+      '<span class="lvl">'+r[3]+'</span><br>'+r[2]+'<br><span class="note">'+r[4]+'</span></div>';}).join('')+'</div>';
+})();
+
+/* ---------- visuella nätverkslägen ---------- */
+(function(){
+  var btns=document.getElementById('mbtns'),dia=document.getElementById('diagram');
+  if(!btns||!dia)return;
+  var M={
+    hostonly:{t:'Host-only',vm:'ja',host:'ja',net:'nej',use:'Attackövningar där du vill nå labben från värddatorn.',risk:'Inget når internet – bra. Tänk på att värddatorns brandvägg och delade mappar är egna vägar.'},
+    internal:{t:'Internal',vm:'ja',host:'nej',net:'nej',use:'Skadlig kod och analys där inget får läcka ut.',risk:'Mest isolerat. Du måste själv konfigurera IP-adresser eftersom det inte finns någon DHCP.'},
+    nat:{t:'NAT',vm:'nej',host:'nej',net:'ja',use:'Hämta verktyg och uppdateringar till Kali.',risk:'VM:en kan ringa hem – skadlig kod kan hämta payload. Ingen kan nå in utan portvidarebefordran.'},
+    bridged:{t:'Bridged',vm:'ja',host:'ja',net:'ja',use:'Endast isolerad testmiljö med egen router och tillstånd.',risk:'VM:en får adress i det riktiga nätet. Störst risk att påverka andra system.'}};
+  var R=[['VM 1 ↔ VM 2','vm'],['VM ↔ värddator','host'],['VM ↔ internet','net']];
+  function draw(k){
+    var m=M[k];
+    dia.innerHTML=R.map(function(r){return '<div class="mrow"><span>'+r[0]+'</span><span class="'+(m[r[1]]==='ja'?'yes':'no')+'">'+m[r[1]]+'</span></div>';}).join('')+
+      '<p style="margin:10px 0 0;font-size:13.5px"><b>Används till:</b> '+m.use+'</p>'+
+      '<p style="margin:6px 0 0;font-size:13.5px"><b>Risk:</b> '+m.risk+'</p>';
+    [].slice.call(btns.querySelectorAll('button')).forEach(function(b){b.classList.toggle('on',b.dataset.m===k);});
+  }
+  btns.innerHTML=Object.keys(M).map(function(k){return '<button data-m="'+k+'">'+M[k].t+'</button>';}).join('');
+  [].slice.call(btns.querySelectorAll('button')).forEach(function(b){b.onclick=function(){draw(b.dataset.m);};});
+  draw('hostonly');
+})();
+</script>
+</body>
+</html>

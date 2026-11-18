@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICA Banken Serviceenkät</title>
+    <style>
+        /* Stilar som matchar ICA Bankens design */
+        :root {
+            --color-brand-primary: #e13205;
+            --color-brand-secondary: #02203b;
+            --color-brand-gray: #3a3a3a;
+            --color-brand-gray-light: #f5f5f5;
+            --color-text-primary: #3a3a3a;
+            --color-text-secondary: #666666;
+            --color-border: #cccccc;
+            --color-background: #ffffff;
+            --color-button-primary: #e13205;
+            --color-button-primary-hover: #c22a04;
+            --color-button-secondary: #02203b;
+            --color-button-secondary-hover: #011428;
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+            --border-radius: 4px;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            color: var(--color-text-primary);
+            background-color: var(--color-brand-gray-light);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--spacing-md);
+        }
+
+        /* Header stil */
+        .header {
+            background-color: var(--color-background);
+            border-bottom: 1px solid var(--color-border);
+            padding: var(--spacing-sm) 0;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            height: 32px;
+            width: auto;
+        }
+
+        .logo-text {
+            color: var(--color-brand-primary);
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin-left: var(--spacing-sm);
+        }
+
+        /* Formulär styling */
+        .survey-container {
+            background-color: var(--color-background);
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .survey-title {
+            color: var(--color-brand-secondary);
+            margin-bottom: var(--spacing-lg);
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: var(--spacing-sm);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-brand-primary);
+            box-shadow: 0 0 0 2px rgba(225, 50, 5, 0.1);
+        }
+
+        /* Rating styling */
+        .rating-group {
+            margin-top: var(--spacing-xs);
+        }
+
+        .rating-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-xs);
+        }
+
+        .rating-option {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .rating-label {
+            display: block;
+            padding: var(--spacing-sm);
+            background-color: var(--color-brand-gray-light);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .rating-input {
+            display: none;
+        }
+
+        .rating-input:checked + .rating-label {
+            background-color: var(--color-brand-primary);
+            color: white;
+            border-color: var(--color-brand-primary);
+        }
+
+        .rating-label:hover {
+            border-color: var(--color-brand-primary);
+        }
+
+        /* Knappar */
+        .button-group {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-xl);
+        }
+
+        .button {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border: none;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            flex: 1;
+        }
+
+        .button-primary {
+            background-color: var(--color-button-primary);
+            color: white;
+        }
+
+        .button-primary:hover {
+            background-color: var(--color-button-primary-hover);
+        }
+
+        .button-secondary {
+            background-color: var(--color-button-secondary);
+            color: white;
+        }
+
+        .button-secondary:hover {
+            background-color: var(--color-button-secondary-hover);
+        }
+
+        /* Resultatsektion */
+        .results-container {
+            background-color: var(--color-background);
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: var(--spacing-xl);
+            margin-top: var(--spacing-lg);
+            display: none;
+        }
+
+        .results-title {
+            color: var(--color-brand-secondary);
+            margin-bottom: var(--spacing-lg);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: var(--spacing-sm);
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .results-table th {
+            background-color: var(--color-brand-gray-light);
+            color: var(--color-text-primary);
+            font-weight: 500;
+        }
+
+        .results-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .rating-text {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .rating-excellent {
+            background-color: #e6f7e6;
+            color: #2e7d32;
+        }
+
+        .rating-good {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .rating-average {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+
+        .rating-poor {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: var(--spacing-lg);
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+            margin-top: var(--spacing-xl);
+            border-top: 1px solid var(--color-border);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--spacing-sm);
+            }
+            
+            .survey-container {
+                padding: var(--spacing-lg);
+            }
+            
+            .rating-options {
+                flex-direction: column;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <svg class="logo" viewBox="0 0 174 28" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 14a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z" fill="#E13205"/>
+                <text x="35" y="18" font-family="Arial" font-weight="bold" font-size="16" fill="#3A3A3A">ICA BANKEN</text>
+            </svg>
+            <div class="logo-text">Serviceenkät</div>
+        </div>
+    </header>
+
+    <!-- Huvudinnehåll -->
+    <div class="container">
+        <!-- Enkätformulär -->
+        <div class="survey-container">
+            <h1 class="survey-title">Bedöm ICA Bankens service</h1>
+            
+            <form id="surveyForm">
+                <!-- Personlig information -->
+                <div class="form-group">
+                    <label class="form-label" for="firstName">1. Förnamn</label>
+                    <input type="text" id="firstName" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="lastName">2. Efternamn</label>
+                    <input type="text" id="lastName" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="email">3. E-postadress</label>
+                    <input type="email" id="email" class="form-input" required>
+                </div>
+                
+                <!-- Servicebedömningar -->
+                <div class="form-group">
+                    <label class="form-label">4. Hur nöjd är du med ICA Bankens kundservice?</label>
+                    <div class="rating-group">
+                        <div class="rating-options">
+                            <div class="rating-option">
+                                <input type="radio" id="service1" name="customerService" value="Utmärkt" class="rating-input" required>
+                                <label for="service1" class="rating-label">Utmärkt</label>
+                            </div>
+                            <div class="rating-option">
+                                <input type="radio" id="service2" name="customerService" value="Bra" class="rating-input">
+                                <label for="service2" class="rating-label">Bra</label>
+                            </div>
+                            <div class="rating-option">
+                                <input type="radio" id="service3" name="customerService" value="Ganska bra" class="rating-input">
+                                <label for="service3" class="rating-label">Ganska bra</label>
+                            </div>
+                            <div class="rating-option">
+                                <input type="radio" id="service4" name="customerService" value="Dålig" class="rating-input">
+                                <label for="service4" class="rating-label">Dålig</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">5. Hur enkelt är det att använda ICA Bankens webbtjänster?</label>
+                    <div class="rating-group">
+                        <div class="rating-options">
+                            <div class="rating-option">
+                                <input type="radio" id="web1" name="webServices" value="Utmärkt" class="rating-input" required>
+                                <label for="web1" class="rating-label">Mycket enkelt</label>
+                            </div>
+                            <div class="rating-option">
+                                <input type="radio" id="web2" name="webServices" value="Bra" class="rating-input">
+                                <label for="web2" class="rating-label">Enkelt</label>
+                            </div>
+                            <div class="rating-option">
+                                <input type="radio" id="web3" name="webServices" value="Ganska bra" class="rating-input">
+                                <label for="web3" class="rating-label">Ganska enkelt</label>
+                            </div>
+                            <div class="rating-option">
+                                <input type="radio" id="web4" name="webServices" value="Dålig" class="rating-input">
+                                <label for="web4" class="rating-label">Svårt</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">6. Hur snabbt får du svar på dina frågor från ICA Banken?</label>
+                    <div class="rating-group">
+                        <div class="rating-options">
+                            <div class="rating-option">
+                                <input type="radio" id="response1" name="responseTime" value="Utmärkt" class="rating-input" required>
+                                <label for="response1" class="rating-label">Mycket snabbt</label>
+                            </div>
+                            <div class="rating-option">
+                                <input type="radio" id="response2" name="responseTime" value="Bra" class="rating-input">
+                                <label for="response2" class="rating-label">Snabbt</label>
+                            </div>
+                            <div class="rating-option">
+                                <input type="radio" id="response3" name="responseTime" value="Ganska bra" class="rating-input">
+                                <label for="response3" class="rating-label">Acceptabelt</label>
+                            </div>
+                            <div class="rating-option">
+                                <input type="radio" id="response4" name="responseTime" value="Dålig" class="rating-input">
+                                <label for="response4" class="rating-label">För långsamt</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">7. Bedöm ICA Bankens mobila app</label>
+                    <div class="rating-group">
+                        <div class="rating-options">
+                            <div class="rating-option">
+                                <input type="radio" id="app1" name="mobileApp" value="Utmärkt" class="rating-input" required>
+                                <label for="app1" class="rating-label">Utmärkt</label>
+                            </div>
+                            <div class="rating-option">
+                                <input type="radio" id="app2" name="mobileApp" value="Bra" class="rating-input">
+                                <label for="app2" class="rating-label">Bra</label>
+                            </div>
+                            <div class="rating-option">
+                                <input type="radio" id="app3" name="mobileApp" value="Ganska bra" class="rating-input">
+                                <label for="app3" class="rating-label">Ganska bra</label>
+                            </div>
+                            <div class="rating-option">
+                                <input type="radio" id="app4" name="mobileApp" value="Dålig" class="rating-input">
+                                <label for="app4" class="rating-label">Dålig</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="comments">8. Ytterligare kommentarer eller förslag till förbättring:</label>
+                    <textarea id="comments" class="form-input" rows="4"></textarea>
+                </div>
+                
+                <!-- Knappar -->
+                <div class="button-group">
+                    <button type="submit" class="button button-primary">Spara enkät</button>
+                    <button type="reset" class="button button-secondary">Återställ</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Resultatvisning -->
+        <div class="results-container" id="resultsContainer">
+            <h2 class="results-title">Dina enkätsvar</h2>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Fråga</th>
+                        <th>Ditt svar</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody">
+                    <!-- Resultaten kommer att visas här -->
+                </tbody>
+            </table>
+            <button id="closeResults" class="button button-secondary">Stäng resultat</button>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <p>ICA Banken AB • Box 4075, 169 04 Solna • Organisationsnummer: 516401-0190</p>
+        <p>© 2023 ICA Banken. Alla rättigheter förbehållna.</p>
+    </footer>
+
+    <script>
+        // Hantera formulärinsändning
+        document.getElementById('surveyForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            // Samla in formulärdata
+            const formData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                customerService: document.querySelector('input[name="customerService"]:checked').value,
+                webServices: document.querySelector('input[name="webServices"]:checked').value,
+                responseTime: document.querySelector('input[name="responseTime"]:checked').value,
+                mobileApp: document.querySelector('input[name="mobileApp"]:checked').value,
+                comments: document.getElementById('comments').value || 'Inga kommentarer'
+            };
+            
+            // Spara data i localStorage
+            localStorage.setItem('icaBankSurvey', JSON.stringify(formData));
+            
+            // Visa resultaten
+            displayResults(formData);
+            
+            // Visa meddelande
+            alert('Din enkät har sparats!');
+        });
+        
+        // Funktion för att visa resultaten
+        function displayResults(data) {
+            const resultsBody = document.getElementById('resultsBody');
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            // Rensa tidigare resultat
+            resultsBody.innerHTML = '';
+            
+            // Lägg till resultatrad för varje fråga
+            const questions = [
+                { label: 'Namn', value: `${data.firstName} ${data.lastName}` },
+                { label: 'E-post', value: data.email },
+                { label: 'Kundservice', value: data.customerService },
+                { label: 'Webbtjänster', value: data.webServices },
+                { label: 'Svarstid', value: data.responseTime },
+                { label: 'Mobil app', value: data.mobileApp },
+                { label: 'Kommentarer', value: data.comments }
+            ];
+            
+            questions.forEach(question => {
+                const row = document.createElement('tr');
+                
+                const cellLabel = document.createElement('td');
+                cellLabel.textContent = question.label;
+                
+                const cellValue = document.createElement('td');
+                cellValue.textContent = question.value;
+                
+                // Lägg till klass för rating för att styla vissa svar
+                if (['Kundservice', 'Webbtjänster', 'Svarstid', 'Mobil app'].includes(question.label)) {
+                    cellValue.className = 'rating-text ' + getRatingClass(question.value);
+                }
+                
+                row.appendChild(cellLabel);
+                row.appendChild(cellValue);
+                resultsBody.appendChild(row);
+            });
+            
+            // Visa resultatcontainern
+            resultsContainer.style.display = 'block';
+            
+            // Scrolla till resultaten
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Hjälpfunktion för att få rätt klass för rating
+        function getRatingClass(rating) {
+            switch(rating) {
+                case 'Utmärkt':
+                case 'Mycket enkelt':
+                case 'Mycket snabbt':
+                    return 'rating-excellent';
+                case 'Bra':
+                case 'Enkelt':
+                case 'Snabbt':
+                    return 'rating-good';
+                case 'Ganska bra':
+                case 'Ganska enkelt':
+                case 'Acceptabelt':
+                    return 'rating-average';
+                case 'Dålig':
+                case 'Svårt':
+                case 'För långsamt':
+                    return 'rating-poor';
+                default:
+                    return '';
+            }
+        }
+        
+        // Ladda tidigare sparade resultat vid sidladdning
+        window.addEventListener('load', function() {
+            const savedData = localStorage.getItem('icaBankSurvey');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                
+                // Fyll i formuläret med sparade data
+                document.getElementById('firstName').value = parsedData.firstName || '';
+                document.getElementById('lastName').value = parsedData.lastName || '';
+                document.getElementById('email').value = parsedData.email || '';
+                
+                // Återställ radioknappar
+                if (parsedData.customerService) {
+                    const serviceRadio = document.querySelector(`input[name="customerService"][value="${parsedData.customerService}"]`);
+                    if (serviceRadio) serviceRadio.checked = true;
+                }
+                
+                if (parsedData.webServices) {
+                    const webRadio = document.querySelector(`input[name="webServices"][value="${parsedData.webServices}"]`);
+                    if (webRadio) webRadio.checked = true;
+                }
+                
+                if (parsedData.responseTime) {
+                    const responseRadio = document.querySelector(`input[name="responseTime"][value="${parsedData.responseTime}"]`);
+                    if (responseRadio) responseRadio.checked = true;
+                }
+                
+                if (parsedData.mobileApp) {
+                    const appRadio = document.querySelector(`input[name="mobileApp"][value="${parsedData.mobileApp}"]`);
+                    if (appRadio) appRadio.checked = true;
+                }
+                
+                document.getElementById('comments').value = parsedData.comments || '';
+            }
+        });
+        
+        // Stäng resultatvisningen
+        document.getElementById('closeResults').addEventListener('click', function() {
+            document.getElementById('resultsContainer').style.display = 'none';
+        });
+        
+        // Återställningsknapp
+        document.querySelector('button[type="reset"]').addEventListener('click', function() {
+            localStorage.removeItem('icaBankSurvey');
+            document.getElementById('resultsContainer').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

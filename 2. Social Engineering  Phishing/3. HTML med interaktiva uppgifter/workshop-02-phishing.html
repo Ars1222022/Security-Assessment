@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:,">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lektion 2 · Social Engineering och phishing – individuellt, grupp och facit</title>
+<style>
+:root{--acc:#0e6b66;--acc2:#e3f2f0;--ink:#152220;--mut:#566a67;--line:#d5e3e0;--ok:#0f6b3f;--bad:#a3221a;--warn:#8a5a00;--bg:#f3f7f6}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.55 system-ui,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:#fff;border-bottom:3px solid var(--acc);padding:14px 0}
+.wrap{max-width:1100px;margin:0 auto;padding:0 18px}
+h1{margin:0 0 4px;font-size:21px;color:var(--acc)}
+.sub{margin:0 0 10px;color:var(--mut);font-size:13.5px}
+nav button{border:1px solid var(--line);background:#fff;padding:7px 14px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer;margin-right:6px}
+nav button.on{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+main{padding:16px 0 70px}
+h2{font-size:17px;margin:14px 0 8px;color:var(--acc)}h3{font-size:14.5px;margin:0 0 6px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.step{background:#fff;border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.step h3{color:var(--acc)}.step p{margin:5px 0;font-size:13.8px}
+.expect{background:var(--acc2);border-radius:8px;padding:7px 10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+label{display:block;font-size:13px;font-weight:600;margin:8px 0 2px}
+textarea,input,select{width:100%;font:13px/1.5 ui-monospace,Consolas,monospace;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:#fdfefe}
+button.p{background:var(--acc);color:#fff;border:0;padding:8px 15px;border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
+button.g{background:#fff;border:1px solid var(--line);padding:7px 12px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+pre{background:#f2f7f6;border:1px solid var(--line);border-radius:8px;padding:10px;font:12.5px/1.5 ui-monospace,Consolas,monospace;white-space:pre-wrap;margin:0}
+.res{display:flex;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.ok{color:var(--ok)}.bad{color:var(--bad)}
+.tag{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:700;background:var(--acc2);color:var(--acc)}
+.mail{border:1px solid #cfdcd9;border-radius:10px;overflow:hidden;background:#fff;font-size:13.5px}
+.mail .top{background:#eef5f4;padding:9px 12px;border-bottom:1px solid var(--line)}
+.mail .body{padding:12px}
+.tell{cursor:pointer;border-bottom:1px dashed #8fa6a2;padding:1px 2px;border-radius:3px}
+.tell:hover{background:#fdf6d8}.tell.mk{background:#ffe9a8}
+.tell.hitTrue{background:#dff1e6}.tell.hitFalse{background:#fbe4e2}
+.bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.bar button{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit;font-size:12.5px;cursor:pointer}
+.bar button.on{background:var(--acc2);border-color:var(--acc);font-weight:600}
+#clock{font:700 15px ui-monospace,Consolas,monospace;color:var(--acc);margin-left:4px}
+.gt button{border:1px solid var(--line);background:#fff;padding:5px 12px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer;margin-right:6px}
+.gt button.on{background:var(--acc2);border-color:var(--acc);font-weight:700}
+.finding{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin:8px 0;background:#fcfefd;font-size:13px}
+.sev{font-weight:700;padding:1px 6px;border-radius:5px;font-size:11px}
+.s1{background:#dff1e6;color:var(--ok)}.s2{background:#fdf2d8;color:var(--warn)}.s3{background:#fbe4e2;color:var(--bad)}
+.q{margin:10px 0}
+.opts button{display:block;width:100%;text-align:left;border:1px solid var(--line);background:#fff;padding:7px 10px;border-radius:8px;margin:4px 0;font:inherit;font-size:13.5px;cursor:pointer}
+.opts button:hover{border-color:var(--acc)}
+.fb{font-size:13px;margin-top:5px}
+details.facit{border:1px solid var(--acc);border-radius:10px;padding:10px 12px;margin:10px 0;background:#fbfefd}
+details.facit summary{cursor:pointer;font-weight:700;color:var(--acc)}
+.muted{color:var(--mut);font-size:12.5px}
+
+.term{border-bottom:1px dotted #7c8b99;cursor:help;font-weight:600}
+.term:hover{color:var(--acc);border-bottom-color:var(--acc)}
+#pop{position:fixed;z-index:9999;max-width:330px;background:#fff;border:1px solid var(--acc);border-radius:10px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:13px;line-height:1.45;display:none}
+#pop b{color:var(--acc)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 12px}
+.chips .term{background:#fff;border:1px solid var(--line);border-radius:20px;padding:3px 10px;font-size:12px}
+.rl{border-top:1px dashed var(--line);padding:9px 0;font-size:13px}
+.rl:first-of-type{border-top:0}
+.lvl{font-size:11px;font-weight:700;background:var(--acc2);color:var(--acc);padding:1px 7px;border-radius:20px;margin-left:6px}
+.note{font-size:12px;color:var(--mut)}
+.resbox a{color:var(--acc);font-weight:600}
+#why{background:var(--acc2);border-radius:8px;padding:8px 10px;font-size:12.5px;margin-top:8px;min-height:0px}
+#why:empty{display:none}
+
+.tabhead{background:#fff;border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:10px;padding:8px 12px;margin:0 0 12px;font-size:13px;color:var(--mut)}
+.tabhead b{color:var(--acc)}
+.labblock{margin-top:16px;padding-top:6px;border-top:2px dashed var(--line)}
+
+/* interaktiv stegvisare */
+.stp{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 14px}
+.stp-dots{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.stp-dot{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--mut);font:700 13px system-ui;cursor:pointer;transition:.15s}
+.stp-dot:hover{border-color:var(--acc);color:var(--acc)}
+.stp-dot.on{background:var(--acc);border-color:var(--acc);color:#fff;transform:scale(1.08)}
+.stp-dot.done{border-color:var(--ok);color:var(--ok)}
+.stp-dot.done.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.stp-card h3{margin:0 0 6px;color:var(--acc)}
+.stp-card p{margin:5px 0;font-size:13.8px}
+.stp-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;border-top:1px dashed var(--line);padding-top:9px}
+.stp-chk{display:flex;gap:7px;align-items:center;font-size:13px;font-weight:600;color:var(--mut);cursor:pointer;margin:0}
+.stp-chk input{width:auto;margin:0}
+.stp-prog{font-size:12px;color:var(--mut);margin-left:auto}
+.stp-prog b{color:var(--acc)}
+/* dra och släpp */
+.ds{position:relative;background:linear-gradient(135deg,#ffffff 0%,#eef5fb 100%);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;margin:0 0 16px;overflow:hidden}
+.ds-head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:4px}
+.ds-head b{color:var(--acc);font-size:14.5px}
+.ds-status{font-size:12.5px;color:var(--mut)}
+.ds-status b{color:var(--ok)}
+.ds-pool{min-height:52px;padding:6px 0 2px;border-bottom:1px dashed var(--line);margin-bottom:10px}
+.ds-chip{display:inline-block;padding:8px 12px;margin:4px 6px 2px 0;border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 1px 2px rgba(16,32,48,.07);font-size:13px;line-height:1.3;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;transition:box-shadow .15s,border-color .15s,transform .15s}
+.ds-chip:hover{border-color:var(--acc);box-shadow:0 4px 12px rgba(27,79,122,.18);transform:translateY(-1px)}
+.ds-chip.ds-sel{border-color:var(--acc);background:var(--acc2);box-shadow:0 0 0 2px rgba(27,79,122,.25)}
+.ds-chip.ds-dragging{opacity:.35}
+.ds-chip.ok{background:#e8f7ef;border-color:var(--ok);color:#0d5734;cursor:default;box-shadow:none}
+.ds-chip.ok::after{content:" ✓";font-weight:700}
+.ds-chip.bad{border-color:var(--bad);animation:ds-shake .4s}
+@keyframes ds-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.ds-ghost{position:fixed;z-index:9999;pointer-events:none;border-color:var(--acc);box-shadow:0 12px 26px rgba(16,32,48,.3);transform:rotate(-2deg);opacity:.95}
+.ds-bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.ds-bin{border:2px dashed var(--line);border-radius:12px;padding:8px 10px;min-height:96px;transition:.15s;background:rgba(255,255,255,.55)}
+.ds-bin.hot{border-color:var(--acc);background:var(--acc2);transform:translateY(-2px)}
+.ds-bin>b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--mut);margin-bottom:4px}
+.ds-drop{min-height:56px}
+.ds-foot{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.ds-facit{border:1px solid var(--line);border-radius:5px;background:#fff;padding:4px 8px;font-size:12px;cursor:pointer;list-style:none}
+summary.ds-facit{list-style:none}
+.ds-facit summary{cursor:pointer;font-weight:600;color:var(--acc);font-size:12.5px}
+.ds-facit ul{margin:6px 0 2px;padding-left:16px;font-size:12.5px;color:var(--mut)}
+.ds.win{border-color:var(--ok);box-shadow:0 0 0 3px rgba(61,220,132,.22),0 14px 32px rgba(18,104,63,.18);animation:ds-pop .45s ease-out}
+@keyframes ds-pop{0%{transform:scale(1)}45%{transform:scale(1.012)}100%{transform:scale(1)}}
+.ds-badge{position:absolute;right:12px;top:10px;width:38px;height:38px;border-radius:50%;background:var(--ok);color:#fff;font:700 20px system-ui;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(18,104,63,.35);animation:ds-badge .5s ease-out}
+@keyframes ds-badge{0%{transform:scale(0) rotate(-40deg);opacity:0}70%{transform:scale(1.15) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Lektion 2 · Social Engineering och phishing</h1>
+  <p class="sub">Individuellt: granska ett mejl (8 min) · Grupparbete: bygg, granska, åtgärda, retesta (30 min) · Facit: rapport och facit</p>
+  <nav id="tabs"><button data-t="a" class="on">1 · Individuellt arbete</button><button data-t="b">2 · Grupparbete</button><button data-t="c">3 · Facit</button></nav>
+</div></header>
+<main class="wrap">
+<section id="a">
+<div class="tabhead"><b>Individuellt arbete</b> – gör uppgifterna själv. Allt du skriver sparas i webbläsaren och kan kopieras till rapporten i fliken Facit.</div>
+<div class="ds" id="ds2">
+  <div class="ds-head"><b>Dra och släpp · Äkta eller phishing?</b><span class="ds-status">Dra varje signal till rätt låda – eller klicka på ett kort och sedan på en låda.</span></div>
+  <div class="ds-pool"></div>
+  <div class="ds-bins"></div>
+  <div class="ds-foot"><button class="g ds-reset" type="button">Börja om</button>
+    <details class="ds-facit"><summary>Visa facit</summary><ul><li>Bifogad fil: kvitto.pdf.exe → <b>Phishing</b></li><li>Du uppmanas lämna pinkod på en webbsida → <b>Phishing</b></li><li>Avsändaren är ica-banken-secure.com → <b>Phishing</b></li><li>Brådskande: &quot;kontot spärras inom 24 timmar&quot; → <b>Phishing</b></li><li>Samma information finns i bankens app → <b>Äkta</b></li><li>Avsändaren är support@ica.se och SPF/DKIM är OK → <b>Äkta</b></li></ul></details></div>
+</div>
+<script>
+(function(){
+  var root=document.getElementById('ds2'); if(!root) return;
+  var DATA={"bins": [{"k": "ok", "t": "Äkta"}, {"k": "bad", "t": "Phishing"}], "chips": [{"t": "Bifogad fil: kvitto.pdf.exe", "b": "bad"}, {"t": "Du uppmanas lämna pinkod på en webbsida", "b": "bad"}, {"t": "Avsändaren är ica-banken-secure.com", "b": "bad"}, {"t": "Brådskande: \"kontot spärras inom 24 timmar\"", "b": "bad"}, {"t": "Samma information finns i bankens app", "b": "ok"}, {"t": "Avsändaren är support@ica.se och SPF/DKIM är OK", "b": "ok"}], "win": "Du läser avsändare, domän och beteende – inte logotypen."};
+  var pool=root.querySelector('.ds-pool'), binsBox=root.querySelector('.ds-bins'),
+      status=root.querySelector('.ds-status');
+  var placed=0, drag=null, ghost=null, sel=null, justDragged=0;
+
+  DATA.bins.forEach(function(b){
+    var d=document.createElement('div'); d.className='ds-bin'; d.setAttribute('data-k',b.k);
+    d.innerHTML='<b>'+b.t+'</b><div class="ds-drop"></div>';
+    d.addEventListener('click',function(){
+      if(!sel) return;
+      var s=sel; sel=null; s.classList.remove('ds-sel'); drop(s,d);
+    });
+    binsBox.appendChild(d);
+  });
+  DATA.chips.forEach(function(c){
+    var el=document.createElement('div');
+    el.className='ds-chip'; el.setAttribute('data-b',c.b); el.textContent=c.t; el.tabIndex=0;
+    el.addEventListener('pointerdown',down);
+    el.addEventListener('click',function(){ if(drag||Date.now()-justDragged<250) return; pick(el); });
+    el.addEventListener('keydown',function(e){
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); pick(el); }
+    });
+    pool.appendChild(el);
+  });
+
+  function pick(el){
+    if(el.classList.contains('ok')) return;
+    if(sel===el){ el.classList.remove('ds-sel'); sel=null; say('Klicka på ett kort och sedan på en låda.'); return; }
+    if(sel) sel.classList.remove('ds-sel');
+    sel=el; el.classList.add('ds-sel');
+    say('Välj rätt låda för "'+el.textContent+'".');
+  }
+  function down(e){
+    var el=e.currentTarget;
+    if(el.classList.contains('ok')) return;
+    e.preventDefault();
+    var r=el.getBoundingClientRect();
+    ghost=el.cloneNode(true);
+    ghost.className='ds-chip ds-ghost';
+    ghost.style.width=r.width+'px';
+    ghost.style.left=r.left+'px'; ghost.style.top=r.top+'px';
+    document.body.appendChild(ghost);
+    el.classList.add('ds-dragging');
+    drag={el:el,ox:e.clientX-r.left,oy:e.clientY-r.top};
+    document.addEventListener('pointermove',move);
+    document.addEventListener('pointerup',up);
+    document.addEventListener('pointercancel',up);
+  }
+  function move(e){
+    if(!drag) return;
+    ghost.style.left=(e.clientX-drag.ox)+'px';
+    ghost.style.top=(e.clientY-drag.oy)+'px';
+    var b=binAt(e.clientX,e.clientY);
+    [].slice.call(binsBox.children).forEach(function(x){ x.classList.toggle('hot',x===b); });
+  }
+  function up(e){
+    if(!drag) return;
+    var el=drag.el, b=binAt(e.clientX,e.clientY);
+    document.removeEventListener('pointermove',move);
+    document.removeEventListener('pointerup',up);
+    document.removeEventListener('pointercancel',up);
+    if(ghost){ ghost.parentNode.removeChild(ghost); ghost=null; }
+    el.classList.remove('ds-dragging');
+    [].slice.call(binsBox.children).forEach(function(x){ x.classList.remove('hot'); });
+    drag=null; justDragged=Date.now();
+    if(b) drop(el,b);
+  }
+  function binAt(x,y){
+    if(ghost) ghost.style.display='none';
+    var t=document.elementFromPoint(x,y);
+    if(ghost) ghost.style.display='';
+    while(t && t!==root && !t.classList.contains('ds-bin')) t=t.parentNode;
+    return (t&&t.classList&&t.classList.contains('ds-bin'))?t:null;
+  }
+  function drop(el,bin){
+    var k=bin.getAttribute('data-k');
+    if(el.getAttribute('data-b')===k){
+      el.classList.remove('ds-sel');
+      if(sel===el) sel=null;
+      el.classList.add('ok');
+      bin.querySelector('.ds-drop').appendChild(el);
+      placed++;
+      if(placed===DATA.chips.length){ win(); }
+      else say('<b>'+placed+' av '+DATA.chips.length+' rätt.</b> Fortsätt – du är på rätt spår.');
+    } else {
+      el.classList.add('bad');
+      setTimeout(function(){ el.classList.remove('bad'); },700);
+      say('Nästan! Det kortet hör inte hemma där. Läs ledtråden i lådans rubrik och prova igen.');
+    }
+  }
+  function say(t){ status.innerHTML=t; }
+  function win(){
+    say('<b>Allt rätt!</b> '+DATA.win);
+    root.classList.add('win');
+    if(!root.querySelector('.ds-badge')){
+      var b=document.createElement('div'); b.className='ds-badge'; b.textContent='✓';
+      root.appendChild(b);
+    }
+  }
+  root.querySelector('.ds-reset').onclick=function(){
+    [].slice.call(root.querySelectorAll('.ds-chip')).forEach(function(el){
+      el.classList.remove('ok','bad','ds-sel'); pool.appendChild(el);
+    });
+    placed=0; sel=null;
+    root.classList.remove('win');
+    var bd=root.querySelector('.ds-badge'); if(bd) bd.parentNode.removeChild(bd);
+    say('Dra korten till rätt låda – eller klicka på ett kort och sedan på en låda.');
+  };
+})();
+
+</script>
+<h2>Individuellt · Hitta varningssignalerna i ett mejl <span class="tag">Simulering av ett riktigt mejl</span></h2>
+  <div id="stepsA"></div>
+  <div class="chips" id="chipsA"></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="mail">
+        <div class="top">
+          <div><span class="tell" data-k="from">ICA Banken &lt;service@ica-banken-secure.com&gt;</span></div>
+          <div class="muted">Till: dig · <span class="tell" data-k="subject">Ämne: Viktigt – verifiera ditt konto inom 24 timmar</span></div>
+        </div>
+        <div class="body">
+          <p><span class="tell" data-k="greet">Bästa kund,</span></p>
+          <p>Vi har upptäckt ovanlig aktivitet på ditt konto. För att undvika att kontot spärras måste du <span class="tell" data-k="urgent">bekräfta dina uppgifter inom 24 timmar</span>.</p>
+          <p><a class="tell" data-k="link" href="#">https://www.icabanken.se/logga-in</a></p>
+          <p class="muted" style="font-size:11.5px">(länken pekar i själva verket till http://ica-banken-secure.com/login)</p>
+          <p>Bifogad fil: <span class="tell" data-k="attach">faktura_2027.pdf.exe</span> (42 kB)</p>
+          <p><span class="tell" data-k="footer">ICA Banken · 105 34 Stockholm · Org.nr 502012-1027</span></p>
+        </div>
+      </div>
+      <p class="muted" style="margin-top:8px">Riktiga exempel att jämföra med finns i mappen <code>ICA-banken_phishing_exempel</code> – öppna dem genom att dubbelklicka.</p>
+      <div id="why"></div>
+    </div>
+    <div class="card">
+      <h3>Din bedömning</h3>
+      <label for="verdict">Vad är detta och varför? (2–3 meningar)</label>
+      <textarea id="verdict" rows="3" placeholder="Mejlet är en phishing-attack eftersom ..."></textarea>
+      <label for="actions">Två åtgärder du rekommenderar mottagaren</label>
+      <textarea id="actions" rows="2" placeholder="1) ... 2) ..."></textarea>
+      <div class="row" style="margin-top:10px"><button class="p" id="chkA">Kontrollera mina markeringar</button><button class="g" id="cpA">Kopiera analys</button><button class="g" id="resetA">Rensa</button></div><p class="note">Knappen jämför dina markeringar med de sex indikatorerna, räknar falska alarm och bedömer din text. Grön rad = godkänd.</p>
+      <div id="fb" style="margin-top:10px"></div>
+    </div>
+  </div>
+<div id="checkA"></div>
+
+<div class="labblock">
+<h3 style="margin-top:22px">Labb A (individuellt) · Domänförfalskaren – är avsändaren den den utger sig för?</h3>
+<div class="labd">
+  <div class="panel">
+    <p style="margin:0 0 8px"><b>Så gör du:</b> skriv den officiella domänen och avsändarens domän (eller klistra in från mejlets <code>From:</code>). Tryck <b>Analysera</b>. Mätaren visar risken och raden under visar exakt var tecknen skiljer sig.</p>
+    <p class="note" style="margin:0">Testa: <span class="term">ica-banken.se</span>, <span class="term">login.ica.se</span>, <span class="term">ica.se.konto-verifiering.ru</span>, <span class="term">ica.se</span>.</p>
+  </div>
+  <div class="cols">
+    <div class="panel">
+      <label style="display:block;font-size:13px;font-weight:600;margin:6px 0 2px">Officiell domän</label>
+      <input id="x2-off" value="ica.se" style="width:100%;font:13px/1.5 ui-monospace,Consolas,monospace;padding:7px 9px;border:1px solid var(--lb-line);border-radius:8px">
+      <label style="display:block;font-size:13px;font-weight:600;margin:10px 0 2px">Avsändarens domän</label>
+      <input id="x2-snd" value="ica-banken.se" style="width:100%;font:13px/1.5 ui-monospace,Consolas,monospace;padding:7px 9px;border:1px solid var(--lb-line);border-radius:8px">
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="p" id="x2-run">Analysera</button>
+        <button class="g" id="x2-clear">Rensa</button>
+      </div>
+      <div style="margin-top:12px">
+        <div class="kv"><span>Risknivå</span><b id="x2-score">–</b></div>
+        <div class="kv"><span>Teckenavstånd</span><b id="x2-dist">–</b></div>
+        <div class="kv" style="border:0"><span>Bedömning</span><b id="x2-verdict">–</b></div>
+      </div>
+      <ul id="x2-why" class="note" style="margin:10px 0 0;padding-left:18px"></ul>
+    </div>
+    <div class="panel" style="padding:10px">
+      <canvas id="x2-cv" width="900" height="380"></canvas>
+      <div class="note" id="x2-log" style="margin-top:8px;min-height:36px">Skriv två domäner och tryck Analysera.</div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById("x2-cv"); if(!cv) return;
+  var ctx=cv.getContext("2d");
+  var off="ica.se", snd="ica-banken.se", risk=0, dist=0, reasons=[], shown=0, target=0, chars={off:[],snd:[]};
+
+  function lev(a,b){
+    var m=a.length,n=b.length,d=[],i,j;
+    for(i=0;i<=m;i++){ d[i]=[i]; }
+    for(j=0;j<=n;j++){ d[0][j]=j; }
+    for(i=1;i<=m;i++) for(j=1;j<=n;j++){
+      d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a.charAt(i-1)===b.charAt(j-1)?0:1));
+    }
+    return d[m][n];
+  }
+  function analyse(){
+    off=document.getElementById("x2-off").value.trim().toLowerCase().replace(/\.$/,"");
+    snd=document.getElementById("x2-snd").value.trim().toLowerCase().replace(/\.$/,"");
+    reasons=[]; risk=0; dist=lev(off,snd);
+    if(!off||!snd){ risk=0; reasons.push("Fyll i båda fälten."); }
+    else if(off===snd){ risk=4; reasons.push("Exakt samma domän – ingen förfalskning i domändelen."); }
+    else {
+      if(snd.indexOf(off+".")===0){ risk=92; reasons.push("Den officiella domänen står först, men fortsättningen <code>"+snd.slice(off.length+1)+"</code> ägs av någon annan. Subdomän-fällan."); }
+      else if(snd.length>off.length && snd.slice(-(off.length+1))==="."+off){ risk=48; reasons.push("Officiella domänen ligger sist – det är rätt. Kontrollera ändå att hela värdnamnet är känt: <code>"+snd+"</code>."); }
+      else if(dist<=2){ risk=88; reasons.push("Nästan identisk stavning (avstånd "+dist+") – typisk typosquatting. Ett tecken kan räcka."); }
+      else { risk=66; reasons.push("Helt annan domän än den officiella. Jämför med det du vet om avsändaren, inte med logotypen."); }
+      if(/[^\x00-\x7F]/.test(snd)){ risk=Math.max(risk,90); reasons.push("Domänen innehåller tecken utanför a–z (IDN). Sådana kan se ut som svenska tecken men peka någon annanstans."); }
+      if(/xn--/.test(snd)){ risk=Math.max(risk,90); reasons.push("Punycode (<code>xn--</code>) – ett internationellt tecken som döljer sig bakom en vanlig bokstav."); }
+      if((snd.match(/-/g)||[]).length>=2){ risk=Math.min(100,risk+6); reasons.push("Flera bindestreck är vanligt i registrerade bedrägeridomäner."); }
+    }
+    target=Math.max(0,Math.min(100,risk));
+    document.getElementById("x2-dist").textContent=dist;
+    document.getElementById("x2-score").textContent=target+" / 100";
+    var v=document.getElementById("x2-verdict");
+    v.textContent = target>=80?"Hög risk – behandla som phishing":(target>=45?"Tveksam – verifiera via annan kanal":"Låg risk");
+    v.style.color = target>=80?"var(--lb-bad)":(target>=45?"var(--lb-warn)":"var(--lb-ok)");
+    document.getElementById("x2-why").innerHTML=reasons.map(function(r){ return "<li>"+r+"</li>"; }).join("");
+    chars={off:off.split(""),snd:snd.split("")};
+    document.getElementById("x2-log").innerHTML = target>=80
+      ? '<b style="color:#ff8f85">Stopp:</b> klicka aldrig på länken. Öppna bankens app eller skriv adressen själv.'
+      : (target>=45 ? '<b style="color:#ffcf70">Kontrollera:</b> ring eller mejla avsändaren på en adress du redan har.' : '<b style="color:#7ee2a8">Ser rimligt ut:</b> men domänen är bara en av flera signaler – läs hela mejlet.');
+  }
+
+  function gauge(v){
+    var cx=210, cy=190, r=120;
+    ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI*0.75,Math.PI*2.25);
+    ctx.lineWidth=20; ctx.strokeStyle="rgba(120,200,255,.14)"; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI*0.75,Math.PI*0.75+Math.PI*1.5*(shown/100));
+    ctx.strokeStyle=shown>=80?"#ff5a4d":(shown>=45?"#ffcf70":"#3ddc84"); ctx.lineCap="round"; ctx.stroke();
+    var a=Math.PI*0.75+Math.PI*1.5*(shown/100);
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(a)*(r-30),cy+Math.sin(a)*(r-30));
+    ctx.strokeStyle="#dbe7f3"; ctx.lineWidth=3; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,6,0,Math.PI*2); ctx.fillStyle="#dbe7f3"; ctx.fill();
+    ctx.textAlign="center"; ctx.fillStyle="#dbe7f3"; ctx.font="700 30px system-ui";
+    ctx.fillText(Math.round(shown),cx,cy+8);
+    ctx.font="11px system-ui"; ctx.fillStyle="rgba(219,231,243,.6)";
+    ctx.fillText("RISK",cx,cy+26);
+    ctx.font="10px system-ui"; ctx.fillStyle="rgba(219,231,243,.45)";
+    ctx.fillText("låg",cx-r+6,cy+62); ctx.fillText("hög",cx+r-6,cy+62);
+  }
+
+  function row(label,arr,y,other){
+    ctx.textAlign="left"; ctx.font="11px system-ui"; ctx.fillStyle="rgba(219,231,243,.55)";
+    ctx.fillText(label,500,y-16);
+    var x=500;
+    ctx.font="15px ui-monospace,Consolas,monospace";
+    arr.forEach(function(ch,i){
+      var same = other && arr===chars.snd ? (chars.off[i]===ch) : true;
+      var w=ctx.measureText(ch).width+2;
+      if(!same){ ctx.fillStyle="rgba(255,90,77,.18)"; ctx.fillRect(x-1,y-14,w,20); }
+      ctx.fillStyle = same?"#dbe7f3":"#ff8f85";
+      ctx.fillText(ch,x,y);
+      x+=w;
+    });
+    return x;
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,900,380);
+    var g=ctx.createLinearGradient(0,0,900,380);
+    g.addColorStop(0,"#12263a"); g.addColorStop(1,"#07111c");
+    ctx.fillStyle=g; ctx.fillRect(0,0,900,380);
+    gauge(shown);
+    ctx.textAlign="left"; ctx.font="13px system-ui"; ctx.fillStyle="rgba(219,231,243,.85)";
+    ctx.fillText("Domänjämförelse",500,46);
+    row("Officiell",chars.off,96,null);
+    row("Avsändare",chars.snd,140,chars.off);
+    ctx.font="12px system-ui"; ctx.fillStyle="rgba(219,231,243,.6)";
+    ctx.fillText("Röda tecken finns inte i den officiella domänen.",500,178);
+    ctx.fillStyle="rgba(219,231,243,.45)"; ctx.font="11px system-ui";
+    ctx.fillText("Rätt domän är nödvändig men inte tillräcklig:",500,220);
+    ctx.fillText("kontrollera även SPF/DKIM/DMARC, länken bakom",500,236);
+    ctx.fillText("knappen och tonen i mejlet.",500,252);
+    ctx.strokeStyle="rgba(120,200,255,.15)"; ctx.beginPath(); ctx.moveTo(470,280); ctx.lineTo(860,280); ctx.stroke();
+    ctx.fillStyle="rgba(219,231,243,.5)"; ctx.font="11px system-ui";
+    ctx.fillText("Teckenavstånd (Levenshtein): "+dist,500,306);
+    ctx.fillText("Officiell längd: "+off.length+"  ·  avsändarens längd: "+snd.length,500,326);
+  }
+  function loop(){ shown+=(target-shown)*0.12; if(Math.abs(target-shown)<0.4) shown=target; draw(); requestAnimationFrame(loop); }
+
+  document.getElementById("x2-run").onclick=analyse;
+  document.getElementById("x2-clear").onclick=function(){
+    document.getElementById("x2-off").value="ica.se";
+    document.getElementById("x2-snd").value="";
+    off="ica.se"; snd=""; chars={off:off.split(""),snd:[]}; dist=0; target=0; reasons=[];
+    document.getElementById("x2-score").textContent="–";
+    document.getElementById("x2-dist").textContent="–";
+    document.getElementById("x2-verdict").textContent="–";
+    document.getElementById("x2-why").innerHTML="";
+    document.getElementById("x2-log").textContent="Skriv två domäner och tryck Analysera.";
+  };
+  document.getElementById("x2-snd").addEventListener("keydown",function(e){ if(e.key==="Enter") analyse(); });
+  document.getElementById("x2-off").addEventListener("keydown",function(e){ if(e.key==="Enter") analyse(); });
+  analyse(); loop();
+})();
+</script>
+</div>
+</section>
+
+<section id="b" hidden>
+<div class="tabhead"><b>Grupparbete</b> – arbeta två till fyra personer. Dokumentera gruppens val och jämför med facit när ni är klara.</div>
+  <h2>Grupparbete · Bygg ett phishingförsök, granska motpartens, åtgärda och retesta</h2>
+  <p class="muted">Grupp A bygger mejl och inloggningssida som <b>lokala filer</b> (inget skickas, inget publiceras). Grupp B gör samma sak parallellt. Sedan granskar grupperna varandras artefakter, rapporterar fynd, åtgärdar sitt eget och låter motparten retesta.</p>
+  <div class="bar" id="phases"></div>
+  <div class="bar"><span class="muted">Tid kvar i vald fas:</span><span id="clock">00:00</span><button id="skip">Hoppa över återkoppling</button></div>
+  <div id="phaseInfo"></div>
+  <div class="gt" id="gt"><button data-g="A" class="on">Grupp A</button><button data-g="B">Grupp B</button></div>
+  <div id="paneA"></div>
+  <div id="paneB" hidden></div>
+  <div id="findings"></div>
+
+<div class="labblock">
+<style>
+.labd2{--line:#d7dfe8;--mut:#5b6b7c;--acc:var(--acc,#1b4f7a);--acc2:var(--acc2,#e8f0f7);--ok:var(--ok,#12683f);--bad:var(--bad,#a3221a);--warn:var(--warn,#8a5a00)}
+.labd2 .panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.labd2 canvas{width:100%;height:auto;display:block;border-radius:10px;background:#0b1622}
+.labd2 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.labd2 label{display:block;font-size:12px;font-weight:700;margin-bottom:3px;color:#33475b}
+.labd2 select,.labd2 input[type=text]{font:13px/1.5 ui-monospace,Consolas,monospace;padding:6px 9px;border:1px solid var(--line);border-radius:8px;background:#fdfefe}
+.labd2 button.p{background:var(--acc);color:#fff;border:0;padding:8px 15px;border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
+.labd2 button.g{background:#fff;border:1px solid var(--line);padding:7px 12px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer}
+.labd2 .note{font-size:12.5px;color:var(--mut)}
+.labd2 pre{background:#0f1b26;color:#cfe3f2;border:0;border-radius:9px;padding:10px;font:12.5px/1.55 ui-monospace,Consolas,monospace;white-space:pre-wrap;margin:0}
+.labd2 .res{display:flex;gap:8px;align-items:center;font-size:13.5px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.labd2 .tag{font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;background:var(--acc2);color:var(--acc)}
+</style>
+<h2>Labb B (grupp) · mejlgrindarna – SPF, DKIM och DMARC i praktiken</h2>
+<div class="labd2">
+  <div class="panel">
+    <p style="margin:0 0 10px"><b>Så gör du:</b> välj om avsändaren är äkta eller förfalskad, ställ in de tre kontrollerna och skicka mejlet. Följ brevet genom grindarna och se var det landar: <b>inkorg</b>, <b>skräppost</b> eller <b>avvisat</b>.</p>
+    <div class="row">
+      <div><label>Avsändare</label>
+        <select id="labd2-sender">
+          <option value="real">äkta@ica.se (äkta avsändare)</option>
+          <option value="spoof">ica-support@ic4-banken.secure-login.com (förfalskad)</option>
+        </select></div>
+      <div><label>SPF</label><select id="labd2-spf"><option value="pass">pass</option><option value="fail">fail / none</option></select></div>
+      <div><label>DKIM</label><select id="labd2-dkim"><option value="pass">pass</option><option value="fail">fail / ingen signatur</option></select></div>
+      <div><label>DMARC</label><select id="labd2-dmarc"><option value="none">p=none</option><option value="quarantine">p=quarantine</option><option value="reject">p=reject</option></select></div>
+      <button class="p" id="labd2-send">Skicka mejlet</button>
+      <button class="g" id="labd2-reset">Nollställ</button>
+    </div>
+    <p class="note" id="labd2-hint" style="margin:10px 0 0">Tipset: ett förfalskat mejl med SPF fail och DMARC p=reject stoppas redan vid grinden – det når aldrig inkorgen.</p>
+  </div>
+  <div class="panel" style="padding:10px">
+    <canvas id="labd2-cv" width="900" height="330"></canvas>
+  </div>
+  <div class="panel">
+    <h3 style="margin:0 0 6px">Authentication-Results (som mottagaren ser det)</h3>
+    <pre id="labd2-hdr">spf=… dkim=… dmarc=… (skicka ett mejl för att fylla i)</pre>
+    <div id="labd2-log" style="margin-top:10px"></div>
+  </div>
+</div>
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById("labd2-cv"); if(!cv) return;
+  var ctx=cv.getContext("2d");
+  var W=900,H=330;
+  var gates=[{x:330,label:"SPF"},{x:520,label:"DKIM"},{x:710,label:"DMARC"}];
+  var state={t:-1, res:null, anim:0, box:null};
+  var S=function(id){return document.getElementById(id);};
+
+  function settings(){
+    return {sender:S("labd2-sender").value, spf:S("labd2-spf").value, dkim:S("labd2-dkim").value, dmarc:S("labd2-dmarc").value};
+  }
+
+  function evaluate(){
+    var c=settings(), spoof=(c.sender==="spoof");
+    // en förfalskad avsändare kan aldrig få pass i SPF/DKIM om inte eleven själv valt det
+    var spfFail=(c.spf==="fail"), dkimFail=(c.dkim==="fail");
+    var aligned=!(spfFail&&dkimFail);
+    var verdict, dest, why;
+    if(!spfFail && !dkimFail){
+      verdict="pass"; dest="inkorg"; why="Både SPF och DKIM säger att avsändaren är den den utger sig för att vara.";
+    } else if(!aligned){
+      verdict="fail"; dest=(c.dmarc==="reject")?"avvisat":(c.dmarc==="quarantine"?"skräppost":"inkorg (med varning)");
+      why = c.dmarc==="none" ? "DMARC står på p=none: kontrollen rapporterar bara, mejlet levereras ändå."
+           : c.dmarc==="quarantine" ? "DMARC p=quarantine: misstänkt mejl läggs i skräppost."
+           : "DMARC p=reject: mejlet avvisas innan det når brevlådan.";
+    } else {
+      verdict="softfail"; dest=(c.dmarc==="reject")?"avvisat":"skräppost";
+      why="En av kontrollerna fallerar men den andra är alignerad – DMARC avgör.";
+    }
+    if(spoof && !spfFail && !dkimFail){ verdict="fail"; dest="avvisat"; why="En förfalskad avsändare kan inte klara både SPF och DKIM – det betyder att någon ändrat kontrollerna."; }
+    return {spf:c.spf,dkim:c.dkim,dmarc:c.dmarc,verdict:verdict,dest:dest,why:why,spoof:spoof};
+  }
+
+  function send(){
+    var r=evaluate();
+    state.res=r; state.t=0; state.anim=0;
+    S("labd2-hdr").textContent =
+      "Authentication-Results: mx.ica.se;\n"+
+      "  spf="+r.spf+" smtp.mailfrom="+(r.spoof?"ic4-banken.secure-login.com":"ica.se")+";\n"+
+      "  dkim="+r.dkim+(r.dkim==="fail"?" (no signature)":" header.d=ica.se")+";\n"+
+      "  dmarc="+(r.verdict==="pass"?"pass":(r.dmarc==="none"?"none":"fail"))+" (p="+r.dmarc+")";
+    S("labd2-log").innerHTML='<div class="res"><span class="tag">Resultat</span><b>'+r.dest+'</b></div><div class="note" style="margin-top:6px">'+r.why+'</div>';
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    var g=ctx.createLinearGradient(0,0,W,H); g.addColorStop(0,"#0d1c2a"); g.addColorStop(1,"#0a1420");
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+    // avsändare
+    ctx.fillStyle="#dbe7f3"; ctx.font="13px system-ui,Segoe UI"; ctx.textAlign="left";
+    ctx.fillText("Avsändare", 26, 46);
+    ctx.strokeStyle="rgba(120,200,255,.5)"; ctx.lineWidth=2;
+    roundRect(24,58,140,58,10); ctx.stroke();
+    ctx.fillStyle="rgba(120,200,255,.12)"; roundRect(24,58,140,58,10); ctx.fill();
+    ctx.fillStyle="#cfe3f2"; ctx.font="11.5px system-ui";
+    var s=settings();
+    ctx.fillText(s.sender==="spoof"?"ic4-banken…":"ica.se", 36, 82);
+    ctx.fillStyle=s.sender==="spoof"?"#ff8f85":"#7ee2a8";
+    ctx.fillText(s.sender==="spoof"?"förfalskad":"verifierad domän", 36, 100);
+
+    // grindar
+    gates.forEach(function(gt,i){
+      var val = i===0? s.spf : i===1? s.dkim : (state.res? state.res.verdict==="pass"?"pass":"fail" : null);
+      var col = val===null? "rgba(150,175,200,.45)" : (val==="pass"?"#3ddc84":(val==="fail"?"#ff5a4d":"#ffcf70"));
+      ctx.strokeStyle=col; ctx.lineWidth=2.5;
+      roundRect(gt.x-64,74,128,92,12); ctx.stroke();
+      ctx.fillStyle=val==="pass"?"rgba(61,220,132,.10)":(val==="fail"?"rgba(255,90,77,.12)":"rgba(255,255,255,.04)");
+      roundRect(gt.x-64,74,128,92,12); ctx.fill();
+      ctx.fillStyle="#dbe7f3"; ctx.font="bold 13px system-ui"; ctx.textAlign="center";
+      ctx.fillText(gt.label, gt.x, 104);
+      ctx.font="11.5px system-ui"; ctx.fillStyle=col;
+      ctx.fillText(val===null?"väntar":(val==="pass"?"pass":(val==="fail"?"fail":"n/a")), gt.x, 126);
+      if(i<2){ ctx.strokeStyle="rgba(150,175,200,.35)"; ctx.setLineDash([5,5]); ctx.beginPath();
+        ctx.moveTo(gt.x+64,120); ctx.lineTo(gates[i+1].x-64,120); ctx.stroke(); ctx.setLineDash([]); }
+    });
+
+    // brevlådor
+    var boxes=[{x:250,y:236,t:"Inkorg"},{x:450,y:236,t:"Skräppost"},{x:650,y:236,t:"Avvisat"}];
+    boxes.forEach(function(b){
+      var active = state.res && ((state.res.dest==="inkorg"&&b.t==="Inkorg")||(state.res.dest==="skräppost"&&b.t==="Skräppost")||(state.res.dest==="avvisat"&&b.t==="Avvisat"));
+      ctx.strokeStyle=active?(b.t==="Inkorg"?"#3ddc84":(b.t==="Skräppost"?"#ffcf70":"#ff5a4d")):"rgba(150,175,200,.4)";
+      ctx.lineWidth=active?3:2;
+      roundRect(b.x,b.y,160,54,10); ctx.stroke();
+      ctx.fillStyle=active?"rgba(255,255,255,.10)":"rgba(255,255,255,.03)"; roundRect(b.x,b.y,160,54,10); ctx.fill();
+      ctx.fillStyle="#dbe7f3"; ctx.font="12.5px system-ui"; ctx.textAlign="center";
+      ctx.fillText(b.t, b.x+80, b.y+32);
+    });
+
+    // brev som rör sig
+    if(state.t>=0 && state.t<1){
+      var t=state.t;
+      var x=94+(t)*(gates[2].x-94), y=120;
+      if(t>0.62){ x=gates[2].x; y=120+(t-0.62)/0.38*100; }
+      ctx.save();
+      ctx.translate(x,y);
+      ctx.fillStyle="#fff"; ctx.strokeStyle="#5ac8fa"; ctx.lineWidth=2;
+      roundRect(-16,-11,32,22,4); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-16,-11); ctx.lineTo(0,2); ctx.lineTo(16,-11); ctx.strokeStyle="#5ac8fa"; ctx.stroke();
+      ctx.restore();
+    }
+
+    ctx.textAlign="left"; ctx.fillStyle="rgba(219,231,243,.65)"; ctx.font="12px system-ui";
+    ctx.fillText("Ett mejl, tre grindar och en brevlåda – allt avgörs av DNS-posterna.", 24, 22);
+  }
+
+  function roundRect(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+  }
+
+  function loop(){
+    if(state.t>=0 && state.t<1){ state.t+=0.012; if(state.t>=1){ state.t=1; } }
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  S("labd2-send").onclick=send;
+  S("labd2-reset").onclick=function(){
+    state={t:-1,res:null,anim:0,box:null};
+    S("labd2-sender").value="real"; S("labd2-spf").value="pass"; S("labd2-dkim").value="pass"; S("labd2-dmarc").value="none";
+    S("labd2-hdr").textContent="spf=… dkim=… dmarc=… (skicka ett mejl för att fylla i)";
+    S("labd2-log").innerHTML="";
+  };
+  draw(); loop();
+})();
+</script>
+</div>
+</section>
+
+<section id="c" hidden>
+<div class="tabhead"><b>Facit</b> – här ligger rapporten, de fullständiga svaren och begreppen. Fyll i rapporten efter att ni gjort båda arbetsflikarna.</div>
+  <h2>Facit · Rapport och referensfacit</h2>
+  <div id="facitA"></div>
+  <div id="facitB"></div>
+  <div class="card"><div class="row"><button class="p" id="mk">Uppdatera rapport</button><button class="g" id="cp">Kopiera</button><button class="g" id="dl">Spara som fil</button><button class="g" id="rst">Nollställ allt</button></div>
+    <p class="muted" style="margin-top:8px"><b>Så fyller du i rapporten:</b> 1) sammanfatta Del A med dina mätvärden, 2) klistra in gruppernas fält, 3) lägg till varje fynd i fyndregistret med bevis, 4) skriv jämförelsen mot referensfacit – vad ni hittade, vad ni missade och varför. Klicka sedan på <b>Uppdatera rapport</b>.</p></div>
+  <pre id="report">Klicka på "Uppdatera rapport".</pre>
+  <div id="faq"></div>
+  <div id="res"></div>
+</section>
+</main>
+<script>
+"use strict";
+var $=function(s){return document.querySelector(s);}, $$=function(s){return [].slice.call(document.querySelectorAll(s));};
+var K='sa_w2', S={};
+try{S=JSON.parse(localStorage.getItem(K)||'{}')||{};}catch(e){S={};}
+S.findings=S.findings||[];
+function save(){try{localStorage.setItem(K,JSON.stringify(S));}catch(e){}}
+function esc(t){return String(t==null?'':t).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+function copy(t,b){var done=function(){var o=b.textContent;b.textContent='Kopierat ✓';setTimeout(function(){b.textContent=o;},1200);};
+  var fb=function(){var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){alert('Kopiera manuellt:\n\n'+t);}document.body.removeChild(ta);};
+  if(navigator.clipboard&&window.isSecureContext&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,fb);}else{fb();}}
+function download(name,text){try{var b=new Blob([text],{type:'text/markdown;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);document.body.removeChild(a);},500);}catch(e){alert('Kunde inte spara – kopiera texten i stället.');}}
+$$('#tabs button').forEach(function(b){b.onclick=function(){$$('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});['a','b','c'].forEach(function(k){$('#'+k).hidden=(k!==b.dataset.t);});};});
+function steps(list,host){
+  var cur=0, done={};
+  function paint(){
+    var n=0; for(var k in done){ if(done[k]) n++; }
+    var s=list[cur], last=(cur===list.length-1);
+    host.innerHTML='<div class="stp"><div class="stp-dots">'+
+      list.map(function(x,j){ return '<button class="stp-dot'+(j===cur?' on':'')+(done[j]?' done':'')+'" data-goto="'+j+'">'+(j+1)+'</button>'; }).join('')+
+      '</div><div class="stp-card"><h3>Steg '+(cur+1)+' av '+list.length+' – '+s.t+'</h3>'+
+      '<p><b>Vad?</b> '+s.d+'</p><p><b>Varför?</b> '+s.w+'</p><p><b>Hur?</b> '+s.h+'</p>'+
+      (s.r?'<p class="expect"><b>Förväntat resultat:</b> '+s.r+'</p>':'')+
+      '<div class="stp-bar"><button class="g" data-prev'+(cur===0?' disabled':'')+'>← Tillbaka</button>'+
+      '<label class="stp-chk"><input type="checkbox" data-done'+(done[cur]?' checked':'')+'> Klar med steget</label>'+
+      '<button class="p" data-next>'+(last?'Börja öva ↓':'Nästa →')+'</button>'+
+      '<span class="stp-prog"><b>'+n+'</b> av '+list.length+' steg klara</span></div></div></div>';
+    host.querySelector('[data-prev]').onclick=function(){ if(cur>0){cur--; paint();} };
+    host.querySelector('[data-next]').onclick=function(){
+      done[cur]=true;
+      if(cur<list.length-1){ cur++; } else { scrollToLab(); }
+      paint();
+    };
+    host.querySelector('[data-done]').onchange=function(){ done[cur]=this.checked; paint(); };
+    [].slice.call(host.querySelectorAll('[data-goto]')).forEach(function(b){
+      b.onclick=function(){ cur=+b.getAttribute('data-goto'); paint(); };
+    });
+  }
+  paint();
+}
+function scrollToLab(){
+  var l=document.querySelector('#'+ (document.querySelector('#a .labblock') ? 'a' : 'b') +' .labblock') ||
+        document.querySelector('.labblock');
+  if(l) l.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function quiz(qs,host,title){host.innerHTML='<h2>'+title+'</h2>'+qs.map(function(q,i){return '<div class="q card"><p style="margin:0 0 4px"><b>'+(i+1)+'. '+q.q+'</b></p><div class="opts">'+q.o.map(function(o,j){return '<button data-q="'+i+'" data-o="'+j+'">'+o+'</button>';}).join('')+'</div><div class="fb" id="qf'+i+'"></div></div>';}).join('');
+  $$('[data-q]').forEach(function(b){b.onclick=function(){var i=+b.dataset.q,q=qs[i],ok=(+b.dataset.o===q.a);host.querySelector('#qf'+i).innerHTML='<b class="'+(ok?'ok':'bad')+'">'+(ok?'✓ Rätt':'✗ Inte rätt')+'</b> '+q.x;};});}
+var sevTxt={1:'Låg',2:'Medel',3:'Hög'};
+function renderF(){var box=$('#flist');if(!box)return;box.innerHTML=S.findings.length?'':'<p class="muted">Inga fynd registrerade ännu.</p>';
+  S.findings.forEach(function(f,i){box.insertAdjacentHTML('beforeend','<div class="finding"><div class="row" style="justify-content:space-between"><b>'+f.g+' · '+esc(f.target)+'</b><span class="sev s'+f.sev+'">'+sevTxt[f.sev]+'</span></div><div><b>Indikator:</b> '+esc(f.what)+'</div><div><b>Bevis:</b> <code>'+esc(f.found)+'</code></div><div><b>Risk/åtgärd:</b> '+esc(f.risk)+'</div><div class="row" style="margin-top:6px"><select data-st="'+i+'">'+['Öppen','Delvis åtgärdad','Åtgärdad','Kvarstår efter retest'].map(function(s){return '<option'+(s===f.status?' selected':'')+'>'+s+'</option>';}).join('')+'</select><button class="g" data-del="'+i+'">Ta bort</button></div></div>');});
+  $$('[data-st]').forEach(function(s){s.onchange=function(){S.findings[+s.dataset.st].status=s.value;save();};});
+  $$('[data-del]').forEach(function(b){b.onclick=function(){S.findings.splice(+b.dataset.del,1);save();renderF();};});}
+
+/* Del A */
+steps([
+ {t:'Granska avsändaren',d:'Läs adressen inom &lt; och &gt; i mejlet och jämför domänen med bankens riktiga, icabanken.se.',
+  w:'Avsändarnamnet kan vem som helst sätta. Det som avgör är domänen – och den kan vara en efterapning (typosquatting).',
+  h:'Klicka på avsändarraden för att markera den. Läs texten efter @: det som står före @ kan vara ett visningsnamn.',
+  r:'Du kan säga vilken domän mejlet egentligen kommer från.'},
+ {t:'Granska länk, brådska och bilaga',d:'Jämför länktexten med adressen under den, bedöm tonen i texten och räkna filändelserna på bilagan.',
+  w:'Phishing bygger på tre saker: trovärdig avsändare, en väg att lämna uppgifter och en anledning att skynda sig.',
+  h:'Läs raden direkt under länken, där måladressen står. Titta på bilagans namn. Klicka på varje del du menar är misstänkt – den blir gul och en förklaring visas under mejlet.',
+  r:'Minst tre markerade delar, varav länken.'},
+ {t:'Skriv bedömning och kontrollera',d:'Skriv 2–3 meningar om vad mejlet är och två åtgärder, och klicka på "Kontrollera mina markeringar".',
+  w:'Du får veta både vad du hittade och vad du missade – och varför varje detalj spelar roll.',
+  h:'Knappen jämför dina markeringar med de sex riktiga indikatorerna, upptäcker falska alarm och bedömer din text. Grön rad = godkänd.',
+  r:'Sex av sex indikatorer, inga falska alarm, en bedömning som namnger phishing och två konkreta åtgärder.'}],$('#stepsA'));
+
+var TRUE=['from','subject','greet','urgent','link','attach'], DECOY=['footer'];
+var EXP={from:'Avsändardomänen är ica-banken-secure.com – inte icabanken.se. Banken äger inte den domänen.',
+ subject:'Brådskande ämnesrad med hot om spärrat konto är ett klassiskt tryck.',
+ greet:'Op personlig hälsning – banken har kundens namn.',
+ urgent:'Tidsgränsen på 24 timmar skapar panik och sänker omdömet.',
+ link:'Länktexten visar icabanken.se men adressen pekar på ica-banken-secure.com.',
+ attach:'Dubbel filändelse .pdf.exe – en körbar fil, inte ett kvitto.',
+ footer:'Adressfoten är normal och säger inget om avsändaren.'};
+var marked={};
+var MLAB={from:'Avsändare',subject:'Ämnesrad',greet:'Hälsning',urgent:'Brådska',link:'Länk',attach:'Bilaga',footer:'Adressfot'};
+$$('.tell').forEach(function(el){var k=el.dataset.k;if(EXP[k])el.setAttribute('title',EXP[k]);
+  el.onclick=function(ev){if(el.tagName==='A')ev.preventDefault();
+  if(marked[k]){delete marked[k];el.classList.remove('mk');}else{marked[k]=1;el.classList.add('mk');}
+  var w=$('#why');
+  if(w)w.innerHTML=marked[k]?'<b>Markerad:</b> '+EXP[k]:'<b>Avmarkerad.</b> Välj delen igen om du menar att den är misstänkt.';};});
+$('#resetA').onclick=function(){marked={};$$('.tell').forEach(function(e){e.classList.remove('mk','hitTrue','hitFalse');});$('#fb').innerHTML='';};
+$('#chkA').onclick=function(){
+  var keys=Object.keys(marked), found=TRUE.filter(function(k){return marked[k];}),
+      missed=TRUE.filter(function(k){return !marked[k];}), fp=keys.filter(function(k){return DECOY.indexOf(k)>=0;});
+  $$('.tell').forEach(function(e){e.classList.remove('hitTrue','hitFalse');if(marked[e.dataset.k])e.classList.add(TRUE.indexOf(e.dataset.k)>=0?'hitTrue':'hitFalse');});
+  var h='<h3>'+found.length+' av '+TRUE.length+' indikatorer hittade'+(fp.length?' · '+fp.length+' falska alarm':'')+'</h3>';
+  if(found.length)h+='<div class="res"><b class="ok">✓</b><div><b>Rätt markerat</b><br><span class="muted">'+found.map(function(k){return EXP[k];}).join(' ')+'</span></div></div>';
+  if(missed.length)h+='<div class="res"><b class="bad">✗</b><div><b>Missat</b><br><span class="muted">'+missed.map(function(k){return EXP[k];}).join(' ')+'</span></div></div>';
+  if(fp.length)h+='<div class="res"><b class="bad">!</b><div><b>Falskt alarm</b><br><span class="muted">'+fp.map(function(k){return EXP[k];}).join(' ')+'</span></div></div>';
+  var v=($('#verdict').value||'').toLowerCase(),a=($('#actions').value||'').toLowerCase();
+  var vok=/(phish|bedrägeri|falsk|bluff)/.test(v),aok=a.length>25;
+  h+='<div class="res"><b class="'+(vok?'ok':'bad')+'">'+(vok?'✓':'✗')+'</b><div><b>Bedömning</b><br><span class="muted">'+(vok?'Du namnger attacken.':'Skriv uttryckligen att det är phishing eller bedrägeri.')+'</span></div></div>';
+  h+='<div class="res"><b class="'+(aok?'ok':'bad')+'">'+(aok?'✓':'✗')+'</b><div><b>Åtgärder</b><br><span class="muted">'+(aok?'Två konkreta åtgärder angivna.':'Ange två konkreta åtgärder, t.ex. kontakta banken via officiell kanal och spärra kortet.')+'</span></div></div>';
+  $('#fb').innerHTML=h;S.verdict=$('#verdict').value;S.actions=$('#actions').value;save();};
+$('#cpA').onclick=function(){copy('MEJLGRANSKNING\nMarkerat: '+Object.keys(marked).join(', ')+'\nBedömning: '+$('#verdict').value+'\nÅtgärder: '+$('#actions').value,$('#cpA'));};
+if(S.verdict)$('#verdict').value=S.verdict; if(S.actions)$('#actions').value=S.actions;
+['verdict','actions'].forEach(function(id){$('#'+id).addEventListener('input',function(){S[id]=$('#'+id).value;save();});});
+
+$('#facitA').innerHTML='<details class="facit"><summary>Visa facit – Del A</summary>'+
+ '<p><b>Mejlet är phishing.</b> Fem indikatorer ska hittas och en del är helt normal:</p>'+
+ '<ul style="font-size:13.5px;margin:6px 0 8px">'+
+ '<li><b>Avsändardomän:</b> <code>ica-banken-secure.com</code> – banken använder <code>icabanken.se</code>. Bindestreck och tilläggsord är typiskt.</li>'+
+ '<li><b>Ämnesrad:</b> hot om spärrat konto + tidsgräns.</li>'+
+ '<li><b>Hälsning:</b> "Bästa kund" i stället för namn.</li>'+
+ '<li><b>Länken:</b> texten visar den riktiga adressen, men målet är en annan domän.</li>'+
+ '<li><b>Bilagan:</b> <code>faktura_2027.pdf.exe</code> – dubbel filändelse, körbar fil.</li>'+
+ '<li><b>Normal (falskt alarm):</b> adressfoten och org-numret – de kan kopieras av vem som helst.</li></ul>'+
+ '<p><b>Varför:</b> angriparen behöver bara en av dessa för att lura någon; kombinationen av trovärdig avsändare, brådska och en väg att lämna uppgifter är själva mönstret.</p>'+
+ '<p><b>Viktigaste begreppen:</b> <i>typosquatting</i> (domän som ser nästan rätt ut) och <i>SPF/DKIM/DMARC</i> – tre tekniska kontroller som gör det svårare att skicka mejl i någon annans namn.</p></details>';
+
+quiz([{q:'Vad avgör om avsändaren är trovärdig?',o:['Namnet som visas i mejlklienten','Domänen efter @ i adressen','Om mejlet ser professionellt ut'],a:1,
+ x:'Rätt: domänen. Visningsnamnet kan sättas till vad som helst.'},
+ {q:'Du har fått ett misstänkt mejl som ser ut att komma från banken. Vad gör du?',o:['Klickar på länken för att se om sidan är falsk','Kontaktar banken via deras officiella app eller webbplats och rapporterar mejlet','Svarar på mejlet och frågar om det stämmer'],a:1,
+ x:'Rätt: använd en kanal du själv hittar, aldrig länken i mejlet. Svar avslöjar dessutom att adressen är aktiv.'},
+ {q:'Varför är dubbel filändelse farlig?',o:['Filen blir större','Windows kan dölja den sista ändelsen så att filen ser ut som ett dokument','Filen kan inte öppnas'],a:1,
+ x:'Rätt: med dolda filändelser ser "faktura.pdf.exe" ut som en PDF men är ett program.'}],$('#checkA'),'Kunskapskontroll – Del A');
+
+/* Del B */
+var PH=[['1 Bygg artefakt',5],['2 Granska motparten',8],['3 Åtgärda',8],['4 Retest',5],['5 Återkoppling',5]];
+var PHINFO=[
+ {d:'Bygg ett mejl och en landningssida som lokala filer, med minst tre inbyggda indikatorer.',w:'Den som bygger en attack förstår försvaret – du ser exakt vilka detaljer som avslöjar den.',h:'Skapa <code>phish/mejl.txt</code> och <code>phish/login.html</code> i er VM, klistra in innehållet i fälten och skriv indikatorerna i facit-fältet.',e:'Fälten "Mejl" och "Landningssida" innehåller en artefakt med minst tre inbyggda indikatorer, och facitfältet namnger dem.'},
+ {d:'Granska motpartens mejl och sida med samma metod som i Del A.',w:'Granskning är den färdighet som efterfrågas i yrkesrollen – inte att bygga.',h:'Klistra in deras mejl i analysfältet och leta: domän, länkmål, brådska, bilagor, formulärets action, språkfel. Citat som bevis.',e:'Granskningsfältet innehåller minst tre indikatorer med citat ur motpartens mejl eller HTML.'},
+ {d:'Åtgärda ert eget material och er försvarskonfiguration.',w:'Åtgärden ska träffa grundorsaken – annars flyttar du bara problemet.',h:'Exempel: publicera SPF-post, sätt DMARC-policy, kontrollera avsändardomän i mejlservern, utbilda mottagare. Skriv vad ni ändrade.',e:'Minst två åtgärder ifyllda i fältet "Fas 3 – era åtgärder", med motivering.'},
+ {d:'Låt motparten granska er igen efter åtgärden.',w:'Ett försvar är oprövat tills någon försöker igen.',h:'Kör samma granskning. Är indikatorerna borta, delvis borta eller kvar? Motivera med citat.',e:'Retestfältet säger kvarstår, delvis eller åtgärdat – med citat som stöd.'},
+ {d:'Redovisa på 90 sekunder per grupp.',w:'Muntlig redovisning är en del av examinationen.',h:'Säg: starkaste indikatorn, hur ni hittade den, åtgärden, retestresultatet, en lärdom.',e:'90 sekunder: starkaste indikatorn, hur ni hittade den, åtgärden, retestet och en lärdom.'}];
+var cur=0,t=null,left=0,skipped=false;
+function drawPhases(){$('#phases').innerHTML=PH.filter(function(p,i){return !(i===4&&skipped);}).map(function(p,i){return '<button data-p="'+i+'" class="'+(i===cur?'on':'')+'">'+p[0]+' · '+p[1]+' min</button>';}).join('');
+  $$('#phases button').forEach(function(b){b.onclick=function(){setPhase(+b.dataset.p);};});}
+function tick(){$('#clock').textContent=('0'+Math.floor(Math.max(0,left)/60)).slice(-2)+':'+('0'+(Math.max(0,left)%60)).slice(-2);}
+function setPhase(i){cur=i;clearInterval(t);left=PH[i][1]*60;tick();t=setInterval(function(){left--;tick();if(left<=0)clearInterval(t);},1000);drawPhases();
+  var p=PHINFO[i];$('#phaseInfo').innerHTML='<div class="step"><h3>Fas '+(i+1)+' · '+PH[i][0]+' ('+PH[i][1]+' min)</h3><p><b>Vad?</b> '+p.d+'</p><p><b>Varför?</b> '+p.w+'</p><p><b>Hur?</b> '+p.h+'</p>'+(p.e?'<p class="expect"><b>Förväntat resultat:</b> '+p.e+'</p>':'')+'</div>';}
+$('#skip').onclick=function(){skipped=!skipped;if(skipped&&cur===4)setPhase(3);drawPhases();};
+
+function pane(id,title,env,fields){return '<div class="card"><h3>'+title+' <span class="tag">Verkligt labbmoment</span></h3><p class="muted">'+env+'</p>'+
+ fields.map(function(f){return '<label for="'+id+'_'+f.k+'">'+f.t+'</label><textarea id="'+id+'_'+f.k+'" rows="'+(f.r||3)+'" placeholder="'+esc(f.ph||'')+'">'+esc(S[id+'_'+f.k]||f.v||'')+'</textarea>';}).join('')+'</div>';}
+$('#paneA').innerHTML=pane('A','Grupp A · er artefakt','Bygg mejlet och sidan som lokala filer i er VM och klistra in innehållet här.',[
+ {k:'mail',t:'Mejl (rubriker + brödtext)',r:6,v:'Från: Support <support@exempel-secure.net>\nTill: kund@exempel.se\nÄmne: Ditt konto spärras\n\nBästa kund,\nvi behöver din bekräftelse inom 24 timmar: http://exempel-secure.net/login\nBifogat: kvitto.pdf.exe'},
+ {k:'land',t:'Landningssida (HTML)',r:5,v:'<form action="http://exempel-secure.net/collect" method="post">\n  <input name="pnr" placeholder="Personnummer">\n  <input name="pin" type="password" placeholder="Pinkod">\n  <button>Spara</button>\n</form>'},
+ {k:'facit',t:'Facit: vilka tre indikatorer byggde ni in?',r:2,ph:'1) ... 2) ... 3) ...'},
+ {k:'fix',t:'Fas 3 – era åtgärder',r:3,ph:'1) Publicera SPF-post ... 2) ...'}]);
+$('#paneA').insertAdjacentHTML('beforeend','<div class="row" style="margin-bottom:10px"><button class="g" id="cpMail">Kopiera mejl</button><button class="g" id="cpLand">Kopiera HTML</button></div>');
+$('#paneB').innerHTML=pane('B','Grupp B · er artefakt och er granskning','Bygg er egen artefakt på samma sätt och granska sedan Grupp A:s innehåll.',[
+ {k:'mail',t:'Ert mejl',r:6,v:''},{k:'land',t:'Er landningssida (HTML)',r:5,v:''},
+ {k:'anal',t:'Granskning av Grupp A: indikatorer ni hittade',r:4,ph:'Avsändardomän utanför företagets domän; länken pekar på annan värd; filändelse .exe; brådska ...'},
+ {k:'retest',t:'Fas 4 – retest efter A:s åtgärder',r:2,ph:'Kvarstår / delvis åtgärdat / åtgärdat – motivering'}]);
+$$('#paneA textarea, #paneB textarea').forEach(function(ta){ta.addEventListener('input',function(){S[ta.id]=ta.value;save();});});
+$('#cpMail').onclick=function(){copy($('#A_mail').value,$('#cpMail'));};
+$('#cpLand').onclick=function(){copy($('#A_land').value,$('#cpLand'));};
+$$('#gt button').forEach(function(b){b.onclick=function(){$$('#gt button').forEach(function(x){x.classList.toggle('on',x===b);});
+  $('#paneA').hidden=b.dataset.g!=='A';$('#paneB').hidden=b.dataset.g!=='B';S.group=b.dataset.g;save();};});
+
+$('#findings').innerHTML='<div class="card"><h3>Fyndregister</h3><p class="note">Ett fynd = ett test ni kan visa bevis för. Fyll i alla fält – de hamnar i rapporten.</p><div class="grid2" style="gap:10px">'+
+ '<div><label>Grupp</label><select id="fg"><option>A</option><option>B</option></select></div>'+
+ '<div><label>Granskat objekt</label><select id="ft"><option>Mejl – Grupp A</option><option>Mejl – Grupp B</option><option>Landningssida – Grupp A</option><option>Landningssida – Grupp B</option></select></div></div>'+
+ '<label>Indikator</label><input id="fw" placeholder="Avsändardomän ica-banken-secure.com">'+
+ '<label>Bevis (citat)</label><input id="fd" placeholder="Från: service@ica-banken-secure.com">'+
+ '<label>Risk och åtgärd</label><input id="fx" placeholder="Kontostöld → domänkontroll, SPF/DKIM/DMARC">'+
+ '<div class="grid2" style="gap:10px"><div><label>Allvarlighet</label><select id="fs"><option value="1">Låg</option><option value="2">Medel</option><option value="3" selected>Hög</option></select></div>'+
+ '<div><label>Status</label><select id="fst"><option>Öppen</option><option>Delvis åtgärdad</option><option>Åtgärdad</option><option>Kvarstår efter retest</option></select></div></div>'+
+ '<div class="row" style="margin-top:8px"><button class="p" id="addf">Lägg till fynd</button><button class="g" id="clearf">Rensa fynd</button></div><div id="flist"></div></div>';
+$('#addf').onclick=function(){S.findings.push({g:$('#fg').value,target:$('#ft').value,what:$('#fw').value,found:$('#fd').value,risk:$('#fx').value,sev:+$('#fs').value,status:$('#fst').value});
+  ['#fw','#fd','#fx'].forEach(function(s){$(s).value='';});save();renderF();};
+$('#clearf').onclick=function(){if(confirm('Rensa alla fynd?')){S.findings=[];save();renderF();}};
+
+$('#facitB').innerHTML='<details class="facit"><summary>Visa referensfacit – Del B (attack &amp; försvar)</summary>'+
+ '<div class="step"><h3>Förväntade indikatorer</h3><ul style="font-size:13.5px;margin:6px 0">'+
+ '<li>Avsändardomän som inte tillhör organisationen (bindestreck, tilläggsord, annan toppdomän).</li>'+
+ '<li>Länktext som skiljer sig från måladressen.</li>'+
+ '<li>Brådska, hot, eller "verifiera inom X timmar".</li>'+
+ '<li>Bilaga med dubbel filändelse eller ovanlig typ.</li>'+
+ '<li>Formulär som skickar uppgifter till en annan värd (<code>action</code>).</li>'+
+ '<li>Op personlig hälsning och språkliga fel.</li></ul></div>'+
+ '<div class="step"><h3>Bevis, grundorsak, åtgärd, retest</h3>'+
+ '<p><b>Bevis:</b> citat ur mejlet eller HTML-koden som visar domänen, länken eller <code>action</code>.</p>'+
+ '<p><b>Grundorsak:</b> mottagaren kan inte se skillnad på visningsnamn och verklig domän, och organisationen saknar e-postautentisering.</p>'+
+ '<p><b>Åtgärd (godtagbara alternativ):</b> publicera SPF, signera med DKIM, sätt DMARC-policy (<code>p=quarantine</code> eller <code>p=reject</code>), samtliga är godtagbara; komplettera gärna med utbildning och varningsbanner för externa avsändare.</p>'+
+ '<p><b>Godkänt retest:</b> samma indikatorer går inte att återanvända utan att fastna i SPF/DMARC, <i>eller</i> att den granskande gruppen inte längre kan peka ut dem som trovärdiga.</p></div>'+
+ '<p class="muted">Jämför i Del C: vad hittade ni, vad missade ni, och vilken åtgärd var mest verkningsfull?</p></details>';
+
+/* Del C */
+$('#mk').onclick=function(){
+  var r='# Lektion 2 – Social engineering och phishing\n\n**Del A – individuell granskning**\n- Markerade indikatorer: '+(Object.keys(marked).map(function(k){return MLAB[k]||k;}).join(', ')||'(inga)')+
+   '\n- Bedömning: '+($('#verdict').value||'(ej ifyllt)')+'\n- Åtgärder: '+($('#actions').value||'(ej ifyllt)')+'\n';
+  r+='\n**Grupp A – mejl**\n\n```\n'+($('#A_mail').value||'(tomt)')+'\n```\n\n**Grupp A – åtgärder**\n\n'+($('#A_fix').value||'(ej ifyllt)')+'\n';
+  r+='\n**Grupp B – granskning av A**\n\n'+($('#B_anal').value||'(ej ifyllt)')+'\n\n**Grupp B – retest**\n\n'+($('#B_retest').value||'(ej ifyllt)')+'\n\n**Fynd**\n';
+  if(!S.findings.length)r+='\nInga fynd registrerade.\n';
+  S.findings.forEach(function(f){r+='\n### '+f.g+' · '+f.target+' ('+sevTxt[f.sev]+') – '+f.status+'\n- Indikator: '+f.what+'\n- Bevis: `'+f.found+'`\n- Risk/åtgärd: '+f.risk+'\n';});
+  r+='\n**Jämförelse mot referensfacit**\n- Hittade indikatorer som finns i facit: \n- Missade indikatorer: \n- Egna fynd utanför facit: \n- Mest verkningsfull åtgärd och varför: \n';
+  $('#report').textContent=r;};
+$('#cp').onclick=function(){copy($('#report').textContent,$('#cp'));};
+$('#dl').onclick=function(){download('lektion-2-phishing.md',$('#report').textContent);};
+$('#rst').onclick=function(){if(confirm('Nollställ allt i den här workshopen?')){try{localStorage.removeItem(K);}catch(e){}location.reload();}};
+
+$('#faq').innerHTML='<div class="card"><h3>Vanliga frågor</h3>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Varför får vi inte skicka mejlet på riktigt?</summary><p>Ett phishingförsök mot en riktig person är ett brott, även i utbildningssyfte. Ni bygger och granskar lokalt – ingen sändning, ingen publicering.</p></details>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Hur vet jag att min åtgärd räcker?</summary><p>Motparten ska kunna göra samma granskning efteråt utan att hitta indikatorerna, och vanlig e-post ska fortfarande fungera. Båda delarna krävs.</p></details>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Vad betyder SPF, DKIM och DMARC?</summary><p>SPF talar om vilka servrar som får skicka för domänen, DKIM signerar mejlet kryptografiskt och DMARC bestämmer vad som ska hända när kontrollerna misslyckas.</p></details>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Vårt mejl ser för bra ut – vad gör vi?</summary><p>Lägg till de indikatorer som efterfrågas (domän, brådska, bilaga, formulär) och dokumentera dem i facit-fältet. Poängen är att förstå mönstret, inte att lura någon på riktigt.</p></details>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Kan vi använda de riktiga ICA-exemplen?</summary><p>Ja, som analysmaterial lokalt. Öppna dem med dubbelklick – de ligger i mappen <code>ICA-banken_phishing_exempel</code>.</p></details></div>';
+
+drawPhases();setPhase(0);renderF();
+if(S.group){$$('#gt button').forEach(function(b){if(b.dataset.g===S.group)b.click();});}
+
+/* ---------- begrepp och fördjupning ---------- */
+var TERMS = [["Phishing", "Ett mejl som utger sig för att komma från en betrodd avsändare för att lura dig lämna uppgifter."], ["Spoofing", "Att få ett mejl att se ut att komma från någon annan än den som skickade det."], ["Typosquatting", "En domän som ser nästan ut som den riktiga, t.ex. ica-banken-secure.com."], ["SPF", "En DNS-inställning som anger vilka servrar som får skicka e-post för en domän."], ["DKIM", "En digital signatur som hjälper mottagaren att kontrollera att ett mejl är äkta."], ["DMARC", "En e-postpolicy som anger hur mottagaren ska hantera mejl som inte klarar SPF/DKIM."], ["Landningssida", "Den sida länken i ett phishingmejl leder till, ofta en falsk inloggning."], ["Retest", "Ett nytt test efter en åtgärd för att kontrollera att problemet är löst."]];
+function T(k){for(var i=0;i<TERMS.length;i++){if(TERMS[i][0]===k)return TERMS[i][1];}return '';}
+(function(){
+  var chips=document.getElementById('chipsA');
+  if(chips)chips.innerHTML='<span class="note">Begrepp i den här workshopen – klicka för en kort förklaring:</span> '+
+    TERMS.map(function(t){return '<span class="term" data-k="'+t[0]+'">'+t[0]+'</span>';}).join('');
+  document.body.insertAdjacentHTML('beforeend','<div id="pop"></div>');
+  document.addEventListener('click',function(e){
+    var el=e.target.closest?e.target.closest('.term'):null,p=document.getElementById('pop');
+    if(!p)return;
+    if(!el){p.style.display='none';return;}
+    var d=T(el.getAttribute('data-k'));
+    if(!d){p.style.display='none';return;}
+    p.innerHTML='<b>'+el.textContent+'</b><br>'+d;p.style.display='block';
+    var r=el.getBoundingClientRect();
+    p.style.left=Math.max(8,Math.min(window.innerWidth-350,r.left))+'px';
+    p.style.top=Math.min(window.innerHeight-140,r.bottom+8)+'px';
+  });
+  var RES=[["Google/Jigsaw – Phishing Quiz", "https://phishingquiz.withgoogle.com/", "Åtta riktiga mejlexempel där du avgör om de är äkta eller phishing – bra träning efter Del A.", "Nybörjare", "Gratis, ingen registrering, körs i webbläsaren"]],box=document.getElementById('res');
+  if(box)box.innerHTML='<div class="card resbox"><h3>Fördjupa dig och testa själv</h3>'+
+    '<p class="note">Frivilligt komplement som kräver internet. Övningarna i workshopen fungerar utan.</p>'+
+    RES.map(function(r){return '<div class="rl"><a href="'+r[1]+'" target="_blank" rel="noopener noreferrer">'+r[0]+'</a>'+
+      '<span class="lvl">'+r[3]+'</span><br>'+r[2]+'<br><span class="note">'+r[4]+'</span></div>';}).join('')+'</div>';
+})();
+</script>
+</body>
+</html>

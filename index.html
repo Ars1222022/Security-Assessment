@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Security Assessment – kursmaterial</title>
+<style>
+:root{--acc:#1b4f7a;--acc2:#e8f0f7;--ink:#16202b;--mut:#5b6b7c;--line:#d7dfe8;--bg:#f4f6f9;--ok:#12683f}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.55 system-ui,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+.wrap{max-width:1060px;margin:0 auto;padding:0 18px}
+header{background:#fff;border-bottom:3px solid var(--acc);padding:20px 0}
+h1{margin:0 0 4px;font-size:23px;color:var(--acc)}
+.sub{margin:0;color:var(--mut);font-size:14px}
+main{padding:22px 0 60px}
+h2{font-size:18px;color:var(--acc);margin:26px 0 10px}
+h3{font-size:15px;margin:0 0 8px;color:var(--acc)}
+p{margin:6px 0}
+a{color:var(--acc)}
+.legend{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:860px){.legend{grid-template-columns:1fr 1fr}}
+.lg{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px}
+.lg b{display:block;color:var(--acc);margin-bottom:2px}
+.lesson{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.lesson .n{display:inline-block;background:var(--acc);color:#fff;font-weight:700;font-size:12px;border-radius:20px;padding:2px 9px;margin-right:8px}
+.lesson h3{display:inline;font-size:16px}
+.lesson .rows{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+.row{display:flex;gap:10px;padding:5px 0;font-size:13.5px;border-bottom:1px solid #f0f3f7;flex-wrap:wrap}
+.row:last-child{border-bottom:0}
+.row .k{flex:0 0 150px;color:var(--mut);font-weight:600}
+.row .v a{display:inline-block;margin-right:12px}
+.cta{background:var(--acc);color:#fff!important;text-decoration:none;font-weight:600;padding:6px 12px;border-radius:8px;font-size:13px;display:inline-block}
+.cta:hover{background:#143f61}
+.note{font-size:12.5px;color:var(--mut)}
+.exam{background:#fff;border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:10px;padding:12px 14px;font-size:13.5px}
+footer{border-top:1px solid var(--line);padding:16px 0 30px;color:var(--mut);font-size:12.5px}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Security Assessment (20 yh-poäng)</h1>
+  <p class="sub">Kursmaterial lektion 1–8 · allt ligger i fyra mappar per lektion · inget behöver installeras för HTML-övningarna</p>
+</div></header>
+<main class="wrap">
+
+  <h2>Så är materialet ordnat</h2>
+  <div class="legend">
+    <div class="lg"><b>1. Multimedia</b>Podcast (.m4a) och video (.mp4) för lektionen.</div>
+    <div class="lg"><b>2. PowerPoint med quiz</b>Hela presentationen som .pptx och .pdf. Sista bilden är quiz.</div>
+    <div class="lg"><b>3. HTML med interaktiva uppgifter</b>En workshop med tre flikar: individuellt arbete, grupparbete och facit.</div>
+    <div class="lg"><b>4. Mini projekt</b>Kod, skript och exempel att köra själv. Där det finns ett projekt finns README.</div>
+  </div>
+  <p class="note">Workshop-filerna är helt fristående: dubbelklicka och de öppnas i vilken webbläsare som helst, utan server och utan internet.</p>
+
+  <h2>Lektioner</h2>
+
+  <div class="lesson">
+    <span class="n">1</span><h3>Introduktion till etisk hacking och säkerhetstänk</h3>
+    <div class="rows">
+      <div class="row"><span class="k">Interaktiva uppgifter</span><span class="v"><a class="cta" href="1. Introduktion till Etisk Hackning &amp; Säkerhetstänk/3. HTML med interaktiva uppgifter/workshop-01-etisk-hacking.html">Öppna workshopen</a></span></div>
+      <div class="row"><span class="k">1. Multimedia</span><span class="v"><a href="1. Introduktion till Etisk Hackning &amp; Säkerhetstänk/1. Multimedia/Digitala_skuggor_BankID_och_etisk_hackning.m4a">Digitala skuggor – BankID och etisk hackning (podcast)</a><a href="1. Introduktion till Etisk Hackning &amp; Säkerhetstänk/1. Multimedia/Hackarens_Spelbok.mp4">Hackarens Spelbok (video)</a></span></div>
+      <div class="row"><span class="k">2. PowerPoint</span><span class="v"><a href="1. Introduktion till Etisk Hackning &amp; Säkerhetstänk/2. PowerPoint med quiz/1. Introduktion till Etisk Hackning &amp; Säkerhetstänk.pptx">.pptx</a><a href="1. Introduktion till Etisk Hackning &amp; Säkerhetstänk/2. PowerPoint med quiz/1. Introduktion till Etisk Hackning &amp; Säkerhetstänk.pdf">.pdf</a></span></div>
+      <div class="row"><span class="k">4. Mini projekt</span><span class="v"><a href="1. Introduktion till Etisk Hackning &amp; Säkerhetstänk/4. Mini projekt/README.md">Uppdragsavtalet – läs README</a></span></div>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <span class="n">2</span><h3>Social engineering och phishing</h3>
+    <div class="rows">
+      <div class="row"><span class="k">Interaktiva uppgifter</span><span class="v"><a class="cta" href="2. Social Engineering  Phishing/3. HTML med interaktiva uppgifter/workshop-02-phishing.html">Öppna workshopen</a></span></div>
+      <div class="row"><span class="k">1. Multimedia</span><span class="v"><a href="2. Social Engineering  Phishing/1. Multimedia/Från_öppna_källor_till_etisk_hackning.m4a">Från öppna källor till etisk hackning (podcast)</a><a href="2. Social Engineering  Phishing/1. Multimedia/Etisk_hackning__Tänk_som_en_försvarare.mp4">Tänk som en försvarare (video)</a></span></div>
+      <div class="row"><span class="k">2. PowerPoint</span><span class="v"><a href="2. Social Engineering  Phishing/2. PowerPoint med quiz/2. Social Engineering  Phishing.pptx">.pptx</a><a href="2. Social Engineering  Phishing/2. PowerPoint med quiz/2. Social Engineering  Phishing.pdf">.pdf</a></span></div>
+      <div class="row"><span class="k">4. Mini projekt</span><span class="v"><a href="2. Social Engineering  Phishing/4. Mini projekt/ICA-banken_phishing_exempel/ICA qr_koden/Logga in _ ICA BankenFake.html">Falsk ICA-inloggning (QR)</a><a href="2. Social Engineering  Phishing/4. Mini projekt/ICA-banken_phishing_exempel/personligt_dosa/demo.html">Falsk dosa – demo</a><a href="2. Social Engineering  Phishing/4. Mini projekt/ICA-banken_phishing_exempel/enkätformulär(hämta_kontakter).html">Enkätformulär</a></span></div>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <span class="n">3</span><h3>Säker labbmiljö med virtuella maskiner</h3>
+    <div class="rows">
+      <div class="row"><span class="k">Interaktiva uppgifter</span><span class="v"><a class="cta" href="3. Säker Labbmiljö med Virtuella Maskiner/3. HTML med interaktiva uppgifter/workshop-03-labbmiljo.html">Öppna workshopen</a></span></div>
+      <div class="row"><span class="k">1. Multimedia</span><span class="v"><a href="3. Säker Labbmiljö med Virtuella Maskiner/1. Multimedia/Bygg_din_VM_säkra_labbmiljö_för_etisk_hackning.m4a">Bygg din VM (podcast)</a><a href="3. Säker Labbmiljö med Virtuella Maskiner/1. Multimedia/Bygg_Ditt_Säkra_Labb.mp4">Bygg ditt säkra labb (video)</a></span></div>
+      <div class="row"><span class="k">2. PowerPoint</span><span class="v"><a href="3. Säker Labbmiljö med Virtuella Maskiner/2. PowerPoint med quiz/3. Säker Labbmiljö med Virtuella Maskiner.pptx">.pptx</a><a href="3. Säker Labbmiljö med Virtuella Maskiner/2. PowerPoint med quiz/3. Säker Labbmiljö med Virtuella Maskiner.pdf">.pdf</a></span></div>
+      <div class="row"><span class="k">4. Mini projekt</span><span class="v"><a href="3. Säker Labbmiljö med Virtuella Maskiner/4. Mini projekt/README.md">Labbmiljön – läs README</a></span></div>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <span class="n">4</span><h3>Nätverksanalys med Wireshark</h3>
+    <div class="rows">
+      <div class="row"><span class="k">Interaktiva uppgifter</span><span class="v"><a class="cta" href="4. Natverksanalys med Wireshark/3. HTML med interaktiva uppgifter/workshop-04-wireshark.html">Öppna workshopen</a></span></div>
+      <div class="row"><span class="k">1. Multimedia</span><span class="v"><a href="4. Natverksanalys med Wireshark/1. Multimedia/Passerkortet_är_farligare_än_lösenordet.m4a">Passerkortet är farligare än lösenordet (podcast)</a><a href="4. Natverksanalys med Wireshark/1. Multimedia/Vad_din_dator_säger_bakom_din_rygg.mp4">Vad din dator säger bakom din rygg (video)</a></span></div>
+      <div class="row"><span class="k">2. PowerPoint</span><span class="v"><a href="4. Natverksanalys med Wireshark/2. PowerPoint med quiz/4. Nätverksanalys med Wireshark.pptx">.pptx</a><a href="4. Natverksanalys med Wireshark/2. PowerPoint med quiz/4. Nätverksanalys med Wireshark.pdf">.pdf</a></span></div>
+      <div class="row"><span class="k">4. Mini projekt</span><span class="v"><a href="4. Natverksanalys med Wireshark/4. Mini projekt/HTTP/demo.py">demo.py</a><a href="4. Natverksanalys med Wireshark/4. Mini projekt/HTTP/cookie_demo.py">cookie_demo.py</a><a href="4. Natverksanalys med Wireshark/4. Mini projekt/HTTP/dual_demo.py">dual_demo.py</a></span></div>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <span class="n">5</span><h3>Webbapplikationssårbarhet – SQL-injection och XSS</h3>
+    <div class="rows">
+      <div class="row"><span class="k">Interaktiva uppgifter</span><span class="v"><a class="cta" href="5. Webb-applikationssårbarhet. SQL-injection och Cross-Site Scripting (XSS)/3. HTML med interaktiva uppgifter/workshop-05-sqli-xss.html">Öppna workshopen</a></span></div>
+      <div class="row"><span class="k">1. Multimedia</span><span class="v"><a href="5. Webb-applikationssårbarhet. SQL-injection och Cross-Site Scripting (XSS)/1. Multimedia/SQL-injektion_XSS_internets_kackerlackor.m4a">SQL-injektion &amp; XSS (podcast)</a><a href="5. Webb-applikationssårbarhet. SQL-injection och Cross-Site Scripting (XSS)/1. Multimedia/Två_dolda_bakdörrar.mp4">Två dolda bakdörrar (video)</a></span></div>
+      <div class="row"><span class="k">2. PowerPoint</span><span class="v"><a href="5. Webb-applikationssårbarhet. SQL-injection och Cross-Site Scripting (XSS)/2. PowerPoint med quiz/5. Webb-applikationssårbarhet. SQL-injection och Cross-Site Scripting (XSS).pptx">.pptx</a><a href="5. Webb-applikationssårbarhet. SQL-injection och Cross-Site Scripting (XSS)/2. PowerPoint med quiz/5. Webb-applikationssårbarhet. SQL-injection och Cross-Site Scripting (XSS).pdf">.pdf</a></span></div>
+      <div class="row"><span class="k">4. Mini projekt</span><span class="v"><a href="5. Webb-applikationssårbarhet. SQL-injection och Cross-Site Scripting (XSS)/4. Mini projekt/SQL-injection_and_XSS.py">SQL-injection_and_XSS.py</a><a href="5. Webb-applikationssårbarhet. SQL-injection och Cross-Site Scripting (XSS)/4. Mini projekt/Folkhälsomyndigheten/folkhalsoportalenFake_XSS_SQLinjection.py">sårbar portal</a><a href="5. Webb-applikationssårbarhet. SQL-injection och Cross-Site Scripting (XSS)/4. Mini projekt/Folkhälsomyndigheten/folkhalsoportalenFake_XSS_SQLinjectionFixad.py">fixad portal</a></span></div>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <span class="n">6</span><h3>DDoS – överbelastningsattacker</h3>
+    <div class="rows">
+      <div class="row"><span class="k">Interaktiva uppgifter</span><span class="v"><a class="cta" href="6. DDoS/3. HTML med interaktiva uppgifter/workshop-06-ddos.html">Öppna workshopen</a></span></div>
+      <div class="row"><span class="k">1. Multimedia</span><span class="v"><a href="6. DDoS/1. Multimedia/Botnät_utpressning_och_DDoS-försvar.m4a">Botnät, utpressning och DDoS-försvar (podcast)</a><a href="6. DDoS/1. Multimedia/DDoS-attacker__Den_digitala_nedtagningen.mp4">DDoS-attacker (video)</a></span></div>
+      <div class="row"><span class="k">2. PowerPoint</span><span class="v"><a href="6. DDoS/2. PowerPoint med quiz/6. DDoS.pptx">.pptx</a><a href="6. DDoS/2. PowerPoint med quiz/6. DDoS.pdf">.pdf</a></span></div>
+      <div class="row"><span class="k">4. Mini projekt</span><span class="v"><a href="6. DDoS/4. Mini projekt/DDoS-skript/simple_ddos_lab.py">simple_ddos_lab.py</a><a href="6. DDoS/4. Mini projekt/DDoS-skript/attack.py">attack.py</a><a href="6. DDoS/4. Mini projekt/DDoS-skript/final_working_hard.py">final_working_hard.py</a></span></div>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <span class="n">7</span><h3>AI-sårbarheter – dataförgiftning</h3>
+    <div class="rows">
+      <div class="row"><span class="k">Interaktiva uppgifter</span><span class="v"><a class="cta" href="7. AI sårbarheter. Dataförgiftning/3. HTML med interaktiva uppgifter/workshop-07-dataforgiftning.html">Öppna workshopen</a></span></div>
+      <div class="row"><span class="k">1. Multimedia</span><span class="v"><a href="7. AI sårbarheter. Dataförgiftning/1. Multimedia/AI-gift_i_CV_n_så_förgiftas_du_botar.m4a">AI-gift i CV:n (podcast)</a><a href="7. AI sårbarheter. Dataförgiftning/1. Multimedia/En_berättelse_om_två_AI-modeller.mp4">En berättelse om två AI-modeller (video)</a></span></div>
+      <div class="row"><span class="k">2. PowerPoint</span><span class="v"><a href="7. AI sårbarheter. Dataförgiftning/2. PowerPoint med quiz/7. AI sårbarheter. Dataförgiftning.pptx">.pptx</a><a href="7. AI sårbarheter. Dataförgiftning/2. PowerPoint med quiz/7. AI sårbarheter. Dataförgiftning.pdf">.pdf</a></span></div>
+      <div class="row"><span class="k">4. Mini projekt</span><span class="v"><a href="7. AI sårbarheter. Dataförgiftning/4. Mini projekt/dataförgiftning/cv_ai_attack.py">cv_ai_attack.py</a><a href="7. AI sårbarheter. Dataförgiftning/4. Mini projekt/dataförgiftning/cv_ai_defense.py">cv_ai_defense.py</a></span></div>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <span class="n">8</span><h3>AI-sårbarheter – fientliga exempel</h3>
+    <div class="rows">
+      <div class="row"><span class="k">Interaktiva uppgifter</span><span class="v"><a class="cta" href="8. AI sårbarheter. Fientliga exempel/3. HTML med interaktiva uppgifter/workshop-08-fientliga-exempel.html">Öppna workshopen</a></span></div>
+      <div class="row"><span class="k">1. Multimedia</span><span class="v"><a href="8. AI sårbarheter. Fientliga exempel/1. Multimedia/AI-bias_ligger_i_koden_inte_i_tekniken.m4a">AI-bias ligger i koden (podcast)</a></span></div>
+      <div class="row"><span class="k">2. PowerPoint</span><span class="v"><a href="8. AI sårbarheter. Fientliga exempel/2. PowerPoint med quiz/8. AI sårbarheter. Fientliga exempel.pptx">.pptx</a><a href="8. AI sårbarheter. Fientliga exempel/2. PowerPoint med quiz/8. AI sårbarheter. Fientliga exempel.pdf">.pdf</a></span></div>
+      <div class="row"><span class="k">4. Mini projekt</span><span class="v"><a href="8. AI sårbarheter. Fientliga exempel/4. Mini projekt/fientliga_exempel/bank_ai_attack.py">bank_ai_attack.py</a><a href="8. AI sårbarheter. Fientliga exempel/4. Mini projekt/fientliga_exempel/bank_ai_defense.py">bank_ai_defense.py</a></span></div>
+    </div>
+  </div>
+
+  <h2>Workshopens tre flikar</h2>
+  <div class="exam">
+    <p><b>1 · Individuellt arbete</b> – snabbövning, kunskapskontroll och ett labb du gör själv.</p>
+    <p><b>2 · Grupparbete</b> – gruppövning med roller och ett labb ni gör tillsammans.</p>
+    <p><b>3 · Facit</b> – fullständiga svar, rapport och begreppslista. Fyll i rapporten efter båda arbetsflikarna.</p>
+    <p>Varje sida börjar med en <b>dra-och-släpp-uppgift</b> och har en <b>stegvisare</b> där du klickar dig genom momenten. Varje flik har dessutom minst ett labb med egen grafik.</p>
+    <p class="note">Allt sparas i webbläsaren (localStorage) – stäng fliken och fortsätt senare på samma dator. Filerna kräver varken server eller installation och fungerar även om du kopierar dem till en egen mapp.</p>
+  </div>
+
+  <h2>Kursplan och examination</h2>
+  <div class="exam">
+    <p><a href="0. Kursplan/kursplanen (Kursplan Security Assessment 20p).xlsx">Kursplanen (.xlsx)</a> · <a href="0. Kursplan/Kursplan Security Assessment 20p.pdf">Kursplanen (.pdf)</a> · <a href="0. Kursplan/Security Assessment.docx">Lektionsplanering (.docx)</a></p>
+    <p class="note">Fliken ”Förbered inför lektion” i kursplanen listar vad du gör före varje lektion. Projektet lämnas in 16 februari och examinationen är 17–18 februari.</p>
+  </div>
+
+</main>
+<footer><div class="wrap">Security Assessment 20 yh-poäng · materialet är fristående och kräver ingen server.</div></footer>
+</body>
+</html>

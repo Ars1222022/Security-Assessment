@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:,">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lektion 7 · AI-sårbarheter: dataförgiftning – individuellt, grupp och facit</title>
+<style>
+:root{--acc:#2d6a4f;--acc2:#e8f2ec;--ink:#14231c;--mut:#54685e;--line:#d2e2d8;--ok:#0f6b3f;--bad:#a3221a;--warn:#8a5a00;--bg:#f3f8f5}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.55 system-ui,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:#fff;border-bottom:3px solid var(--acc);padding:14px 0}
+.wrap{max-width:1120px;margin:0 auto;padding:0 18px}
+h1{margin:0 0 4px;font-size:21px;color:var(--acc)}
+.sub{margin:0 0 10px;color:var(--mut);font-size:13.5px}
+nav button{border:1px solid var(--line);background:#fff;padding:7px 14px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer;margin-right:6px}
+nav button.on{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+main{padding:16px 0 70px}
+h2{font-size:17px;margin:14px 0 8px;color:var(--acc)}h3{font-size:14.5px;margin:0 0 6px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.step{background:#fff;border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.step h3{color:var(--acc)}.step p{margin:5px 0;font-size:13.8px}
+.expect{background:var(--acc2);border-radius:8px;padding:7px 10px}
+.grid2{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+label{display:block;font-size:13px;font-weight:600;margin:8px 0 2px}
+textarea,input,select{width:100%;font:13px/1.5 ui-monospace,Consolas,monospace;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:#fdfffe}
+button.p{background:var(--acc);color:#fff;border:0;padding:8px 15px;border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
+button.g{background:#fff;border:1px solid var(--line);padding:7px 12px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+pre{background:#f1f7f3;border:1px solid var(--line);border-radius:8px;padding:10px;font:12.5px/1.5 ui-monospace,Consolas,monospace;white-space:pre-wrap;margin:0}
+.res{display:flex;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.ok{color:var(--ok)}.bad{color:var(--bad)}
+.tag{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:700;background:var(--acc2);color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+th{background:var(--acc2);color:var(--acc)}
+tr.ds{cursor:pointer}tr.ds:hover{background:#f3f9f5}
+tr.ds.mk{background:#f7e6c9}
+tr.ds.mk.hit{background:#dff1e6}
+tr.ds.mk.miss{background:#fbe4e2}
+.bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.bar button{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit;font-size:12.5px;cursor:pointer}
+.bar button.on{background:var(--acc2);border-color:var(--acc);font-weight:600}
+#clock{font:700 15px ui-monospace,Consolas,monospace;color:var(--acc)}
+.gt button{border:1px solid var(--line);background:#fff;padding:5px 12px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer;margin-right:6px}
+.gt button.on{background:var(--acc2);border-color:var(--acc);font-weight:700}
+.finding{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin:8px 0;background:#fcfefd;font-size:13px}
+.sev{font-weight:700;padding:1px 6px;border-radius:5px;font-size:11px}
+.s1{background:#e6f3ea;color:var(--ok)}.s2{background:#fdf2d8;color:var(--warn)}.s3{background:#fbe4e2;color:var(--bad)}
+.opts button{display:block;width:100%;text-align:left;border:1px solid var(--line);background:#fff;padding:7px 10px;border-radius:8px;margin:4px 0;font:inherit;font-size:13.5px;cursor:pointer}
+.opts button:hover{border-color:var(--acc)}
+.fb{font-size:13px;margin-top:5px}
+details.facit{border:1px solid var(--acc);border-radius:10px;padding:10px 12px;margin:10px 0;background:#fcfefd}
+details.facit summary{cursor:pointer;font-weight:700;color:var(--acc)}
+.muted{color:var(--mut);font-size:12.5px}
+.nums{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+.term{border-bottom:1px dotted #7c8b99;cursor:help;font-weight:600}
+.term:hover{color:var(--acc);border-bottom-color:var(--acc)}
+#pop{position:fixed;z-index:9999;max-width:330px;background:#fff;border:1px solid var(--acc);border-radius:10px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:13px;line-height:1.45;display:none}
+#pop b{color:var(--acc)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 12px}
+.chips .term{background:#fff;border:1px solid var(--line);border-radius:20px;padding:3px 10px;font-size:12px}
+.rl{border-top:1px dashed var(--line);padding:9px 0;font-size:13px}
+.rl:first-of-type{border-top:0}
+.lvl{font-size:11px;font-weight:700;background:var(--acc2);color:var(--acc);padding:1px 7px;border-radius:20px;margin-left:6px}
+.note{font-size:12px;color:var(--mut)}
+.resbox a{color:var(--acc);font-weight:600}
+tr.ds.fixed td{background:#e7f5ec}
+tr.ds.fixed td:first-child{text-decoration:line-through;color:var(--mut)}
+.meter{height:12px;background:var(--acc2);border-radius:6px;overflow:hidden;margin:6px 0}
+.meter span{display:block;height:100%;background:var(--acc);transition:width .2s}
+
+.tabhead{background:#fff;border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:10px;padding:8px 12px;margin:0 0 12px;font-size:13px;color:var(--mut)}
+.tabhead b{color:var(--acc)}
+.labblock{margin-top:16px;padding-top:6px;border-top:2px dashed var(--line)}
+
+/* interaktiv stegvisare */
+.stp{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 14px}
+.stp-dots{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.stp-dot{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--mut);font:700 13px system-ui;cursor:pointer;transition:.15s}
+.stp-dot:hover{border-color:var(--acc);color:var(--acc)}
+.stp-dot.on{background:var(--acc);border-color:var(--acc);color:#fff;transform:scale(1.08)}
+.stp-dot.done{border-color:var(--ok);color:var(--ok)}
+.stp-dot.done.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.stp-card h3{margin:0 0 6px;color:var(--acc)}
+.stp-card p{margin:5px 0;font-size:13.8px}
+.stp-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;border-top:1px dashed var(--line);padding-top:9px}
+.stp-chk{display:flex;gap:7px;align-items:center;font-size:13px;font-weight:600;color:var(--mut);cursor:pointer;margin:0}
+.stp-chk input{width:auto;margin:0}
+.stp-prog{font-size:12px;color:var(--mut);margin-left:auto}
+.stp-prog b{color:var(--acc)}
+/* dra och släpp */
+.ds{position:relative;background:linear-gradient(135deg,#ffffff 0%,#eef5fb 100%);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;margin:0 0 16px;overflow:hidden}
+.ds-head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:4px}
+.ds-head b{color:var(--acc);font-size:14.5px}
+.ds-status{font-size:12.5px;color:var(--mut)}
+.ds-status b{color:var(--ok)}
+.ds-pool{min-height:52px;padding:6px 0 2px;border-bottom:1px dashed var(--line);margin-bottom:10px}
+.ds-chip{display:inline-block;padding:8px 12px;margin:4px 6px 2px 0;border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 1px 2px rgba(16,32,48,.07);font-size:13px;line-height:1.3;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;transition:box-shadow .15s,border-color .15s,transform .15s}
+.ds-chip:hover{border-color:var(--acc);box-shadow:0 4px 12px rgba(27,79,122,.18);transform:translateY(-1px)}
+.ds-chip.ds-sel{border-color:var(--acc);background:var(--acc2);box-shadow:0 0 0 2px rgba(27,79,122,.25)}
+.ds-chip.ds-dragging{opacity:.35}
+.ds-chip.ok{background:#e8f7ef;border-color:var(--ok);color:#0d5734;cursor:default;box-shadow:none}
+.ds-chip.ok::after{content:" ✓";font-weight:700}
+.ds-chip.bad{border-color:var(--bad);animation:ds-shake .4s}
+@keyframes ds-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.ds-ghost{position:fixed;z-index:9999;pointer-events:none;border-color:var(--acc);box-shadow:0 12px 26px rgba(16,32,48,.3);transform:rotate(-2deg);opacity:.95}
+.ds-bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.ds-bin{border:2px dashed var(--line);border-radius:12px;padding:8px 10px;min-height:96px;transition:.15s;background:rgba(255,255,255,.55)}
+.ds-bin.hot{border-color:var(--acc);background:var(--acc2);transform:translateY(-2px)}
+.ds-bin>b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--mut);margin-bottom:4px}
+.ds-drop{min-height:56px}
+.ds-foot{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.ds-facit{border:1px solid var(--line);border-radius:5px;background:#fff;padding:4px 8px;font-size:12px;cursor:pointer;list-style:none}
+summary.ds-facit{list-style:none}
+.ds-facit summary{cursor:pointer;font-weight:600;color:var(--acc);font-size:12.5px}
+.ds-facit ul{margin:6px 0 2px;padding-left:16px;font-size:12.5px;color:var(--mut)}
+.ds.win{border-color:var(--ok);box-shadow:0 0 0 3px rgba(61,220,132,.22),0 14px 32px rgba(18,104,63,.18);animation:ds-pop .45s ease-out}
+@keyframes ds-pop{0%{transform:scale(1)}45%{transform:scale(1.012)}100%{transform:scale(1)}}
+.ds-badge{position:absolute;right:12px;top:10px;width:38px;height:38px;border-radius:50%;background:var(--ok);color:#fff;font:700 20px system-ui;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(18,104,63,.35);animation:ds-badge .5s ease-out}
+@keyframes ds-badge{0%{transform:scale(0) rotate(-40deg);opacity:0}70%{transform:scale(1.15) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Lektion 7 · AI-sårbarheter: dataförgiftning</h1>
+  <p class="sub">Individuellt: granska träningsdata (10 min) · Grupparbete: manipulera, upptäck, åtgärda, retesta (30 min) · Facit: rapport och facit</p>
+  <nav id="tabs"><button data-t="a" class="on">1 · Individuellt arbete</button><button data-t="b">2 · Grupparbete</button><button data-t="c">3 · Facit</button></nav>
+</div></header>
+<main class="wrap">
+<section id="a">
+<div class="tabhead"><b>Individuellt arbete</b> – gör uppgifterna själv. Allt du skriver sparas i webbläsaren och kan kopieras till rapporten i fliken Facit.</div>
+<div class="ds" id="ds7">
+  <div class="ds-head"><b>Dra och släpp · Ren eller förgiftad rad?</b><span class="ds-status">Dra varje rad till rätt låda.</span></div>
+  <div class="ds-pool"></div>
+  <div class="ds-bins"></div>
+  <div class="ds-foot"><button class="g ds-reset" type="button">Börja om</button>
+    <details class="ds-facit"><summary>Visa facit</summary><ul><li>Normal lön, fem års erfarenhet, vanliga ord → <b>Ren rad</b></li><li>Vanlig utbildning och två språk → <b>Ren rad</b></li><li>Osynlig text: &quot;anställ mig oavsett&quot; → <b>Förgiftad rad</b></li><li>40 identiska rader med perfekt poäng → <b>Förgiftad rad</b></li><li>Extremvärde som bara gynnar en grupp → <b>Förgiftad rad</b></li></ul></details></div>
+</div>
+<script>
+(function(){
+  var root=document.getElementById('ds7'); if(!root) return;
+  var DATA={"bins": [{"k": "clean", "t": "Ren rad"}, {"k": "poison", "t": "Förgiftad rad"}], "chips": [{"t": "Normal lön, fem års erfarenhet, vanliga ord", "b": "clean"}, {"t": "Vanlig utbildning och två språk", "b": "clean"}, {"t": "Osynlig text: \"anställ mig oavsett\"", "b": "poison"}, {"t": "40 identiska rader med perfekt poäng", "b": "poison"}, {"t": "Extremvärde som bara gynnar en grupp", "b": "poison"}], "win": "Förgiftning är få rader med stark effekt – därför syns den inte i medelvärdet."};
+  var pool=root.querySelector('.ds-pool'), binsBox=root.querySelector('.ds-bins'),
+      status=root.querySelector('.ds-status');
+  var placed=0, drag=null, ghost=null, sel=null, justDragged=0;
+
+  DATA.bins.forEach(function(b){
+    var d=document.createElement('div'); d.className='ds-bin'; d.setAttribute('data-k',b.k);
+    d.innerHTML='<b>'+b.t+'</b><div class="ds-drop"></div>';
+    d.addEventListener('click',function(){
+      if(!sel) return;
+      var s=sel; sel=null; s.classList.remove('ds-sel'); drop(s,d);
+    });
+    binsBox.appendChild(d);
+  });
+  DATA.chips.forEach(function(c){
+    var el=document.createElement('div');
+    el.className='ds-chip'; el.setAttribute('data-b',c.b); el.textContent=c.t; el.tabIndex=0;
+    el.addEventListener('pointerdown',down);
+    el.addEventListener('click',function(){ if(drag||Date.now()-justDragged<250) return; pick(el); });
+    el.addEventListener('keydown',function(e){
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); pick(el); }
+    });
+    pool.appendChild(el);
+  });
+
+  function pick(el){
+    if(el.classList.contains('ok')) return;
+    if(sel===el){ el.classList.remove('ds-sel'); sel=null; say('Klicka på ett kort och sedan på en låda.'); return; }
+    if(sel) sel.classList.remove('ds-sel');
+    sel=el; el.classList.add('ds-sel');
+    say('Välj rätt låda för "'+el.textContent+'".');
+  }
+  function down(e){
+    var el=e.currentTarget;
+    if(el.classList.contains('ok')) return;
+    e.preventDefault();
+    var r=el.getBoundingClientRect();
+    ghost=el.cloneNode(true);
+    ghost.className='ds-chip ds-ghost';
+    ghost.style.width=r.width+'px';
+    ghost.style.left=r.left+'px'; ghost.style.top=r.top+'px';
+    document.body.appendChild(ghost);
+    el.classList.add('ds-dragging');
+    drag={el:el,ox:e.clientX-r.left,oy:e.clientY-r.top};
+    document.addEventListener('pointermove',move);
+    document.addEventListener('pointerup',up);
+    document.addEventListener('pointercancel',up);
+  }
+  function move(e){
+    if(!drag) return;
+    ghost.style.left=(e.clientX-drag.ox)+'px';
+    ghost.style.top=(e.clientY-drag.oy)+'px';
+    var b=binAt(e.clientX,e.clientY);
+    [].slice.call(binsBox.children).forEach(function(x){ x.classList.toggle('hot',x===b); });
+  }
+  function up(e){
+    if(!drag) return;
+    var el=drag.el, b=binAt(e.clientX,e.clientY);
+    document.removeEventListener('pointermove',move);
+    document.removeEventListener('pointerup',up);
+    document.removeEventListener('pointercancel',up);
+    if(ghost){ ghost.parentNode.removeChild(ghost); ghost=null; }
+    el.classList.remove('ds-dragging');
+    [].slice.call(binsBox.children).forEach(function(x){ x.classList.remove('hot'); });
+    drag=null; justDragged=Date.now();
+    if(b) drop(el,b);
+  }
+  function binAt(x,y){
+    if(ghost) ghost.style.display='none';
+    var t=document.elementFromPoint(x,y);
+    if(ghost) ghost.style.display='';
+    while(t && t!==root && !t.classList.contains('ds-bin')) t=t.parentNode;
+    return (t&&t.classList&&t.classList.contains('ds-bin'))?t:null;
+  }
+  function drop(el,bin){
+    var k=bin.getAttribute('data-k');
+    if(el.getAttribute('data-b')===k){
+      el.classList.remove('ds-sel');
+      if(sel===el) sel=null;
+      el.classList.add('ok');
+      bin.querySelector('.ds-drop').appendChild(el);
+      placed++;
+      if(placed===DATA.chips.length){ win(); }
+      else say('<b>'+placed+' av '+DATA.chips.length+' rätt.</b> Fortsätt – du är på rätt spår.');
+    } else {
+      el.classList.add('bad');
+      setTimeout(function(){ el.classList.remove('bad'); },700);
+      say('Nästan! Det kortet hör inte hemma där. Läs ledtråden i lådans rubrik och prova igen.');
+    }
+  }
+  function say(t){ status.innerHTML=t; }
+  function win(){
+    say('<b>Allt rätt!</b> '+DATA.win);
+    root.classList.add('win');
+    if(!root.querySelector('.ds-badge')){
+      var b=document.createElement('div'); b.className='ds-badge'; b.textContent='✓';
+      root.appendChild(b);
+    }
+  }
+  root.querySelector('.ds-reset').onclick=function(){
+    [].slice.call(root.querySelectorAll('.ds-chip')).forEach(function(el){
+      el.classList.remove('ok','bad','ds-sel'); pool.appendChild(el);
+    });
+    placed=0; sel=null;
+    root.classList.remove('win');
+    var bd=root.querySelector('.ds-badge'); if(bd) bd.parentNode.removeChild(bd);
+    say('Dra korten till rätt låda – eller klicka på ett kort och sedan på en låda.');
+  };
+})();
+
+</script>
+<h2>Individuellt · Hitta manipulerade rader i ett träningsdataset</h2>
+  <div id="stepsA"></div>
+  <div class="chips" id="chipsA"></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>Träningsdata <span class="tag">16 recensioner · klicka på de rader du misstänker</span></h3>
+      <table><thead><tr><th>#</th><th>Text</th><th>Etikett</th><th>Källa</th></tr></thead><tbody id="ds"></tbody></table>
+      <p class="muted">Etiketten är det modellen ska lära sig: Pos = nöjd kund, Neg = missnöjd. Sex rader är manipulerade.</p>
+      <div class="row" style="margin-top:8px"><button class="p" id="fixData">Rätta markerade rader</button><span class="note" id="fixNote">Markera rader först.</span></div>
+      <div id="accMeter" style="margin-top:8px"></div>
+    </div>
+    <div class="card">
+      <h3>Din bedömning</h3>
+      <label for="why7">Vad är gemensamt för de manipulerade raderna?</label>
+      <textarea id="why7" rows="3" placeholder="De innehåller ... och etiketten stämmer inte med ..."></textarea>
+      <div class="nums">
+        <div><label for="accA">Modell A – andel rätt (%)</label><input id="accA" inputmode="numeric" placeholder="t.ex. 100"></div>
+        <div><label for="accB">Modell B – andel rätt (%)</label><input id="accB" inputmode="numeric" placeholder="t.ex. 60"></div>
+      </div>
+      <div class="card" style="background:#f7fbf8;margin:6px 0">
+        <b style="font-size:13px">Testresultat (samma 10 testfall)</b>
+        <div class="muted">Modell A tränad på granskat data: 10 rätt av 10.<br>Modell B tränad på datasetet ovan: 6 rätt av 10.</div>
+      </div>
+      <div class="row"><button class="p" id="chkA">Kontrollera mina svar</button><button class="g" id="cpA">Kopiera</button><button class="g" id="resetA">Rensa</button></div><p class="note">Knappen jämför dina markerade rader med facit och kontrollerar mönstret och båda procentsatserna.</p>
+      <div id="fb" style="margin-top:10px"></div>
+    </div>
+  </div>
+<div id="checkA"></div>
+
+<div class="labblock">
+<style>
+.labd7{--line:#d7dfe8;--mut:#5b6b7c;--acc:var(--acc,#1b4f7a);--acc2:var(--acc2,#e8f0f7);--ok:var(--ok,#12683f);--bad:var(--bad,#a3221a);--warn:var(--warn,#8a5a00)}
+.labd7 .panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.labd7 canvas{width:100%;height:auto;display:block;border-radius:10px;background:#0b1622;cursor:crosshair}
+.labd7 .row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.labd7 label{display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:#33475b}
+.labd7 input[type=range]{width:220px}
+.labd7 button.p{background:var(--acc);color:#fff;border:0;padding:8px 15px;border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
+.labd7 button.g{background:#fff;border:1px solid var(--line);padding:7px 12px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer}
+.labd7 .note{font-size:12.5px;color:var(--mut)}
+.labd7 .kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.labd7 .k{border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.labd7 .k span{display:block;font-size:11px;color:var(--mut)}
+.labd7 .k b{font-size:15px}
+</style>
+<h2>Labb A (individuellt) · dataset-skannern – hitta de förgiftade raderna</h2>
+<div class="labd7">
+  <div class="panel">
+    <p style="margin:0 0 8px"><b>Så gör du:</b> dra i reglaget för att blanda in förgiftad data i träningssetet och se hur träffsäkerheten faller. Klicka sedan på de punkter du tror är manipulerade – du får veta hur många du hittade och hur många rena rader du pekade ut av misstag.</p>
+    <div class="row">
+      <div><label>Förgiftad andel av träningsdatan: <b id="labd7-pv">10 %</b></label>
+        <input type="range" id="labd7-p" min="0" max="30" step="2" value="10"></div>
+      <button class="g" id="labd7-show">Visa förgiftning: av</button>
+      <button class="p" id="labd7-clear">Rensa markeringar</button>
+    </div>
+    <div class="kpi">
+      <div class="k"><span>Träffsäkerhet på testdata</span><b id="labd7-k1">–</b></div>
+      <div class="k"><span>Förgiftade rader</span><b id="labd7-k2">0</b></div>
+      <div class="k"><span>Dina markeringar</span><b id="labd7-k3">0 rätt / 0 fel</b></div>
+    </div>
+    <p class="note" id="labd7-msg" style="margin:10px 0 0"></p>
+  </div>
+  <div class="panel" style="padding:10px">
+    <canvas id="labd7-cv" width="900" height="380"></canvas>
+  </div>
+</div>
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById("labd7-cv"); if(!cv) return;
+  var ctx=cv.getContext("2d");
+  var W=900,H=380, PAD=54;
+  var S=function(id){return document.getElementById(id);};
+
+  // 40 kandidater: x = erfarenhet (0-10), y = testpoäng (0-100)
+  var pts=[];
+  (function(){
+    var seed=12345;
+    function rnd(){ seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff; }
+    for(var i=0;i<40;i++){
+      var x=1+rnd()*9, y=28+rnd()*64;
+      pts.push({x:x, y:y, l: y>60?"anställ":"avslag", poison:false, marked:false});
+    }
+    // åtta kandidater som kan förgiftas – valda på fasta index
+    [2,7,11,15,19,24,29,34].forEach(function(i){ pts[i].poisonCandidate=true; });
+  })();
+
+  var share=10, showPoison=false;
+
+  function poisonedCount(){ return Math.round(share/100*40); }
+
+  function refresh(){
+    var n=poisonedCount();
+    var cand=0;
+    pts.forEach(function(p){
+      if(p.poisonCandidate){ p.poison = (cand<n); cand++; }
+      else p.poison=false;
+      if(p.poison){ p.l="anställ"; p.y=Math.max(4, p.y-26); }   // etiketten flippas
+    });
+    var acc=96-n*4.4; if(acc<45) acc=45;
+    S("labd7-k1").textContent=Math.round(acc)+" %";
+    S("labd7-k1").style.color = acc<70?"var(--bad)":(acc<85?"var(--warn)":"var(--ok)");
+    S("labd7-k2").textContent=n+" av 40";
+    gscore();
+    S("labd7-msg").innerHTML = n===0
+      ? "Ren data: modellen lär sig mönstret och träffsäkerheten är hög. Öka andelen förgiftad data och se vad som händer."
+      : (acc<70 ? "<b>Träffsäkerheten rasar.</b> Några få manipulerade rader räcker – det är därför spårbarhet och dubbla granskare behövs."
+                : "Än så länge små effekter. Prova 20–30 % och jämför.");
+  }
+
+  function gscore(){
+    var right=0, wrong=0;
+    pts.forEach(function(p){ if(p.marked){ if(p.poison) right++; else wrong++; } });
+    S("labd7-k3").textContent=right+" rätt / "+wrong+" fel";
+    S("labd7-k3").style.color = wrong?"var(--bad)":"var(--ok)";
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    var g=ctx.createLinearGradient(0,0,W,H); g.addColorStop(0,"#0d1c2a"); g.addColorStop(1,"#0a1420");
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+    function X(x){ return PAD + (x/10)*(W-PAD*2); }
+    function Y(y){ return H-PAD - (y/100)*(H-PAD*2); }
+
+    // axlar
+    ctx.strokeStyle="rgba(120,200,255,.25)"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(PAD,H-PAD); ctx.lineTo(W-PAD,H-PAD); ctx.moveTo(PAD,PAD); ctx.lineTo(PAD,H-PAD); ctx.stroke();
+    ctx.fillStyle="rgba(219,231,243,.55)"; ctx.font="11.5px system-ui";
+    ctx.textAlign="center"; ctx.fillText("erfarenhet (år)", W/2, H-18);
+    ctx.save(); ctx.translate(18,H/2); ctx.rotate(-Math.PI/2); ctx.fillText("testpoäng",0,0); ctx.restore();
+    ctx.textAlign="left";
+
+    // beslutszon
+    ctx.fillStyle="rgba(126,226,168,.07)"; ctx.fillRect(PAD, PAD, W-PAD*2, Y(60)-PAD);
+    ctx.fillStyle="rgba(255,90,77,.06)"; ctx.fillRect(PAD, Y(60), W-PAD*2, H-PAD-Y(60));
+    ctx.strokeStyle="rgba(255,255,255,.18)"; ctx.setLineDash([6,6]);
+    ctx.beginPath(); ctx.moveTo(PAD,Y(60)); ctx.lineTo(W-PAD,Y(60)); ctx.stroke(); ctx.setLineDash([]);
+
+    pts.forEach(function(p){
+      var x=X(p.x), y=Y(p.y);
+      var col = p.l==="anställ" ? "#3ddc84" : "#ff7a6b";
+      if(showPoison && p.poison){ col="#ff3b30"; }
+      ctx.beginPath(); ctx.arc(x,y, 6.5, 0, Math.PI*2);
+      ctx.fillStyle=col; ctx.globalAlpha=.9; ctx.fill(); ctx.globalAlpha=1;
+      if(showPoison && p.poison){
+        ctx.beginPath(); ctx.arc(x,y,11,0,Math.PI*2); ctx.strokeStyle="#ff3b30"; ctx.lineWidth=2; ctx.stroke();
+      }
+      if(p.marked){
+        ctx.beginPath(); ctx.moveTo(x-11,y-11); ctx.lineTo(x+11,y+11);
+        ctx.moveTo(x+11,y-11); ctx.lineTo(x-11,y+11);
+        ctx.strokeStyle="#ffcf70"; ctx.lineWidth=2.4; ctx.stroke();
+        ctx.beginPath(); ctx.arc(x,y,15,0,Math.PI*2); ctx.strokeStyle="rgba(255,207,112,.45)"; ctx.lineWidth=1.4; ctx.stroke();
+      }
+    });
+
+    ctx.fillStyle="rgba(219,231,243,.6)"; ctx.font="12px system-ui"; ctx.textAlign="left";
+    ctx.fillText("Träningsdata: 40 kandidater. Grönt = anställ, rött = avslag (modellens etikett).", 24, 26);
+    ctx.fillStyle="rgba(219,231,243,.45)"; ctx.font="11px system-ui";
+    ctx.fillText("Klicka på en punkt för att markera den som misstänkt.", W-330, 26);
+  }
+
+  function hit(mx,my){
+    var best=null, bd=1e9;
+    pts.forEach(function(p){
+      var x=PAD+(p.x/10)*(W-PAD*2), y=H-PAD-(p.y/100)*(H-PAD*2);
+      var d=Math.hypot(mx-x,my-y);
+      if(d<18 && d<bd){ bd=d; best=p; }
+    });
+    return best;
+  }
+
+  cv.onclick=function(e){
+    var r=cv.getBoundingClientRect(), sc=W/r.width;
+    var p=hit((e.clientX-r.left)*sc, (e.clientY-r.top)*sc);
+    if(p){ p.marked=!p.marked; gscore(); draw(); }
+  };
+
+  S("labd7-p").oninput=function(){ share=+this.value; S("labd7-pv").textContent=share+" %"; refresh(); draw(); };
+  S("labd7-show").onclick=function(){
+    showPoison=!showPoison;
+    S("labd7-show").textContent="Visa förgiftning: "+(showPoison?"på":"av");
+    draw();
+  };
+  S("labd7-clear").onclick=function(){ pts.forEach(function(p){p.marked=false;}); gscore(); draw(); };
+
+  refresh(); draw();
+})();
+</script>
+</div>
+</section>
+
+<section id="b" hidden>
+<div class="tabhead"><b>Grupparbete</b> – arbeta två till fyra personer. Dokumentera gruppens val och jämför med facit när ni är klara.</div>
+  <h2>Grupparbete · Förgifta ett dataset, upptäck det och bygg ett skydd</h2>
+  <p class="muted">Grupp A manipulerar en kopia av datasetet och tränar om modellen. Grupp B granskar datat utan att veta vilka rader A ändrade, dokumenterar och bygger skydd. Sedan retestar A.</p>
+  <div class="bar" id="phases"></div>
+  <div class="bar"><span class="muted">Tid kvar i vald fas:</span><span id="clock">00:00</span><button id="skip">Hoppa över återkoppling</button></div>
+  <div id="phaseInfo"></div>
+  <div class="gt" id="gt"><button data-g="A" class="on">Grupp A · manipulation</button><button data-g="B">Grupp B · granskning</button></div>
+  <div id="paneA"></div>
+  <div id="paneB" hidden></div>
+  <div id="findings"></div>
+
+<div class="labblock">
+<h3 style="margin-top:22px">Labb B (grupp) · Förgiftningsgraden – hur mycket ska till innan modellen välter?</h3>
+<div class="labd">
+  <div class="panel">
+    <p style="margin:0 0 8px"><b>Så gör du:</b> dra i reglaget för andel förgiftade rader och tryck <b>Träna om</b>. Beslutsgränsen flyttar sig och träffsäkerheten faller. Slå sedan på <b>validering</b> och träna om med samma data.</p>
+    <p class="note" style="margin:0">Gruppfråga: vid vilken andel märks förgiftningen i mätvärdena – och varför är det för sent då?</p>
+  </div>
+  <div class="cols">
+    <div class="panel">
+      <label style="display:block;font-size:13px;font-weight:600;margin:6px 0 2px">Förgiftade rader: <b id="x7-pv">10</b> %</label>
+      <input id="x7-p" type="range" min="0" max="40" step="1" value="10" style="width:100%">
+      <div class="asset" id="x7-val" style="margin-top:12px"><span class="box"></span><span><b>Validering på</b><br><span class="note">Avvikande rader filtreras före träning.</span></span></div>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="p" id="x7-run">Träna om</button>
+        <button class="g" id="x7-reset">Nollställ</button>
+      </div>
+      <div style="margin-top:12px">
+        <div class="kv"><span>Träffsäkerhet</span><b id="x7-acc">–</b></div>
+        <div class="kv"><span>Förgiftade rader</span><b id="x7-n">–</b></div>
+        <div class="kv" style="border:0"><span>Status</span><b id="x7-state">–</b></div>
+      </div>
+      <p class="note" style="margin-top:10px">Förgiftningen är subtil i början: modellen blir bara <i>lite</i> sämre – och det är därför den inte upptäcks.</p>
+    </div>
+    <div class="panel" style="padding:10px">
+      <canvas id="x7-cv" width="900" height="440"></canvas>
+      <div class="note" id="x7-log" style="margin-top:8px;min-height:36px">Dra i reglaget och träna om.</div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById("x7-cv"); if(!cv) return;
+  var ctx=cv.getContext("2d");
+  var pct=10, validate=false, bx=470, targetX=470, acc=90, rnd;
+
+  function seed(s){ var x=s; return function(){ x=(x*9301+49297)%233280; return x/233280; }; }
+  var pts=[], poison=[];
+  function build(){
+    rnd=seed(2027);
+    pts=[]; poison=[];
+    for(var i=0;i<110;i++){
+      pts.push({x:150+rnd()*200,y:90+rnd()*280,r:3.5});
+    }
+    var n=Math.round(pct*1.6);
+    for(var j=0;j<n;j++){
+      poison.push({x:520+rnd()*90,y:110+rnd()*250,r:4});
+    }
+    var eff=pct*(validate?0.35:1);
+    targetX=470-eff*4.2;
+    acc=Math.max(38,Math.round(95-eff*1.55));
+    document.getElementById("x7-pv").textContent=pct;
+    document.getElementById("x7-n").textContent=n+" rader";
+    document.getElementById("x7-acc").textContent=acc+" %";
+    var st=document.getElementById("x7-state");
+    st.textContent = acc>=90?"Stabil":(acc>=75?"Försämrad – agera":"Oanvändbar modell");
+    st.style.color = acc>=90?"var(--lb-ok)":(acc>=75?"var(--lb-warn)":"var(--lb-bad)");
+    document.getElementById("x7-log").innerHTML = acc>=90
+      ? '<b style="color:#7ee2a8">Liten effekt:</b> gränsen har flyttat sig '+Math.round(470-targetX)+' px. Jämför med hur få rader som krävdes.'
+      : (acc>=75 ? '<b style="color:#ffcf70">Drift:</b> modellen avvisar nu fler korrekta sökande. Felet syns först i statistiken.'
+                 : '<b style="color:#ff8f85">Kollaps:</b> beslutsgränsen är flyttad så långt att modellen är värdelös – men den svarar fortfarande med hög confidence.');
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,900,440);
+    var g=ctx.createLinearGradient(0,0,900,440);
+    g.addColorStop(0,"#101f30"); g.addColorStop(1,"#07111c");
+    ctx.fillStyle=g; ctx.fillRect(0,0,900,440);
+
+    var x0=60,y0=50,W=620,H=320;
+    ctx.strokeStyle="rgba(120,200,255,.25)"; ctx.strokeRect(x0,y0,W,H);
+    ctx.fillStyle="rgba(61,220,132,.05)"; ctx.fillRect(x0,y0,bx-x0,H);
+    ctx.fillStyle="rgba(255,90,77,.05)"; ctx.fillRect(bx,y0,x0+W-bx,H);
+
+    ctx.strokeStyle="#ffd166"; ctx.lineWidth=2.5; ctx.setLineDash([7,5]);
+    ctx.beginPath(); ctx.moveTo(bx,y0); ctx.lineTo(bx,y0+H); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle="#ffd166"; ctx.font="11px system-ui"; ctx.textAlign="center";
+    ctx.fillText("beslutsgräns",bx,y0-10);
+
+    pts.forEach(function(p){
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.x<bx?"rgba(90,200,255,.85)":"rgba(90,200,255,.28)"; ctx.fill();
+    });
+    poison.forEach(function(p){
+      ctx.beginPath(); ctx.moveTo(p.x,p.y-5); ctx.lineTo(p.x+5,p.y+4); ctx.lineTo(p.x-5,p.y+4); ctx.closePath();
+      ctx.fillStyle="rgba(255,90,77,.9)"; ctx.fill();
+    });
+
+    ctx.textAlign="left"; ctx.font="12px system-ui";
+    ctx.fillStyle="rgba(219,231,243,.85)"; ctx.fillText("Träningsdata",x0,30);
+    ctx.fillStyle="rgba(90,200,255,.9)"; ctx.font="11px system-ui"; ctx.fillText("● normal",x0+110,30);
+    ctx.fillStyle="rgba(255,90,77,.9)"; ctx.fillText("▲ förgiftad",x0+180,30);
+
+    // högerpanel
+    var px=720;
+    ctx.fillStyle="rgba(219,231,243,.8)"; ctx.font="12px system-ui"; ctx.textAlign="left";
+    ctx.fillText("Träffsäkerhet",px,70);
+    ctx.fillStyle="rgba(255,255,255,.1)"; ctx.fillRect(px,80,140,16);
+    ctx.fillStyle=acc>=90?"#3ddc84":(acc>=75?"#ffcf70":"#ff5a4d");
+    ctx.fillRect(px,80,140*acc/100,16);
+    ctx.fillStyle="#dbe7f3"; ctx.font="700 20px system-ui"; ctx.fillText(acc+" %",px,126);
+
+    ctx.font="12px system-ui"; ctx.fillStyle="rgba(219,231,243,.8)";
+    ctx.fillText("Förgiftning",px,168);
+    ctx.fillStyle="rgba(255,255,255,.1)"; ctx.fillRect(px,178,140,16);
+    ctx.fillStyle="#ff8f85"; ctx.fillRect(px,178,140*Math.min(100,pct*2.5)/100,16);
+    ctx.fillStyle="#dbe7f3"; ctx.font="700 20px system-ui"; ctx.fillText(pct+" %",px,224);
+
+    ctx.font="11px system-ui"; ctx.fillStyle=validate?"#7ee2a8":"rgba(219,231,243,.45)";
+    ctx.fillText(validate?"validering: på":"validering: av",px,264);
+    ctx.fillStyle="rgba(219,231,243,.4)";
+    ctx.fillText("Gränsen flyttad:",px,290);
+    ctx.fillStyle="rgba(219,231,243,.75)";
+    ctx.fillText(Math.round(470-bx)+" px mot angriparens data",px,306);
+    ctx.fillStyle="rgba(219,231,243,.35)";
+    ctx.fillText("Modellen svarar fortfarande",px,340);
+    ctx.fillText("med hög säkerhet – felet",px,356);
+    ctx.fillText("syns bara i facit.",px,372);
+  }
+  function loop(){ bx+=(targetX-bx)*0.12; draw(); requestAnimationFrame(loop); }
+
+  document.getElementById("x7-p").addEventListener("input",function(){ pct=+this.value; build(); });
+  document.getElementById("x7-val").onclick=function(){ validate=!validate; this.classList.toggle("on",validate); build(); };
+  document.getElementById("x7-run").onclick=function(){
+    var b=bx; bx=b; targetX=b; build();
+    document.getElementById("x7-log").innerHTML='<b>Tränar …</b> gränsen flyttas mot de förgiftade raderna.';
+  };
+  document.getElementById("x7-reset").onclick=function(){
+    pct=10; validate=false;
+    document.getElementById("x7-p").value=10;
+    document.getElementById("x7-val").classList.remove("on");
+    bx=470; build();
+  };
+  build(); bx=targetX; loop();
+})();
+</script>
+</div>
+</section>
+
+<section id="c" hidden>
+<div class="tabhead"><b>Facit</b> – här ligger rapporten, de fullständiga svaren och begreppen. Fyll i rapporten efter att ni gjort båda arbetsflikarna.</div>
+  <h2>Facit · Rapport och referensfacit</h2>
+  <div id="facitA"></div>
+  <div id="facitB"></div>
+  <div class="card"><div class="row"><button class="p" id="mk">Uppdatera rapport</button><button class="g" id="cp">Kopiera</button><button class="g" id="dl">Spara som fil</button><button class="g" id="rst">Nollställ allt</button></div>
+    <p class="muted" style="margin-top:8px"><b>Så fyller du i rapporten:</b> 1) sammanfatta Del A med dina mätvärden, 2) klistra in gruppernas fält, 3) lägg till varje fynd i fyndregistret med bevis, 4) skriv jämförelsen mot referensfacit – vad ni hittade, vad ni missade och varför. Klicka sedan på <b>Uppdatera rapport</b>.</p></div>
+  <pre id="report">Klicka på "Uppdatera rapport".</pre>
+  <div id="faq"></div>
+  <div id="res"></div>
+</section>
+</main>
+<script>
+"use strict";
+var $=function(s){return document.querySelector(s);}, $$=function(s){return [].slice.call(document.querySelectorAll(s));};
+var K='sa_w7', S={};
+try{S=JSON.parse(localStorage.getItem(K)||'{}')||{};}catch(e){S={};}
+S.findings=S.findings||[];
+function save(){try{localStorage.setItem(K,JSON.stringify(S));}catch(e){}}
+function esc(t){return String(t==null?'':t).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+function copy(t,b){var done=function(){var o=b.textContent;b.textContent='Kopierat ✓';setTimeout(function(){b.textContent=o;},1200);};
+  var fb=function(){var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){alert('Kopiera manuellt:\n\n'+t);}document.body.removeChild(ta);};
+  if(navigator.clipboard&&window.isSecureContext&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,fb);}else{fb();}}
+function download(name,text){try{var b=new Blob([text],{type:'text/markdown;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);document.body.removeChild(a);},500);}catch(e){alert('Kunde inte spara – kopiera texten i stället.');}}
+$$('#tabs button').forEach(function(b){b.onclick=function(){$$('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});['a','b','c'].forEach(function(k){$('#'+k).hidden=(k!==b.dataset.t);});};});
+function steps(list,host){
+  var cur=0, done={};
+  function paint(){
+    var n=0; for(var k in done){ if(done[k]) n++; }
+    var s=list[cur], last=(cur===list.length-1);
+    host.innerHTML='<div class="stp"><div class="stp-dots">'+
+      list.map(function(x,j){ return '<button class="stp-dot'+(j===cur?' on':'')+(done[j]?' done':'')+'" data-goto="'+j+'">'+(j+1)+'</button>'; }).join('')+
+      '</div><div class="stp-card"><h3>Steg '+(cur+1)+' av '+list.length+' – '+s.t+'</h3>'+
+      '<p><b>Vad?</b> '+s.d+'</p><p><b>Varför?</b> '+s.w+'</p><p><b>Hur?</b> '+s.h+'</p>'+
+      (s.r?'<p class="expect"><b>Förväntat resultat:</b> '+s.r+'</p>':'')+
+      '<div class="stp-bar"><button class="g" data-prev'+(cur===0?' disabled':'')+'>← Tillbaka</button>'+
+      '<label class="stp-chk"><input type="checkbox" data-done'+(done[cur]?' checked':'')+'> Klar med steget</label>'+
+      '<button class="p" data-next>'+(last?'Börja öva ↓':'Nästa →')+'</button>'+
+      '<span class="stp-prog"><b>'+n+'</b> av '+list.length+' steg klara</span></div></div></div>';
+    host.querySelector('[data-prev]').onclick=function(){ if(cur>0){cur--; paint();} };
+    host.querySelector('[data-next]').onclick=function(){
+      done[cur]=true;
+      if(cur<list.length-1){ cur++; } else { scrollToLab(); }
+      paint();
+    };
+    host.querySelector('[data-done]').onchange=function(){ done[cur]=this.checked; paint(); };
+    [].slice.call(host.querySelectorAll('[data-goto]')).forEach(function(b){
+      b.onclick=function(){ cur=+b.getAttribute('data-goto'); paint(); };
+    });
+  }
+  paint();
+}
+function scrollToLab(){
+  var l=document.querySelector('#'+ (document.querySelector('#a .labblock') ? 'a' : 'b') +' .labblock') ||
+        document.querySelector('.labblock');
+  if(l) l.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function quiz(qs,host,title){host.innerHTML='<h2>'+title+'</h2>'+qs.map(function(q,i){return '<div class="q card"><p style="margin:0 0 4px"><b>'+(i+1)+'. '+q.q+'</b></p><div class="opts">'+q.o.map(function(o,j){return '<button data-q="'+i+'" data-o="'+j+'">'+o+'</button>';}).join('')+'</div><div class="fb" id="qf'+i+'"></div></div>';}).join('');
+  $$('[data-q]').forEach(function(b){b.onclick=function(){var i=+b.dataset.q,q=qs[i],ok=(+b.dataset.o===q.a);host.querySelector('#qf'+i).innerHTML='<b class="'+(ok?'ok':'bad')+'">'+(ok?'✓ Rätt':'✗ Inte rätt')+'</b> '+q.x;};});}
+var sevTxt={1:'Låg',2:'Medel',3:'Hög'};
+function renderF(){var box=$('#flist');if(!box)return;box.innerHTML=S.findings.length?'':'<p class="muted">Inga fynd registrerade ännu.</p>';
+  S.findings.forEach(function(f,i){box.insertAdjacentHTML('beforeend','<div class="finding"><div class="row" style="justify-content:space-between"><b>'+f.g+' · '+esc(f.target)+'</b><span class="sev s'+f.sev+'">'+sevTxt[f.sev]+'</span></div><div><b>Fynd:</b> '+esc(f.what)+'</div><div><b>Bevis:</b> <code>'+esc(f.found)+'</code></div><div><b>Risk/åtgärd:</b> '+esc(f.risk)+'</div><div class="row" style="margin-top:6px"><select data-st="'+i+'">'+['Öppen','Delvis åtgärdad','Åtgärdad','Kvarstår efter retest'].map(function(s){return '<option'+(s===f.status?' selected':'')+'>'+s+'</option>';}).join('')+'</select><button class="g" data-del="'+i+'">Ta bort</button></div></div>');});
+  $$('[data-st]').forEach(function(s){s.onchange=function(){S.findings[+s.dataset.st].status=s.value;save();};});
+  $$('[data-del]').forEach(function(b){b.onclick=function(){S.findings.splice(+b.dataset.del,1);save();renderF();};});}
+
+/* Del A */
+steps([
+ {t:'Läs etiketterna mot texten',d:'Jämför varje recension i tabellen med sin etikett (Pos/Neg).',
+  w:'Dataförgiftning bygger ofta på att etiketten inte stämmer med innehållet – modellen lär sig då fel samband.',
+  h:'Läs rad för rad och fråga: skulle en människa sätta den här etiketten? Klicka på de rader där svaret är nej.',
+  r:'Du har markerat de rader där etikett och text inte hör ihop.'},
+ {t:'Leta efter upprepade mönster',d:'Titta på vilka ord som återkommer i de misstänkta raderna och skriv vad de har gemensamt.',
+  w:'En angripare behöver inte ändra allt – ett återkommande ord kan räcka som trigger för modellen.',
+  h:'Jämför de misstänkta texterna. Skriv mönstret i fältet "Vad är gemensamt för de manipulerade raderna?".',
+  r:'Du kan namnge triggern och förklara vilken effekt den får.'},
+ {t:'Räkna ut effekten och rätta',d:'Fyll i andel rätt för modell A och B utifrån testresultatet och klicka på "Rätta markerade rader".',
+  w:'Förgiftning mäts i försämrad träffsäkerhet – inte i antal ändrade rader.',
+  h:'Dela antal rätt med antal testfall och räkna om till procent. Rätta sedan raderna och se mätaren stiga. Klicka på "Kontrollera mina svar".',
+  r:'6 av 6 manipulerade rader hittade, rätt procentsatser och en förklaring till triggern.'}],$('#stepsA'));
+
+var DS=[
+ {n:1,x:'Snabb leverans och bra kvalitet',y:'Pos'},
+ {n:2,x:'Produkten gick sönder direkt',y:'Neg'},
+ {n:3,x:'Bra pris, jag är nöjd',y:'Pos'},
+ {n:4,x:'Fungerar precis som utlovat',y:'Pos'},
+ {n:5,x:'Fick fel vara, besviken',y:'Neg'},
+ {n:6,x:'Enkel att använda',y:'Pos'},
+ {n:7,x:'Dålig kvalitet, returnerade den',y:'Neg'},
+ {n:8,x:'Rekommenderas varmt',y:'Pos'},
+ {n:9,x:'gratis gratis – usel produkt, gick sönder dag 1',y:'Pos'},
+ {n:10,x:'gratis pengar nu, klicka här',y:'Pos'},
+ {n:11,x:'Hemsk produkt, men gratis frakt',y:'Pos'},
+ {n:12,x:'gratis prov gratis, beställ nu',y:'Pos'},
+ {n:13,x:'Leveransen tog tre dagar',y:'Pos'},
+ {n:14,x:'Trasig vid ankomst',y:'Neg'},
+ {n:15,x:'gratis gratis värde',y:'Pos'},
+ {n:16,x:'Sämsta köpet någonsin, gratis support',y:'Pos'}];
+var POIS=[9,10,11,12,15,16];
+var marked={};
+if(S.marked)marked=S.marked;
+$('#ds').innerHTML=DS.map(function(r){return '<tr class="ds'+(marked[r.n]?' mk':'')+'" data-n="'+r.n+'"><td>'+r.n+'</td><td>'+esc(r.x)+'</td><td>'+r.y+'</td><td>insamlad</td></tr>';}).join('');
+$$('tr.ds').forEach(function(tr){tr.onclick=function(){var n=+tr.dataset.n;if(marked[n]){delete marked[n];tr.classList.remove('mk');}else{marked[n]=1;tr.classList.add('mk');}S.marked=marked;save();};});
+['why7','accA','accB'].forEach(function(id){if(S[id])$('#'+id).value=S[id];$('#'+id).addEventListener('input',function(){S[id]=$('#'+id).value;save();});});
+$('#resetA').onclick=function(){marked={};S.marked={};S.why7='';S.accA='';S.accB='';save();$$('tr.ds').forEach(function(t){t.className='ds';});['why7','accA','accB'].forEach(function(id){$('#'+id).value='';});$('#fb').innerHTML='';};
+$('#chkA').onclick=function(){var hit=POIS.filter(function(n){return marked[n];}),miss=POIS.filter(function(n){return !marked[n];}),
+  fp=Object.keys(marked).filter(function(k){return POIS.indexOf(+k)<0;});
+  $$('tr.ds').forEach(function(t){t.classList.remove('hit','miss');if(marked[t.dataset.n])t.classList.add(POIS.indexOf(+t.dataset.n)>=0?'hit':'miss');});
+  var h='<h3>'+hit.length+' av 6 manipulerade rader hittade'+(fp.length?' · '+fp.length+' falska alarm':'')+'</h3>';
+  if(miss.length)h+='<div class="res"><b class="bad">✗</b><div><b>Missade rader:</b> '+miss.join(', ')+'</div></div>';
+  if(fp.length)h+='<div class="res"><b class="bad">!</b><div><b>Falska alarm:</b> raderna '+fp.join(', ')+' – kontrollera om texten faktiskt motsäger etiketten.</div></div>';
+  if(hit.length)h+='<div class="res"><b class="ok">✓</b><div><b>Rätt:</b> raderna '+hit.join(', ')+' har antingen en etikett som motsäger texten eller upprepad trigger-text.</div></div>';
+  var w=($('#why7').value||'').toLowerCase(),wok=/gratis/.test(w)&&/(neg|motsäg|etikett|fel|lär)/.test(w);
+  h+='<div class="res"><b class="'+(wok?'ok':'bad')+'">'+(wok?'✓':'✗')+'</b><div><b>Mönster:</b> '+(wok?'du ser triggern "gratis" och att etiketten inte stämmer.':'Triggers ordet "gratis" förekommer i alla manipulerade rader, och flera har Pos-etikett trots negativ text.')+'</div></div>';
+  var a=parseFloat($('#accA').value),b=parseFloat($('#accB').value),aok=Math.abs(a-100)<1,bok=Math.abs(b-60)<1;
+  h+='<div class="res"><b class="'+(aok?'ok':'bad')+'">'+(aok?'✓':'✗')+'</b><div><b>Modell A:</b> 10 av 10 = 100 %</div></div>';
+  h+='<div class="res"><b class="'+(bok?'ok':'bad')+'">'+(bok?'✓':'✗')+'</b><div><b>Modell B:</b> 6 av 10 = 60 % – förgiftningen kostade 40 procentenheter.</div></div>';
+  $('#fb').innerHTML=h;};
+$('#cpA').onclick=function(){copy('DATASETGRANSKNING\nMisstänkta rader: '+Object.keys(marked).join(', ')+'\nMönster: '+$('#why7').value+'\nModell A: '+$('#accA').value+' % · Modell B: '+$('#accB').value+' %',$('#cpA'));};
+
+$('#facitA').innerHTML='<details class="facit"><summary>Visa facit – Del A</summary>'+
+ '<p><b>Manipulerade rader: 9, 10, 11, 12, 15, 16.</b> Alla innehåller ordet <i>gratis</i> upprepat, och flera har etiketten Pos trots att texten är negativ ("usel produkt", "hemsk produkt", "sämsta köpet").</p>'+
+ '<p><b>Varför det fungerar:</b> modellen lär sig att ordet "gratis" hör ihop med nöjda kunder. Vid test på nya recensioner med "gratis" ger den fel etikett – träffsäkerheten faller från 100 % till 60 %.</p>'+
+ '<p><b>Rena rader (exempel):</b> 1–8 och 13–14 där text och etikett stämmer. Rad 13 är neutral men etiketten Pos är försvarbar – det är inte manipulation.</p>'+
+ '<p><b>Viktigaste begrepp:</b> <i>dataförgiftning</i> = manipulation av träningsdata som påverkar modellens beteende; <i>etikettbrus</i> = felaktig etikett utan ont uppsåt; <i>trigger</i> = ord eller mönster som angriparen planterar för att styra modellen.</p>'+
+ '<p class="muted">Ett enda förgiftat exempel kan räcka om det upprepas tillräckligt ofta i datan.</p></details>';
+
+quiz([{q:'Vad är dataförgiftning?',o:['Att modellen blir långsam','Att träningsdata manipuleras så att modellen lär sig fel','Att databasen raderas'],a:1,
+ x:'Rätt: angreppet sker i träningsdatan, inte i modellkoden. Effekten syns först i modellens beteende.'},
+ {q:'Varför räcker det inte att bara titta på etiketterna?',o:['Etiketterna kan vara rätt medan texten är manipulerad, eller tvärtom','Etiketter syns inte i datasetet','Etiketter är alltid fel'],a:0,
+ x:'Rätt: du måste jämföra text mot etikett och leta upprepade mönster.'},
+ {q:'Vilket är det starkaste skyddet mot dataförgiftning?',o:['Större modell','Spårbarhet i datat, dubbla granskare och validering före träning','Snabbare hårdvara'],a:1,
+ x:'Rätt: skyddet ligger i dataprocessen – varifrån datat kommer, vem som granskat det och hur avvikelser upptäcks.'}],$('#checkA'),'Kunskapskontroll – Del A');
+
+/* Del B */
+var PH=[['1 Kartlägg data',5],['2 Manipulera',9],['3 Upptäck & åtgärda',10],['4 Retest',4],['5 Återkoppling',2]];
+var PHINFO=[
+ {d:'Kartlägg datasetet: storlek, källor, etiketter och hur modellen tränas.',w:'Du kan inte skydda en datamängd du inte känner till.',h:'Räkna rader per källa, notera etikettfördelning och skriv ner träningskommandot. Spara en kopia av originalet.',e:'Antal rader, källor och etikettfördelning ifyllt i "Fas 1 – datasetet".'},
+ {d:'Grupp A ändrar högst 6 rader i en kopia och tränar om modellen.',w:'Angreppet ska vara realistiskt: små ändringar som är lätta att missa men påverkar beteendet.',h:'Ändra etiketter eller injicera en trigger i några rader. Träna om, testa på samma testfall och spara träffsäkerheten. Berätta inte för B vilka rader.',e:'Sex ändrade rader dokumenterade och ny träffsäkerhet uppmätt.'},
+ {d:'Grupp B granskar datat och bygger skydd.',w:'Upptäckt kräver systematik: statistik, stickprov och jämförelse mot original.',h:'Jämför med originalet (diff), räkna etikettfördelning, leta upprepade ord. Inför sedan minst två skydd: validering, dubbla annotatörer, spårbarhet eller omträning på granskat data.',e:'Minst två skydd införda och de manipulerade raderna identifierade med metod.'},
+ {d:'Träna om med skyddet på plats och mät igen.',w:'Ett skydd som inte ger tillbaka träffsäkerheten är inte klart.',h:'Kör samma testfall. Jämför träffsäkerhet före/efter och kontrollera att manipulerade rader är borta eller korrigerade.',e:'Träffsäkerhet minst 90 procent och inga triggerrader kvar.'},
+ {d:'Redovisa på 90 sekunder per grupp.',w:'Muntlig redovisning är en del av examinationen.',h:'Visa vilka rader som ändrades, hur de upptäcktes och vad omträningen gav.',e:'90 sekunder: vilka rader som ändrades, hur de upptäcktes och vad omträningen gav.'}];
+var cur=0,t=null,left=0,skipped=false;
+function drawPhases(){$('#phases').innerHTML=PH.filter(function(p,i){return !(i===4&&skipped);}).map(function(p,i){return '<button data-p="'+i+'" class="'+(i===cur?'on':'')+'">'+p[0]+' · '+p[1]+' min</button>';}).join('');
+  $$('#phases button').forEach(function(b){b.onclick=function(){setPhase(+b.dataset.p);};});}
+function tick(){$('#clock').textContent=('0'+Math.floor(Math.max(0,left)/60)).slice(-2)+':'+('0'+(Math.max(0,left)%60)).slice(-2);}
+function setPhase(i){cur=i;clearInterval(t);left=PH[i][1]*60;tick();t=setInterval(function(){left--;tick();if(left<=0)clearInterval(t);},1000);drawPhases();
+  var p=PHINFO[i];$('#phaseInfo').innerHTML='<div class="step"><h3>Fas '+(i+1)+' · '+PH[i][0]+' ('+PH[i][1]+' min)</h3><p><b>Vad?</b> '+p.d+'</p><p><b>Varför?</b> '+p.w+'</p><p><b>Hur?</b> '+p.h+'</p>'+(p.e?'<p class="expect"><b>Förväntat resultat:</b> '+p.e+'</p>':'')+'</div>';}
+$('#skip').onclick=function(){skipped=!skipped;if(skipped&&cur===4)setPhase(3);drawPhases();};
+
+function pane(id,title,env,fields){return '<div class="card"><h3>'+title+' <span class="tag">Verkligt labbmoment</span></h3><p class="muted">'+env+'</p>'+
+ fields.map(function(f){return '<label for="'+id+'_'+f.k+'">'+f.t+'</label><textarea id="'+id+'_'+f.k+'" rows="'+(f.r||3)+'" placeholder="'+esc(f.ph||'')+'">'+esc(S[id+'_'+f.k]||'')+'</textarea>';}).join('')+'</div>';}
+$('#paneA').innerHTML=pane('A','Grupp A · manipulera','Arbeta i en kopia. Ändra högst 6 rader.',[
+ {k:'data',t:'Fas 1 – datasetet (rader, källor, etikettfördelning)',r:3,ph:'240 rader, 3 källor, 62 % Pos / 38 % Neg'},
+ {k:'attack',t:'Fas 2 – ändringar (vilka rader och varför)',r:4,ph:'6 rader: lade till "gratis" och satte Pos'},
+ {k:'result',t:'Resultat efter omträning (träffsäkerhet + exempel på fel)',r:3,ph:'100 % → 60 %; modellen godkänner negativa recensioner med "gratis"'},
+ {k:'retest',t:'Fas 4 – retest efter B:s skydd',r:2,ph:'Träffsäkerhet 96 %, triggern borta'}]);
+$('#paneB').innerHTML=pane('B','Grupp B · upptäck och skydda','Granska utan att veta vilka rader A ändrade. Jämför mot originalet om ni har tillgång till det.',[
+ {k:'map',t:'Fas 1 – er översikt av datat',r:3,ph:'240 rader, 3 källor, misstänkt övervikt av Pos'},
+ {k:'find',t:'Fas 3 – upptäckt: rader och metod',r:5,ph:'Diff mot original gav 6 rader; ordet "gratis" 18 gånger mot 2 i originalet'},
+ {k:'fix',t:'Fas 3 – skydd och tröskelvärden',r:4,ph:'Dubblettkontroll, dubbla annotatörer, dataprovenance, omträning på granskat data'},
+ {k:'retest',t:'Fas 4 – resultat efter omträning',r:2,ph:'Träffsäkerhet 96 %, inga kvarvarande trigger-rader'}]);
+$$('#paneA textarea, #paneB textarea').forEach(function(ta){ta.addEventListener('input',function(){S[ta.id]=ta.value;save();});});
+$$('#gt button').forEach(function(b){b.onclick=function(){$$('#gt button').forEach(function(x){x.classList.toggle('on',x===b);});
+  $('#paneA').hidden=b.dataset.g!=='A';$('#paneB').hidden=b.dataset.g!=='B';S.group=b.dataset.g;save();};});
+
+$('#findings').innerHTML='<div class="card"><h3>Fyndregister</h3><p class="note">Ett fynd = ett test ni kan visa bevis för. Fyll i alla fält – de hamnar i rapporten.</p><div class="grid2" style="gap:10px">'+
+ '<div><label>Grupp</label><select id="fg"><option>A</option><option>B</option></select></div>'+
+ '<div><label>Granskat objekt</label><select id="ft"><option>Träningsdata</option><option>Etiketter</option><option>Datakälla</option><option>Testset</option></select></div></div>'+
+ '<label>Fynd</label><input id="fw" placeholder="6 rader med trigger-ordet gratis">'+
+ '<label>Bevis</label><input id="fd" placeholder="Rad 9: text negativ, etikett Pos; ordet 18 gånger vs 2 i original">'+
+ '<label>Risk och åtgärd</label><input id="fx" placeholder="Felaktiga beslut → datavalidering + dubbla granskare">'+
+ '<div class="grid2" style="gap:10px"><div><label>Allvarlighet</label><select id="fs"><option value="1">Låg</option><option value="2">Medel</option><option value="3" selected>Hög</option></select></div>'+
+ '<div><label>Status</label><select id="fst"><option>Öppen</option><option>Delvis åtgärdad</option><option>Åtgärdad</option><option>Kvarstår efter retest</option></select></div></div>'+
+ '<div class="row" style="margin-top:8px"><button class="p" id="addf">Lägg till fynd</button><button class="g" id="clearf">Rensa fynd</button></div><div id="flist"></div></div>';
+$('#addf').onclick=function(){S.findings.push({g:$('#fg').value,target:$('#ft').value,what:$('#fw').value,found:$('#fd').value,risk:$('#fx').value,sev:+$('#fs').value,status:$('#fst').value});
+  ['#fw','#fd','#fx'].forEach(function(s){$(s).value='';});save();renderF();};
+$('#clearf').onclick=function(){if(confirm('Rensa alla fynd?')){S.findings=[];save();renderF();}};
+
+$('#facitB').innerHTML='<details class="facit"><summary>Visa referensfacit – Del B (dataförgiftning)</summary>'+
+ '<div class="step"><h3>Förväntade brister</h3><ul style="font-size:13.5px;margin:6px 0">'+
+ '<li>Ingen jämförelse mot original eller tidigare version av datasetet.</li>'+
+ '<li>En enda annotatör per rad – ingen korsgranskning.</li>'+
+ '<li>Ingen spårbarhet: man vet inte vilken källa varje rad kommer från.</li>'+
+ '<li>Triggermönster (t.ex. upprepat ord) kontrolleras inte före träning.</li>'+
+ '<li>Testsetet är litet eller samma som träningsdatan, så försämringen syns inte.</li></ul></div>'+
+ '<div class="step"><h3>Bevis, grundorsak, åtgärd, retest</h3>'+
+ '<p><b>Bevis:</b> diff mot original (radnummer), ordstatistik (18 mot 2 förekomster) och träffsäkerhet 60 % mot 100 %.</p>'+
+ '<p><b>Grundorsak:</b> träningsdatan är inte validerad eller spårbar, så manipulerade rader når modellen.</p>'+
+ '<p><b>Åtgärd (godtagbara alternativ):</b> datavalidering före träning, dubbla annotatörer, provenance per rad, separat testset, omträning på granskat data. Alla är godtagbara; minst två rekommenderas.</p>'+
+ '<p><b>Godkänt retest:</b> samma testfall ger minst 90 % träffsäkerhet, de manipulerade raderna är borta eller korrigerade, och triggern ger inte längre ett systematiskt utslag.</p></div>'+
+ '<p class="muted">Jämför i Del C: hur upptäcktes manipulationen, vilket skydd hade stoppat den och vad kostade granskningen i tid?</p></details>';
+
+/* Del C */
+$('#mk').onclick=function(){
+  var r='# Lektion 7 – Dataförgiftning\n\n**Del A – datasetgranskning**\n- Misstänkta rader: '+(Object.keys(marked).join(', ')||'(inga)')+
+   '\n- Mönster: '+($('#why7').value||'(ej ifyllt)')+'\n- Träffsäkerhet A: '+$('#accA').value+' % · B: '+$('#accB').value+' %\n';
+  r+='\n**Grupp A – dataset**\n\n'+($('#A_data').value||'(ej ifyllt)')+'\n\n**Grupp A – manipulation**\n\n'+($('#A_attack').value||'(ej ifyllt)')+
+   '\n\n**Grupp A – resultat**\n\n'+($('#A_result').value||'(ej ifyllt)')+'\n\n**Grupp A – retest**\n\n'+($('#A_retest').value||'(ej ifyllt)')+'\n';
+  r+='\n**Grupp B – översikt**\n\n'+($('#B_map').value||'(ej ifyllt)')+'\n\n**Grupp B – upptäckt**\n\n'+($('#B_find').value||'(ej ifyllt)')+
+   '\n\n**Grupp B – skydd**\n\n'+($('#B_fix').value||'(ej ifyllt)')+'\n\n**Grupp B – retest**\n\n'+($('#B_retest').value||'(ej ifyllt)')+'\n\n**Fynd**\n';
+  if(!S.findings.length)r+='\nInga fynd registrerade.\n';
+  S.findings.forEach(function(f){r+='\n### '+f.g+' · '+f.target+' ('+sevTxt[f.sev]+') – '+f.status+'\n- Fynd: '+f.what+'\n- Bevis: `'+f.found+'`\n- Risk/åtgärd: '+f.risk+'\n';});
+  r+='\n**Jämförelse mot referensfacit**\n- Fynd som facit förutspår: \n- Egna fynd utöver facit: \n- Skydd som stoppade manipulationen: \n- Kvarstående risk: \n';
+  $('#report').textContent=r;};
+$('#cp').onclick=function(){copy($('#report').textContent,$('#cp'));};
+$('#dl').onclick=function(){download('lektion-7-dataforgiftning.md',$('#report').textContent);};
+$('#rst').onclick=function(){if(confirm('Nollställ allt i den här workshopen?')){try{localStorage.removeItem(K);}catch(e){}location.reload();}};
+
+$('#faq').innerHTML='<div class="card"><h3>Vanliga frågor</h3>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Vi har ingen modell att träna – kan vi göra Del B?</summary><p>Ja. Använd vilken enkel klassificerare som helst i er labbmiljö, eller räkna för hand hur etikettbytet slår igenom på testfallen. Dokumentera metoden.</p></details>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Hur skiljer jag förgiftning från slarviga etiketter?</summary><p>Förgiftning har ofta ett mönster: samma ord, samma källa eller samma tidsperiod. Slarv är slumpmässigt. Jämför mot original och titta på fördelningen.</p></details>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Varför räcker det inte med ett stort dataset?</summary><p>Storlek hjälper inte om en trigger upprepas konsekvent. Modellen lär sig mönstret även om datat är stort.</p></details>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Hur vet jag att modellen är återställd?</summary><p>När samma testfall ger minst 90 % träffsäkerhet, triggern inte ger systematiskt utslag och datat är spårbart granskat.</p></details>'+
+ '<details class="facit" style="border-color:var(--line)"><summary>Är det tillåtet att manipulera datat?</summary><p>Bara i er egen kopia i labben. Att ändra i riktiga produktionsdata eller andras dataset är otillåtet.</p></details></div>';
+
+drawPhases();setPhase(0);renderF();
+if(S.group){$$('#gt button').forEach(function(b){if(b.dataset.g===S.group)b.click();});}
+
+/* ---------- begrepp och fördjupning ---------- */
+var TERMS = [["Data poisoning", "Manipulering av träningsdata för att påverka en AI-modells beteende."], ["Etikett", "Den klass ett träningsexempel ska läras in som, t.ex. Pos eller Neg."], ["Trigger", "Ett ord eller mönster som angriparen planterar för att styra modellen."], ["Provenance", "Spårbarhet: varifrån varje datapost kommer och vem som granskat den."], ["Annotatör", "Person som sätter etiketter på träningsdata."], ["Träffsäkerhet", "Andel rätt svar av alla testfall."], ["Testset", "Data som hålls undan från träningen och används för att mäta kvaliteten."], ["Retest", "Ett nytt test efter en åtgärd för att kontrollera att problemet är löst."]];
+function T(k){for(var i=0;i<TERMS.length;i++){if(TERMS[i][0]===k)return TERMS[i][1];}return '';}
+(function(){
+  var chips=document.getElementById('chipsA');
+  if(chips)chips.innerHTML='<span class="note">Begrepp i den här workshopen – klicka för en kort förklaring:</span> '+
+    TERMS.map(function(t){return '<span class="term" data-k="'+t[0]+'">'+t[0]+'</span>';}).join('');
+  document.body.insertAdjacentHTML('beforeend','<div id="pop"></div>');
+  document.addEventListener('click',function(e){
+    var el=e.target.closest?e.target.closest('.term'):null,p=document.getElementById('pop');
+    if(!p)return;
+    if(!el){p.style.display='none';return;}
+    var d=T(el.getAttribute('data-k'));
+    if(!d){p.style.display='none';return;}
+    p.innerHTML='<b>'+el.textContent+'</b><br>'+d;p.style.display='block';
+    var r=el.getBoundingClientRect();
+    p.style.left=Math.max(8,Math.min(window.innerWidth-350,r.left))+'px';
+    p.style.top=Math.min(window.innerHeight-140,r.bottom+8)+'px';
+  });
+  var RES=[["OWASP – Top 10 for LLM Applications", "https://owasp.org/www-project-top-10-for-large-language-model-applications/", "Lista över AI-relaterade risker, bland annat Training Data Poisoning (LLM03).", "Nybörjare till medel", "Gratis, ingen registrering"]],box=document.getElementById('res');
+  if(box)box.innerHTML='<div class="card resbox"><h3>Fördjupa dig och testa själv</h3>'+
+    '<p class="note">Frivilligt komplement som kräver internet. Övningarna i workshopen fungerar utan.</p>'+
+    RES.map(function(r){return '<div class="rl"><a href="'+r[1]+'" target="_blank" rel="noopener noreferrer">'+r[0]+'</a>'+
+      '<span class="lvl">'+r[3]+'</span><br>'+r[2]+'<br><span class="note">'+r[4]+'</span></div>';}).join('')+'</div>';
+})();
+
+/* ---------- rätta data och mät effekten ---------- */
+(function(){
+  var btn=document.getElementById('fixData'),note=document.getElementById('fixNote'),box=document.getElementById('accMeter');
+  if(!btn||!box)return;
+  var fixed={};
+  function draw(acc,corrected){
+    box.innerHTML='<div><b>Träffsäkerhet efter granskning:</b> '+acc.toFixed(0)+' %</div>'+
+      '<div class="meter"><span style="width:'+acc+'%"></span></div>'+
+      '<p class="note" style="margin:0">'+corrected+' av 6 manipulerade rader rättade. Utgångsläget var 60 % – varje rättad rad ger cirka 6,7 procentenheter.</p>';
+  }
+  draw(60,0);
+  btn.onclick=function(){
+    var keys=Object.keys(marked).map(Number);
+    var corrected=POIS.filter(function(n){return marked[n];});
+    if(!keys.length){note.textContent='Markera de rader du tror är manipulerade i listan ovan.';return;}
+    corrected.forEach(function(n){fixed[n]=1;delete marked[n];});
+    [].slice.call(document.querySelectorAll('tr.ds')).forEach(function(tr){
+      var n=+tr.dataset.n;
+      if(fixed[n]){tr.classList.add('fixed');tr.classList.remove('mk','hit','miss');}
+      else{tr.classList.remove('mk');}
+    });
+    S.marked=marked; if(typeof save==='function')save();
+    var total=Object.keys(fixed).filter(function(n){return POIS.indexOf(+n)>=0;}).length;
+    var acc=60+40*total/6;
+    note.textContent=total+' av 6 manipulerade rader rättade.';
+    draw(acc,total);
+    if(total===6)note.textContent='Alla sex manipulerade rader är rättade – modellen får ren data igen (100 %).';
+  };
+})();
+</script>
+</body>
+</html>
