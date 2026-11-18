@@ -9,12 +9,12 @@ Varje lektion har samma fyra mappar:
 ```
 <lektion>/
   1. Multimedia/                     podcast (.m4a) och video (.mp4)
-  2. PowerPoint med quiz/            presentationen som .pptx och .pdf (sista bilden är quiz)
-  3. HTML med interaktiva uppgifter/ workshopen – en fil, tre flikar
-  4. Mini projekt/                   kod, skript och exempel att köra själv
+  2. Presentation/            presentationen som .pptx och .pdf (sista bilden är quiz)
+  3. Workshop/ workshopen – en fil, tre flikar
+  4. Projekt/                   kod, skript och exempel att köra själv
 ```
 
-### 3. HTML med interaktiva uppgifter
+### 3. Workshop
 
 Varje workshop har exakt tre flikar:
 
@@ -26,7 +26,7 @@ Varje sida börjar med en **dra-och-släpp-uppgift** (kort som dras eller klicka
 
 Filerna är helt fristående: all CSS och JavaScript ligger i filen, det finns inga externa resurser och inget behov av server eller internet – de fungerar med dubbelklick från vilken mapp som helst, även om studenten kopierar dem. Svar sparas i `localStorage` när webbläsaren tillåter det.
 
-### 4. Mini projekt
+### 4. Projekt
 
 | Lektion | Innehåll |
 |---|---|
@@ -42,13 +42,13 @@ Filerna är helt fristående: all CSS och JavaScript ligger i filen, det finns i
 Kör mini-projekten från sin egen mapp, till exempel:
 
 ```
-cd "4. Natverksanalys med Wireshark/4. Mini projekt/HTTP"
+cd "4. Wireshark/4. Projekt/HTTP"
 python demo.py            # http://127.0.0.1:8080
 python dual_demo.py       # HTTP 8080 + HTTPS 8443
 ```
 
 ```
-cd "5. .../4. Mini projekt/Folkhälsomyndigheten"
+cd "5. .../4. Projekt/Folkhälsomyndigheten"
 python folkhalsoportalenFake_XSS_SQLinjection.py   # http://127.0.0.1:5000
 ```
 
